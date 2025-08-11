@@ -1,10 +1,10 @@
-"""Utility functions for level 1 quasimodular forms"""
 from sage.all import *
 
-
+# Level 1 quasimodular forms
 QM = QuasiModularForms(1)
 E2, E4, E6 = QM.gen(0), QM.gen(1), QM.gen(2)  # generators, normalized as constant terms = 1
 Disc = (1 / 1728) * (E4 ** 3 - E6 ** 2)  # discriminant form
+t = var('t')  # variable for the positive imaginary axis
 
 # Depth
 def qm_depth(qm):
@@ -72,27 +72,29 @@ def qm_basis(w, s):
         for i in range(w_ // 4 + 1):
             if (w_ - 4 * i) % 6 == 0:
                 j = (w_ - 4 * i) // 6
-                basis.append(E2^r * E4^i * E6^j)
+                basis.append(E2 ** r * E4 ** i * E6 ** j)
     return basis
 
 # Vanishing order at the cusp
-def qm_cusp_order(qm):
-    N = 1000
-    c_ = qm_coefficients(qm, N)
+def qm_cusp_order(qm, prec=100):
+    #c_ = qm_coefficients(qm, N)
+    c_ = qm.coefficients(list(range(prec + 1)))
     r = 0
-    for i in range(N):
+    for i in range(prec + 1):
         if c_[i] != 0:
             break
         r += 1
+        if i == prec:
+            raise ValueError("The precision is not enough to determine the cusp order")
     return r
 
 # First nonzero Fourier coefficient
-def qm_first_nonzero_coeff(qm):
-    N = 1000
-    c_ = qm_coefficients(qm, N)
-    for i in range(N):
+def qm_first_nonzero_coeff(qm, prec=100):
+    c_ = qm.coefficients(list(range(prec + 1)))
+    for i in range(prec + 1):
         if c_[i] != 0:
             return c_[i]
+    raise ValueError("The precision is not enough to determine the first nonzero coefficient")
 
 # Normalize to make the first nonzero coefficient as 1
 def qm_normalize(qm):
@@ -110,15 +112,26 @@ def print_qm(qm, name, prec=20):
     print("cusp order", qm_cusp_order(qm))
     print("polynomial", qm.polynomial().factor(), "\n")
 
-
-# Express a given quasimodular form as a linear combination of other quasimodular forms.
-def qm_find_lin_comb(qm, ls):
+# Express a quasimodular form as a linear combination of given quasimodular forms
+def qm_find_lin_comb(qm, ls, N=None):
     w = qm.weight()
     s = qm_depth(qm)
-    N = dim_qm(w, s)
-    m = matrix([qm_coefficients(qm_, N) for qm_ in ls])
-    c_ = vector(qm_coefficients(qm, N))
+    if N is None:
+        N = dim_qm(w, s)
+    #m = matrix([qm_coefficients(qm_, N) for qm_ in ls])
+    #c_ = vector(qm_coefficients(qm, N))
+    m = matrix([qm_.coefficients(list(range(N))) for qm_ in ls])
+    c_ = vector(qm.coefficients(list(range(N))))
     x_ = m.solve_left(c_)
     r = sum(x_[j] * ls[j] for j in range(len(ls)))
     assert qm == r
     return x_
+
+# Quasimodular form as a function on the positive imaginary axis
+def qm_to_func(qm, prec=100):
+    t = var('t')
+    c = qm.q_expansion(prec).list()
+    func = c[0]
+    for i in range(1, len(c)):
+        func += c[i] * exp(-i * 2 * pi * t)
+    return func

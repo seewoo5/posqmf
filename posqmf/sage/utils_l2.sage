@@ -1,4 +1,8 @@
-# E2_, E4_, E6_ are the usual Eisenstein series of level 1 and weight 2, 4, 6, but in the space of level 2 forms
+import os
+
+load(os.path.dirname(os.path.abspath(__file__)) + "/sage/utils_l1.sage")
+
+# H2 = Theta_2^4, H4 = Theta_4^4, E2_ = E2
 QM2.<H2, H4, E2_> = QQ['H2,H4,E2']
 E4_ = H2^2 + H2 * H4 + H4^2
 E6_ = (H2 + 2 * H4) * (2 * H2 + H4) * (H4 - H2) / 2
@@ -81,6 +85,12 @@ for i in range(1, prec):
     H4ser += (-1)^i * r4(i) * qh^i
 H2ser = H3ser - H4ser
 
+# q-series of log lambda_S
+LSser = qh
+for i in range(1, prec):
+    LSser += (sigma(2 * i + 1, 1) / (2 * i + 1)) * qh^(2 * i + 1)
+LSser *= (-16)
+
 # q-series of Eisenstein series
 E2ser = 1
 for i in range(1, prec):
@@ -96,13 +106,17 @@ for i in range(1, prec):
 
 def qm2_q_series(qm, prec=20):
     # Recall that the series is in q^(1/2)
-    r = 0
+    r = qh - qh
     H2ser_ = H2ser.series(qh, prec)
     H4ser_ = H4ser.series(qh, prec)
     E2ser_ = E2ser.series(qh, prec)
     for (a, b, e), coeff in qm.dict().items():
         r += coeff * H2ser_^a * H4ser_^b * E2ser_^e
     return r.series(qh, prec)
+
+# Fourier coefficients
+def qm2_coefficients(qm, prec=20):
+    return qm2_q_series(qm, prec).list()
 
 # Cusp order
 def qm2_cusp_order(qm):
@@ -129,7 +143,10 @@ def print_qm2(qm, name, prec=30):
     print("weight", qm2_weight(qm))
     print("depth", qm2_depth(qm))
     print("cusp order", qm2_cusp_order(qm))
-    print("polynomial", qm.factor(), "\n")
+    if qm == 0:
+        print("polynomial", 0, "\n")
+    else:
+        print("polynomial", qm.factor(), "\n")
 
 def dim_m2(w):
     return w / 2 + 1
@@ -154,6 +171,23 @@ def qm2_find_lin_comb(qm, ls):
     assert r == qm
     return x_
 
+def qm2_to_func(qm, prec=100):
+    qser = qm2_q_series(qm, prec=prec)
+    c = qser.list()
+    func = c[0]
+    for i in range(1, len(c)):
+        func += c[i] * exp(-i * pi * t)  # note q^(1/2) = e^(sqrt(-1) * pi * z)
+    return func
+
+# components
+def qm2_modular_components(qm):
+    d = qm.dict()
+    tG = QM2(0)
+    psi = QM2(0)
+    for (a, b, e), coeff in d.items():
+        psi += coeff * H2^a * H4^b * E2_^e
+    return tG, psi
+
 # Rewrite level 1 quasimodular forms as level Gamma(2) forms
 def l1_to_l2(qm):
     r = QM2(0)
@@ -161,11 +195,9 @@ def l1_to_l2(qm):
         r += coeff * E2_^d2 * E4_^d4 * E6_^d6
     return r
 
-def qm2_to_func(qm, prec=100):
-    qser = qm2_q_series(qm, prec=prec)
-    c = qser.list()
-    t = var('t')
-    func = c[0]
-    for i in range(1, len(c)):
-        func += c[i] * exp(-i * pi * t)  # note q^(1/2) = e^(sqrt(-1) * pi * z)
-    return func
+# Rewrite level 1 quasimodular forms as level Gamma(2) forms
+def l1_to_l2(qm):
+    r = QM2(0)
+    for (d2, d4, d6), coeff in qm.polynomial().dict().items():
+        r += coeff * E2_^d2 * E4_^d4 * E6_^d6
+    return r
