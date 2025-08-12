@@ -14,4 +14,4 @@ from posqmf import *
 
 ## Algebraic proof of modular form inequalities for optimal sphere packings
 
-`sphere_packing_ineq.ipynb` checkes the identities in the paper [Algebraic proof of modular form inequalities for optimal sphere packings](https://arxiv.org/abs/2406.14659).
+`sphere_packing_ineq.ipynb` checks the identities in the paper [Algebraic proof of modular form inequalities for optimal sphere packings](https://arxiv.org/abs/2406.14659).
