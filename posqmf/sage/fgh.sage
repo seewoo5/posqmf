@@ -5,7 +5,7 @@ load(os.path.dirname(os.path.abspath(__file__)) + "/sage/utils_l1.sage")
 load(os.path.dirname(os.path.abspath(__file__)) + "/sage/utils_l2.sage")
 
 
-@lru_cache(maxsize=None)
+@lru_cache
 def pos_eigenform(weight):
     # quasimiodular form for (-1)^(d/4)-eigenform of Fourier transform by Feigenbaum-Grabner-Hardin
     w = weight
@@ -39,13 +39,13 @@ def pos_eigenform(weight):
         ssfw_ = qm_serre_derivative(qm_serre_derivative(fw_, w_ - 2), w_)
         r = (w_ - 5) * (w_ - 6) * E4 * fw_ - 36 * ssfw_
         r *= w_ * (w_ - 4) / (192 * (w_ + 2) * (w_ - 3) * (w_ - 5) * (w_ - 10))
-        assert qm_cusp_order(r) == (w - 4) / 4
+        assert qm_cusp_order(r, prec=(w - 4) / 4 + 5) == (w - 4) / 4
     else:  # w % 4 == 2:
         w_ = w - 2
         fw_ = pos_eigenform(w_ - 2)
         ssfw_ = qm_serre_derivative(qm_serre_derivative(fw_, w_ - 4), w_ - 2)
         r = (w_ - 10) * (w_ - 11) * E4 * fw_ - 36 * ssfw_
         r *= (w_ - 4) * (w_ - 8) / (192 * (w_ - 5) * (w_ - 6) * (w_ - 7) * (w_ - 18))
-        assert qm_cusp_order(r) == (w - 6) / 4
+        assert qm_cusp_order(r, prec=(w - 6) / 4 + 5) == (w - 6) / 4
     
     return r
