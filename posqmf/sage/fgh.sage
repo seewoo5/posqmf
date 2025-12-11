@@ -49,3 +49,18 @@ def pos_eigenform(weight):
         assert qm_cusp_order(r, prec=(w - 6) / 4 + 5) == (w - 6) / 4
     
     return r
+
+@lru_cache
+def Gtilde(w):
+    assert w % 4 == 0, "Weight must be divisible by 4"
+    if w == 0:
+        return QM(3 / (2^11 * 7))
+    elif w == 4:
+        return (5 / 2^18 / 11) * E4
+    else:
+        w_ = w - 4
+        Gw_ = Gtilde(w_)
+        ssGw_ = qm_serre_derivative(qm_serre_derivative(Gw_, w_), w_ + 2)
+        r = ((w_ + 8) * (w_ + 9) / 36) * E4 * Gw_ - ssGw_
+        r *= 3 * (w_ + 10) * (w_ + 14) / (16 * (w_ + 4) * (w_ + 9) * (w_ + 11) * (w_ + 16))
+        return r
