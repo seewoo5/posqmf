@@ -1,7 +1,4 @@
 .ipynb_checkpoints/*
 .DS_Store
 
-posqmf/extremal_qm.py
-posqmf/utils_l1.py
-posqmf/utils_l2.py
-posqmf/utils_rqm.py
+posqmf/*.py
