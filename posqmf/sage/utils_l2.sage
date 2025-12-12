@@ -194,10 +194,3 @@ def l1_to_l2(qm):
     for (d2, d4, d6), coeff in qm.polynomial().dict().items():
         r += coeff * E2_^d2 * E4_^d4 * E6_^d6
     return r
-
-# Rewrite level 1 quasimodular forms as level Gamma(2) forms
-def l1_to_l2(qm):
-    r = QM2(0)
-    for (d2, d4, d6), coeff in qm.polynomial().dict().items():
-        r += coeff * E2_^d2 * E4_^d4 * E6_^d6
-    return r
