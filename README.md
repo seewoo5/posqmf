@@ -6,7 +6,7 @@ Requirements: SageMath version >= 10.6
 
 ## `preparse.sh`
 
-Running `sh preparse.sh` will generate python scripts under the directory `posqmf`, from the `sage` files in `posqmf/sage`. This allows you to use import them directly as
+Running `sh preparse.sh` will generate python scripts (including `__init__.py`) under the directory `posqmf`, from the `sage` files in `posqmf/sage`. This allows you to use import them directly as
 
 ```
 from posqmf import *
