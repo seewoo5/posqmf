@@ -19,7 +19,7 @@ private lemma sigma0_mul_rpow_le_pow7 (m : ℕ) (hm : 1 ≤ m) :
         (by exact_mod_cast hm) (show (13:ℝ)/2 ≤ 7 from by norm_num))
         (by norm_cast)
 
-/- Inequality (59) -/
+/- Inequality (60) -/
 theorem main_theorem (m : ℕ) (hm_ge : 3 ≤ m) :
     (2520 : ℝ) / 3 * m ^ 9 -
     18224 / 21 * (divisorCount m : ℝ) * m ^ (11 / 2 : ℝ) +

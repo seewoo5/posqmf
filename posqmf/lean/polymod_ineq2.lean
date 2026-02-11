@@ -97,8 +97,8 @@ private lemma difference_positive (k : ℕ) (hk : 1 ≤ k) :
     128 * ((2560 : ℝ) / 3 * ((2 : ℝ) ^ ((7 : ℝ) * k / 2)) ^ 2 -
           1812 * k * (2 : ℝ) ^ ((7 : ℝ) * k / 2) - 40 / 3) := by
   linarith [difference_algebraic k,
-    mul_pos (mul_pos (by norm_num : (0 : ℝ) < 1812) (two_rpow_pos ((7 : ℝ) * k / 2)))
-      (coeff_positive k hk)]
+            mul_pos (mul_pos (by norm_num : (0 : ℝ) < 1812)
+              (two_rpow_pos ((7 : ℝ) * k / 2))) (coeff_positive k hk)]
 
 private lemma quadratic_lower_bound_pos (k : ℕ) (hk : 1 ≤ k) :
     (2560 : ℝ) / 3 * ((2 : ℝ) ^ ((7 : ℝ) * k / 2)) ^ 2 -
@@ -111,7 +111,8 @@ private lemma quadratic_lower_bound_pos (k : ℕ) (hk : 1 ≤ k) :
       exact quadratic_base_case
     · simp only [Nat.cast_add, Nat.cast_one]
       have hn' := Nat.lt_succ_iff.mp hn
-      linarith [difference_positive n hn', mul_pos (by norm_num : (128 : ℝ) > 0) (ih hn')]
+      linarith [difference_positive n hn', mul_pos (by norm_num : (128 : ℝ) > 0)
+                (ih hn')]
 
 private lemma factor_middle_term (k : ℕ) :
     17 / 21 * ((k + 2 : ℝ) * (2 : ℝ) ^ (((7 : ℝ) * k + 11) / 2) +
@@ -130,7 +131,7 @@ private lemma inner_expression_lower_bound (k : ℕ) (hk : 1 ≤ k) :
   rw [seven_k_as_square k, factor_middle_term k]
   nlinarith [two_rpow_pos ((7 : ℝ) * k / 2), coeff_multiplied_bound k hk]
 
-/- Inequality (60) -/
+/- Inequality (61) -/
 theorem main_inequality (k : ℕ) (hk : 1 ≤ k) :
     (2560 : ℝ) / 3 * (2 : ℝ) ^ (9 * k) - 40 / 3 * (2 : ℝ) ^ (2 * k) -
     17 / 21 * ((k + 2 : ℝ) * (2 : ℝ) ^ ((11 : ℝ) / 2 * (k + 1)) +
