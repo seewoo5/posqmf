@@ -1,4 +1,6 @@
-.ipynb_checkpoints/*
 .DS_Store
+.claude
+.ipynb_checkpoints
+.lake
 
 posqmf/*.py
