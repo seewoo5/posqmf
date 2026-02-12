@@ -1,12 +1,14 @@
 # Utility codes
 
-The sage codes in the directory `sage` provides several functions for computations with quasimodular forms and extremal quasimodular forms.
+## Sage codes
 
-## `extremal_qm.sage`
+The sage codes under the directory `sage` provides several functions for computations with quasimodular forms and extremal quasimodular forms.
+
+### `extremal_qm.sage`
 
 - `extremal_qm` computes an extremal quasimodular form of given weight and depth (Kaneko-Koike). For the case of depth 1 and 2, it uses the recurrence relations in Grabner's paper "Quasimodular forms as solutions of modular differential equations". For other weights and depths (possibly larger than 4), it simply solve linear system on the coefficients of basis of the corresponding space of quasimodular forms.
 
-## `utils_l1.sage`
+### `utils_l1.sage`
 
 Functions for level 1 quasimodular forms, including depths, $q$-expansion, (Serre) derivative.
 
@@ -16,7 +18,9 @@ Functions for level 1 quasimodular forms, including depths, $q$-expansion, (Serr
 
 - `qm_to_func` returns a function $t \mapsto F(it)$ defined on positive real numbers, for a given quasimodular form $F$.
 
-## `utils_l2.sage`
+- `modular_comp` extract modualr form components of a given quasimodular form, i.e. for $F = f_0 + f_1 E_2 + f_2 E_2^2 + \cdots + f_n E_2^n$, it returns the dictionary of modular forms `{k : f_k}`.
+
+### `utils_l2.sage`
 
 Functions for level $\Gamma(2)$ quasimodular forms.
 These are implemented as polynomials in three variables, $H_2$ (`H2`), $H_4$ (`H4`), $E_2$ (`E2`).
@@ -27,8 +31,10 @@ $q$-expansions are given in terms of `qh`, which corresponds to $q^{1/2}$.
 - `l1_to_l2` rewrites a level 1 quasimodular form as level $\Gamma(2)$ quasimodular form.
 It uses the identities between Eisenstein series and Jacobi theta functions.
 
+- `double_argument` returns $F(2z)$ for a given level 1 quasimodular form $F(z)$.
 
-## `utils_rqm.sage`
+
+### `utils_rqm.sage`
 
 For the proof of the "harder" 24-dimensional modular form inequality, we define auxiliary rings `RQM` and `RQM2`, which are
 
@@ -52,3 +58,11 @@ $$
 $$
 
 - `rqm_homogeneous_comps` and `rqm2_homogeneous_comps` extract each of homogeneous components from possibly inhomogeneous input.
+
+## Lean codes
+
+The lean codes under the directory `lean` verifies several inequalities arise in the paper "Inequalities involving polynomials and quasimodular forms".
+
+- `polymod_monotone.lean` verifies (41).
+- `polymod_ineq1.lean` verifies (60).
+- `polymod_ineq2.lean` verifies (61).

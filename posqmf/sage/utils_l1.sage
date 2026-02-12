@@ -135,3 +135,14 @@ def qm_to_func(qm, prec=100):
     for i in range(1, len(c)):
         func += c[i] * exp(-i * 2 * pi * t)
     return func
+
+def modular_comp(qm):
+    # Extract modular form components of a given quasimodular form
+    # In other words, if F = f_0 + f_1 E2 + f_2 E2^2 + ... + f_n E2^n,
+    # return [f_0, f_1, f_2, ..., f_n]
+    comps = {}
+    for k, v in qm._polynomial().dict().items():
+        if k not in comps:
+            comps[k] = QM(0)
+        comps[k] += QM(v)
+    return comps
