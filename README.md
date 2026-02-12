@@ -18,5 +18,5 @@ from posqmf import *
 
 ## Inequalities involving polynomials and quasimodular forms
 
-`polymod.ipynb` checkes the identities in the paper [Inequalities involving polynomials and quasimodular forms](arxivlink), where the `.lean` files under `posqmf/lean` provides formal proof of some inequalities in the paper. 
+`polymod.ipynb` checkes the identities in the paper [Inequalities involving polynomials and quasimodular forms](https://arxiv.org/abs/2602.10536), where the `.lean` files under `posqmf/lean` provides formal proof of some inequalities in the paper. 
 Lean files are initially written by AxiomProver and manually golfed afterwards., which can be checked by `lake exe cache get && lake build`.
