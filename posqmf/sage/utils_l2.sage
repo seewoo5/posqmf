@@ -8,6 +8,9 @@ E4_ = H2^2 + H2 * H4 + H4^2
 E6_ = (H2 + 2 * H4) * (2 * H2 + H4) * (H4 - H2) / 2
 Disc_ = H2^2 * (H2 + H4)^2 * H4^2 / 256
 
+E2_2z = (1/4) * (2 * E2_ + H2 + 2 * H4)  # E2(2z)
+E4_2z = (1/16) * (H2^2 + 16 * H2 * H4 + 16 * H4^2)  # E4(2z)
+E6_2z = (-1/64) * (H2 + 2 * H4) * (H2^2 - 32 * H2 * H4 - 32 * H4^2)  # E6(2z)
 
 # Weight
 def qm2_weight(qm):
@@ -171,6 +174,18 @@ def qm2_find_lin_comb(qm, ls):
     assert r == qm
     return x_
 
+def qm2_find_lin_comb_coeff(coeffs, ls):
+    # Find linear combination when first few coefficients are known
+    N = len(coeffs)
+    m = matrix([qm2_q_series(qm_, N).list() for qm_ in ls])
+    c_ = vector(coeffs)
+    print(f"m: {m}")
+    print(f"c: {c_}")
+    x_ = m.solve_left(c_)
+    r = sum(Rational(x_[j]) * ls[j] for j in range(len(ls)))
+    assert qm2_q_series(r, N).list() == coeffs
+    return x_
+
 def qm2_to_func(qm, prec=100):
     qser = qm2_q_series(qm, prec=prec)
     c = qser.list()
@@ -193,4 +208,11 @@ def l1_to_l2(qm):
     r = QM2(0)
     for (d2, d4, d6), coeff in qm.polynomial().dict().items():
         r += coeff * E2_^d2 * E4_^d4 * E6_^d6
+    return r
+
+# f(z) to f(2z)
+def double_argument(qm):
+    r = QM2(0)
+    for (d2, d4, d6), coeff in qm.polynomial().dict().items():
+        r += coeff * E2_2z^d2 * E4_2z^d4 * E6_2z^d6
     return r
