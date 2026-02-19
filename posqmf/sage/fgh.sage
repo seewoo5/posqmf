@@ -51,6 +51,16 @@ def pos_eigenform(weight):
     return r
 
 @lru_cache
+def Ftilde(w):
+    # For F_w = A_{w}  + B_{w-2} E_2 + C_{w-4} E_2^2, we have
+    # \tilde{F}_{w-2} = B_{w-2} + 2 C_{w-4} E_2
+    F_wp2 = pos_eigenform(w + 2)
+    comps = modular_comp(F_wp2)
+    B_w = comps[1]
+    C_wm2 = comps[2]
+    return B_w + 2 * C_wm2 * E2
+
+@lru_cache
 def Gtilde(w):
     assert w % 4 == 0, "Weight must be divisible by 4"
     if w == 0:
