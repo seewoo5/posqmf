@@ -106,7 +106,8 @@ lemma iteratedDeriv_a_term (n : ℕ) (_hn : 1 ≤ n) (k : Fin 9) (t : ℝ) :
         Real.exp (k.val * t) := by
   have heq : (fun s => (aCoeffs k : ℝ) * s * Real.exp (↑↑k * s)) =
              (fun s => (aCoeffs k : ℝ) * (s * Real.exp (↑↑k * s))) := by ext s; ring
-  rw [heq, iteratedDeriv_const_mul ((t_mul_exp_contDiff ↑↑k).contDiffAt.of_le le_top),
+  rw [heq, iteratedDeriv_const_mul (aCoeffs k : ℝ)
+      ((t_mul_exp_contDiff ↑↑k).contDiffAt.of_le le_top),
       iteratedDeriv_t_mul_exp n ↑↑k t]; ring
 
 private lemma exp_contDiff (c : ℝ) :
@@ -115,7 +116,8 @@ private lemma exp_contDiff (c : ℝ) :
 lemma iteratedDeriv_b_term (n : ℕ) (k : Fin 9) (t : ℝ) :
     iteratedDeriv n (fun s => (bCoeffs k : ℝ) * Real.exp (k * s)) t =
       (bCoeffs k : ℝ) * (k.val : ℝ)^n * Real.exp (k.val * t) := by
-  rw [iteratedDeriv_const_mul ((exp_contDiff ↑↑k).contDiffAt.of_le le_top)]
+  rw [iteratedDeriv_const_mul (bCoeffs k : ℝ)
+      ((exp_contDiff ↑↑k).contDiffAt.of_le le_top)]
   simp [iteratedDeriv_exp_const_mul]; ring
 
 private lemma a_term_contDiff (k : Fin 9) :
@@ -232,10 +234,10 @@ lemma f_zero : f 0 = 0 := by
 /- Positivity of $f(t)$ -/
 theorem f_pos (t : ℝ) (ht : 0 < t) : 0 < f t := by
   have hftc := intervalIntegral.integral_deriv_eq_sub
-    (fun x _ => f_smooth.differentiable le_top x)
-    ((f_smooth.continuous_deriv le_top).intervalIntegrable 0 t)
+    (fun x _ => f_smooth.differentiable (by simp) x)
+    ((f_smooth.continuous_deriv (by simp)).intervalIntegrable 0 t)
   rw [f_zero, sub_zero] at hftc; rw [← hftc]
   exact intervalIntegral.integral_pos ht
-    (f_smooth.continuous_deriv le_top).continuousOn
+    (f_smooth.continuous_deriv (by simp)).continuousOn
     (fun x hx => le_of_lt (deriv_f_pos x hx.1))
     ⟨t, by simp [le_of_lt ht], deriv_f_pos t ht⟩
