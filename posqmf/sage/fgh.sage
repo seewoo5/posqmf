@@ -1,8 +1,46 @@
 import os
+import sys
 from functools import lru_cache
 
-load(os.path.dirname(os.path.abspath(__file__)) + "/sage/utils_l1.sage")
-load(os.path.dirname(os.path.abspath(__file__)) + "/sage/utils_l2.sage")
+_THIS_DIR = os.path.dirname(os.path.abspath(__file__))
+
+
+def _load_sage_dependency(name):
+    candidates = [
+        os.path.join(_THIS_DIR, "sage", name),          # when preparsed to posqmf/*.py
+        os.path.join(_THIS_DIR, name),                  # when loaded from posqmf/sage/*.sage
+        os.path.join(os.getcwd(), "posqmf", "sage", name),
+        os.path.join(os.getcwd(), "sage", name),
+    ]
+    for path in candidates:
+        path = os.path.abspath(path)
+        if os.path.exists(path):
+            load(path)
+            return
+    raise OSError(f"Could not locate dependency {name}")
+
+
+# Prefer preparsed Python modules when available.
+import_roots = [
+    os.getcwd(),
+    os.path.abspath(os.path.join(_THIS_DIR, "..")),      # when _THIS_DIR is .../posqmf
+    os.path.abspath(os.path.join(_THIS_DIR, "..", "..")), # when _THIS_DIR is .../posqmf/sage
+]
+for root in import_roots:
+    if root not in sys.path:
+        sys.path.insert(0, root)
+
+try:
+    from posqmf.utils_l1 import *
+    from posqmf.utils_l2 import *
+except Exception:
+    _load_sage_dependency("utils_l1.sage")
+    _load_sage_dependency("utils_l2.sage")
+
+try:
+    from posqmf.utils_l2_LS import *
+except Exception:
+    _load_sage_dependency("utils_l2_LS.sage")
 
 
 @lru_cache
@@ -74,3 +112,82 @@ def Gtilde(w):
         r = ((w_ + 8) * (w_ + 9) / 36) * E4 * Gw_ - ssGw_
         r *= 3 * (w_ + 10) * (w_ + 14) / (16 * (w_ + 4) * (w_ + 9) * (w_ + 11) * (w_ + 16))
         return r
+
+
+@lru_cache
+def G(w):
+    r"""
+    Level Gamma(2) analog in QM2_LS with explicit initial values and recurrences.
+    """
+    assert w % 2 == 0 and w >= 4, "Weight must be even and >= 4"
+
+    if w == 4:
+        r = (H2 / 2^5) * (H2 + 2 * H4)
+    elif w == 6:
+        r = (H2 / 2^4) * (H2^2 + H2 * H4 + H4^2)
+    elif w == 8:
+        r = (H2^3 / 2^13) * (H2 + 2 * H4)
+    elif w == 10:
+        r = (H2^3 / (2^12 * 5)) * (2 * H2^2 + 5 * H2 * H4 + 5 * H4^2)
+    elif w == 12:
+        r = (3 * Disc_ * LS) / (2^11 * 7)
+        r += (3 * H2^3 / (2^20 * 7)) * (H2^3 + 3 * H2^2 * H4 + 3 * H2 * H4^2 + 2 * H4^3)
+    elif w == 14:
+        r = (H2^5 / (2^20 * 7)) * (2 * H2^2 + 7 * H2 * H4 + 7 * H4^2)
+    elif w == 16:
+        r = (5 * E4_ * Disc_ * LS) / (2^18 * 11)
+        r += (5 * H2^3 / (2^29 * 3 * 11)) * (5 * H2^5 + 20 * H2^4 * H4 + 42 * H2^3 * H4^2 + 68 * H2^2 * H4^3 + 60 * H2 * H4^4 + 24 * H4^5)
+    elif w == 18:
+        r = -(5 * E6_ * Disc_ * LS) / (2^17 * 11 * 13)
+        r += (5 * H2^3 / (2^27 * 3 * 11 * 13)) * (10 * H2^6 + 45 * H2^5 * H4 + 68 * H2^4 * H4^2 + 34 * H2^3 * H4^3 - 13 * H2^2 * H4^4 - 36 * H2 * H4^5 - 12 * H4^6)
+    elif w % 4 == 2:
+        # Use: G_{u+2} from G_{u-2}, where u = w - 2 and u ≡ 0 (mod 4)
+        u = w - 2
+        Gum2 = G(u - 2)
+        ss = ls_serre_derivative(ls_serre_derivative(Gum2, u - 2), u)
+        r = ((u - 9) * (u - 8) / 36) * E4_ * Gum2 - ss
+        r *= 3 * (u - 6) * (u - 2) / (16 * (u - 16) * (u - 5) * (u - 4) * (u - 3))
+    else:  # w % 4 == 0
+        # Use: G_{u+4} from G_u, where u = w - 4 and u ≡ 0 (mod 4)
+        u = w - 4
+        Gu = G(u)
+        ss = ls_serre_derivative(ls_serre_derivative(Gu, u), u + 2)
+        r = ((u - 4) * (u - 3) / 36) * E4_ * Gu - ss
+        r *= 3 * (u - 2) * (u + 2) / (16 * (u - 8) * (u - 3) * (u - 1) * (u + 4))
+
+    return QM2_LS(r)
+
+
+@lru_cache
+def Y(w):
+    r"""
+    Family Y_w in QM2_LS with explicit initial values and recurrences:
+      Y_{w+4} from Y_w for w >= 8, w == 0 (mod 4),
+      Y_{w+2} from Y_w for w >= 8, w == 0 (mod 4).
+    """
+    assert w % 2 == 0 and w >= 2, "Weight must be even and >= 2"
+
+    if w == 2:
+        r = H2 / 2^4
+    elif w == 4:
+        r = -(3 * E4_ * LS) / (2^11 * 5)
+        r -= (3 / (2^12 * 5)) * (H2^2 + 2 * H2 * H4)
+    elif w == 6:
+        r = 0
+    elif w == 8:
+        r = -(5 * E4_^2 * LS) / (2^19 * 7)
+        r -= (5 / (2^21 * 3 * 7)) * (11 * H2^4 + 28 * H2^3 * H4 + 18 * H2^2 * H4^2 + 12 * H2 * H4^3)
+    elif w % 4 == 0:
+        # Use Y_{u+4} from Y_u, where u = w - 4 and u == 0 (mod 4), u >= 8.
+        u = w - 4
+        Yu = Y(u)
+        ss = ls_serre_derivative(ls_serre_derivative(Yu, u), u + 2)
+        r = ((u + 2) * (u + 3) / 36) * E4_ * Yu - ss
+        r *= 3 * (u + 6)^2 / (16 * (u + 3) * (u + 4)^2 * (u + 5))
+    else:
+        # Use Y_{u+2} from Y_u, where u = w - 2 and u == 0 (mod 4), u >= 8.
+        u = w - 2
+        Yu = Y(u)
+        r = (6 / (u + 3)) * ls_serre_derivative(Yu, u)
+
+    return QM2_LS(r)
