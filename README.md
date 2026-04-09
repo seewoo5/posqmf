@@ -25,4 +25,4 @@ Lean files are initially written by AxiomProver and manually golfed afterwards.,
 
 `miscellaneous.ipynb` contains some miscellaneous codes related to quasimodular forms, including
 
-- Depth $s \ge 5$ extremal quasimodular forms. Uniqueness check for $5 \le 10$ and $w \le 200$. Non-positiveness of $X_{16, 5}$.
+- Depth $s \ge 5$ extremal quasimodular forms. Uniqueness check for $5 \le s \le 10$ and $w \le 200$. Non-positiveness of $X_{16, 5}$.
