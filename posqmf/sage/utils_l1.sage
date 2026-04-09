@@ -112,14 +112,28 @@ def print_qm(qm, name, prec=20):
     print("cusp order", qm_cusp_order(qm))
     print("polynomial", qm.polynomial().factor(), "\n")
 
+def qm_find_lin_comb_coeffs(w, s, coeffs, ls=None, N=None):
+    if N is None:
+        N = dim_qm(w, s)
+    if ls is None:
+        # use basis
+        ls = qm_basis(w, s)
+    m = matrix([qm_.coefficients(list(range(N))) for qm_ in ls])
+    c_ = vector(coeffs[:N])
+    try:
+        x_ = m.solve_left(c_)
+        r = sum(x_[j] * ls[j] for j in range(len(ls)))
+        assert r.coefficients(list(range(N))) == coeffs[:N]
+        return r
+    except ValueError:
+        raise ValueError("The given coefficients are not in the span of the given quasimodular forms")
+
 # Express a quasimodular form as a linear combination of given quasimodular forms
 def qm_find_lin_comb(qm, ls, N=None):
     w = qm.weight()
     s = qm_depth(qm)
     if N is None:
         N = dim_qm(w, s)
-    #m = matrix([qm_coefficients(qm_, N) for qm_ in ls])
-    #c_ = vector(qm_coefficients(qm, N))
     m = matrix([qm_.coefficients(list(range(N))) for qm_ in ls])
     c_ = vector(qm.coefficients(list(range(N))))
     x_ = m.solve_left(c_)
@@ -146,3 +160,18 @@ def modular_comp(qm):
             comps[k] = QM(0)
         comps[k] += QM(v)
     return comps
+
+def eisenstein(w):
+    # Compute Eisenstein series of weight $w$ in terms of E4 and E6
+    Bw = bernoulli(w)
+    N = (w // 12) + 1
+    coeffs = [1]
+    for n in range(1, N):
+        coeff = 0
+        for d in divisors(n):
+            coeff += d ** (w - 1)
+        coeff *= -(2 * w) / Bw
+        coeffs.append(coeff)
+    Ew = qm_find_lin_comb_coeffs(w, 0, coeffs)
+    assert Ew.q_expansion(len(coeffs)).list() == coeffs
+    return Ew

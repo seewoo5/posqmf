@@ -80,3 +80,11 @@ def extremal_qm(weight, depth):
       
     ans = sum(x_[j] * bs[j] for j in range(d))
     return ans
+
+def is_extremal_qm_unique(weight, depth):
+    # check if extremal quasimodular form of weight `w` and depth `s` is unique
+    # by considering q-coefficient matrix of basis.
+    bs = qm_basis(weight, depth)
+    d = dim_qm(weight, depth)
+    m = matrix([qm_coefficients(qm_, d) for qm_ in bs])
+    return m.is_invertible()

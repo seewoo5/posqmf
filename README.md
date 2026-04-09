@@ -20,3 +20,9 @@ from posqmf import *
 
 `polymod.ipynb` checkes the identities in the paper [Inequalities involving polynomials and quasimodular forms](https://arxiv.org/abs/2602.10536), where the `.lean` files under `posqmf/lean` provides formal proof of some inequalities in the paper. 
 Lean files are initially written by AxiomProver and manually golfed afterwards., which can be checked by `lake exe cache get && lake build`.
+
+## Miscellaneous
+
+`miscellaneous.ipynb` contains some miscellaneous codes related to quasimodular forms, including
+
+- Depth $s \ge 5$ extremal quasimodular forms. Uniqueness check for $5 \le s \le 10$ and $w \le 200$. Non-positiveness of $X_{16, 5}$.
