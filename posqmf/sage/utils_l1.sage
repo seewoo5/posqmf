@@ -134,8 +134,6 @@ def qm_find_lin_comb(qm, ls, N=None):
     s = qm_depth(qm)
     if N is None:
         N = dim_qm(w, s)
-    #m = matrix([qm_coefficients(qm_, N) for qm_ in ls])
-    #c_ = vector(qm_coefficients(qm, N))
     m = matrix([qm_.coefficients(list(range(N))) for qm_ in ls])
     c_ = vector(qm.coefficients(list(range(N))))
     x_ = m.solve_left(c_)
@@ -163,44 +161,8 @@ def modular_comp(qm):
         comps[k] += QM(v)
     return comps
 
-def derivative_sum_decomposition_d1(qm):
-    # For a given quasimodular form F of depth 1, write it as
-    # F = F_0 + F_1' for some modular forms F_0 and F_1, which are unique.
-    # More precisely, if we write F = A + B E_2, then we have
-    # F_1 = (12 / (w - 2)) B and F_0 = A - (12 / (w - 2)) \partial_{w-2} B
-    comps = modular_comp(qm)
-    A = comps[0]
-    B = comps[1]
-    w = qm.weight()
-    if w == 2:
-        raise ValueError("There's no such decomposition for weight 2 quasimodular forms")
-    F_1 = (12 / (w - 2)) * B
-    F_0 = QM(A - qm_serre_derivative(F_1, w - 2))
-    assert qm == F_0 + F_1.derivative()
-    return F_0, F_1
-
-def derivative_sum_decomposition_d2(qm):
-    # For a given quasimodular form F of depth 2, write it as
-    # F = F_0 + F_1' + F_2'' for some modular forms F_0, F_1, and F_2, which are unique.
-    # More precisely, if we write F = A + B E_2 + C E_2^2, then we have
-    # F_2 = (144 / (w-3) * (w-4)) * C
-    # F_1 = = (12 / (w-2)) * (B - (w-3) / 6 * \partial_{w-4} F_2)
-    # F_0 = A - \partial_{w-2} F_1 - \partial_{w-2}\partial_{w-4} F_2 + (w-4) / 144 E_4 F_2
-    comps = modular_comp(qm)
-    A = comps[0]
-    B = comps[1]
-    C = comps[2]
-    w = qm.weight()
-    if w == 2 or w == 4:
-        raise ValueError("There's no such decomposition for weight 2 or 4 quasimodular forms")
-    F2 = (144 / ((w-3) * (w-4))) * C
-    F1 = (12 / (w - 2)) * (B - (w - 3) / 6 * qm_serre_derivative(F2, w - 4))
-    F0 = A - qm_serre_derivative(F1, w - 2) - qm_serre_derivative(qm_serre_derivative(F2, w - 4), w - 2) + (w-4) / 144 * E4 * F2
-    assert qm == F0 + F1.derivative() + F2.derivative().derivative()
-    return F0, F1, F2
-
 def eisenstein(w):
-    # Compute Eisenstein series of weight $w$ in terms of E2, E4, and E6
+    # Compute Eisenstein series of weight $w$ in terms of E4 and E6
     Bw = bernoulli(w)
     N = (w // 12) + 1
     coeffs = [1]
@@ -213,4 +175,3 @@ def eisenstein(w):
     Ew = qm_find_lin_comb_coeffs(w, 0, coeffs)
     assert Ew.q_expansion(len(coeffs)).list() == coeffs
     return Ew
-    
