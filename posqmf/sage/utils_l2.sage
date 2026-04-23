@@ -64,12 +64,6 @@ def qm2_serre_derivative_fold(qm, r, k=None):
 prec = 80
 qh = var('qh')  # q^1/2
 
-def sigma(k, m):
-    r = 0
-    for i in range(1, k + 1):
-        if k%i == 0:
-            r += i^m
-    return r
 
 def r4(k):
     if k == 0:
