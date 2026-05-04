@@ -1,8 +1,14 @@
-# Utility codes
-
 ## Sage codes
 
 The sage codes under the directory `sage` provides several functions for computations with quasimodular forms and extremal quasimodular forms.
+
+### `extremal_eis.sage`
+
+- `extremal_eisenstein_series` compute extremal Eisenstein series of given weight, i.e. a modular form of weight $w$ with $q$-expansion $1 + O(q^{l})$ where $l$ is the dimension of the space of modular forms of weight $w$. It simply solve linear system on the coefficients of basis of the corresponding space of modular forms.
+
+- `jenkins_rouse_coeff_threshold` computes threshold $n_0$ for extremal Eisenstein series of given weight due to Jenkins and Rouse. If $n \ge n_0$, then $a_n > 0$, where $a_n$ is the $n$-th Fourier coefficient of the extremal Eisenstein series of given weight. Note that there are some minor errors in the original paper, and we use the corrected version here with slightly larger constant.
+
+- `check_extremal_eisenstein_series_completely_positive` checks if the Fourier coefficients of the extremal Eisenstein series of given weight have desired signs (positive for $w \equiv 0 \pmod{4}$, negative for $w \equiv 2 \pmod{4}$) using Jenkins-Rouse coefficient threshold.
 
 ### `extremal_qm.sage`
 
@@ -32,7 +38,6 @@ $q$-expansions are given in terms of `qh`, which corresponds to $q^{1/2}$.
 It uses the identities between Eisenstein series and Jacobi theta functions.
 
 - `double_argument` returns $F(2z)$ for a given level 1 quasimodular form $F(z)$.
-
 
 ### `utils_rqm.sage`
 

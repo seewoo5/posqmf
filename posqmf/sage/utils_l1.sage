@@ -163,15 +163,4 @@ def modular_comp(qm):
 
 def eisenstein(w):
     # Compute Eisenstein series of weight $w$ in terms of E4 and E6
-    Bw = bernoulli(w)
-    N = (w // 12) + 1
-    coeffs = [1]
-    for n in range(1, N):
-        coeff = 0
-        for d in divisors(n):
-            coeff += d ** (w - 1)
-        coeff *= -(2 * w) / Bw
-        coeffs.append(coeff)
-    Ew = qm_find_lin_comb_coeffs(w, 0, coeffs)
-    assert Ew.q_expansion(len(coeffs)).list() == coeffs
-    return Ew
+    return ModularForms(weight=w).basis()[-1]
