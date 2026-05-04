@@ -48,11 +48,9 @@ def pos_eigenform(weight):
     # quasimiodular form for (-1)^(d/4)-eigenform of Fourier transform by Feigenbaum-Grabner-Hardin
     w = weight
     if w == 8:
-        r = (E2^2 * E4 - 2 * E2 * E6 + E4^2)
-        r /= 1728
+        r = (E2^2 * E4 - 2 * E2 * E6 + E4^2) / 1728
     elif w == 10:
-        r = - E2^2 * E6 + 2 * E2 * E4^2 - E4 * E6
-        r /= 1728
+        r = (- E2^2 * E6 + 2 * E2 * E4^2 - E4 * E6) / 1728
     elif w == 12:
         r = (1 / 6000) * (E2 * E4 - E6)^2
         r /= 1728
