@@ -32,7 +32,7 @@ def is_rqm_homogeneous(rqm):
 def rqm_depth(rqm):
     dp = 0
     for qm in rqm.dict().values():
-        dp = max(dp, qm_depth(qm))
+        dp = max(dp, qm.depth())
     return dp
 
 def rqm_derivative(rqm):

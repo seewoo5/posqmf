@@ -7,7 +7,7 @@ load(os.path.dirname(os.path.abspath(__file__)) + "/sage/utils_l1.sage")
 # Extremal quasimodular forms
 def is_extremal_qm(qm):
     # Check if a given quasimodular form is extremal (in the sense of Kaneko-Koike)
-    s = qm_depth(qm)
+    s = qm.depth()
     w = qm.weight()
     d = dim_qm(w, s)
     order = qm_cusp_order(qm)

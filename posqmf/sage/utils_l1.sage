@@ -6,10 +6,6 @@ E2, E4, E6 = QM.gen(0), QM.gen(1), QM.gen(2)  # generators, normalized as consta
 Disc = (1 / 1728) * (E4 ** 3 - E6 ** 2)  # discriminant form
 t = var('t')  # variable for the positive imaginary axis
 
-# Depth
-def qm_depth(qm):
-    return qm.polynomial().degree(E2.polynomial())
-
 # Fourier coefficients
 def qm_coefficients(qm, prec=20):
     qexp = qm.q_expansion(prec)
@@ -29,7 +25,7 @@ def qm_derivative_fold(qm, k):
 # If weight is not given, we use k = (weight - depth) that preserves depth.
 def qm_serre_derivative(qm, k=None):
     if k is None:
-        k = qm.weight() - qm_depth(qm)
+        k = qm.weight() - qm.depth()
     return qm.derivative() - E2 * qm * (k / 12)
 
 # Iterative Serre derivative, which is 
@@ -42,7 +38,7 @@ def qm_serre_derivative_fold(qm, r, k=None):
         return qm_serre_derivative(qm, k)
     else:
         if k is None:
-            k = qm.weight() - qm_depth(qm)
+            k = qm.weight() - qm.depth()
         return qm_serre_derivative(qm_serre_derivative_fold(qm, r-1, k), k + 2 * (r-1))
 
 # Dimension of the space of (genuine) modular forms of weight w and level 1
@@ -77,7 +73,6 @@ def qm_basis(w, s):
 
 # Vanishing order at the cusp
 def qm_cusp_order(qm, prec=100):
-    #c_ = qm_coefficients(qm, N)
     c_ = qm.coefficients(list(range(prec + 1)))
     r = 0
     for i in range(prec + 1):
@@ -108,7 +103,7 @@ def print_qm(qm, name, prec=20):
         print("weight", qm.weight())
     else:
         print("weight", qm.weights_list())
-    print("depth", qm_depth(qm))
+    print("depth", qm.depth())
     print("cusp order", qm_cusp_order(qm))
     print("polynomial", qm.polynomial().factor(), "\n")
 
@@ -131,7 +126,7 @@ def qm_find_lin_comb_coeffs(w, s, coeffs, ls=None, N=None):
 # Express a quasimodular form as a linear combination of given quasimodular forms
 def qm_find_lin_comb(qm, ls, N=None):
     w = qm.weight()
-    s = qm_depth(qm)
+    s = qm.depth()
     if N is None:
         N = dim_qm(w, s)
     m = matrix([qm_.coefficients(list(range(N))) for qm_ in ls])
