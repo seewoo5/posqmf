@@ -11,15 +11,15 @@ import Mathlib.NumberTheory.ArithmeticFunction.Misc
 
 We prove that the sequence
 
-  a_n = x_n + 240 c₆ y_n + c₇ z_n + c₆ τ(n)
+  `a_n = x_n + 240 c₆ y_n + c₇ z_n + c₆ τ(n)`
 
 is strictly negative for every `n ≥ 1`, where
 
-  x_n = - n σ₁₃(n) / 201801600 + 4531 n² σ₁₁(n) / 47809681920
-        - 149 n³ σ_9(n) / 228096000 + 49 n⁴ σ_7(n) / 25660800
-        - 49 n⁵ σ_5(n) / 24883200,
-  y_n = ∑_{k=1}^{n-1} τ(k) σ_3(n - k),
-  z_n = ∑_{k=1}^{n-1} τ(k) (n - k) σ_1(n - k).
+  `x_n = - n σ₁₃(n) / 201801600 + 4531 n² σ₁₁(n) / 47809681920`
+       `  - 149 n³ σ₉(n) / 228096000 + 49 n⁴ σ₇(n) / 25660800`
+       `  - 49 n⁵ σ₅(n) / 24883200`,
+  `y_n = ∑_{k=1}^{n-1} τ(k) σ₃(n - k)`,
+  `z_n = ∑_{k=1}^{n-1} τ(k) (n - k) σ₁(n - k)`.
 
 The constants `c₆`, `c₇` are the rational numbers arising in the linear
 combination of derivatives of Eisenstein series and Δ-quasi-modular forms
@@ -28,8 +28,8 @@ expressing the extremal quasimodular form `X_{16,5}`.
 The strategy follows the sketch in `sketch.tex`:
 
 * Use the trivial bounds `nᵏ ≤ σₖ(n) ≤ nᵏ⁺¹` (for `n ≥ 1`).
-* Take Deligne's bound `|τ(n)| < σ_0(n) n^(11/2)` as an axiom.
-* These yield `|y_n| ≤ (1/15) n^(23/2)` and `|z_n| ≤ (1/15) n^(21/2)`.
+* Take Deligne's bound `|τ(n)| < σ₀(n) n^(11/2)` as an axiom.
+* These yield `|y_n| ≤ (2/15) n^(23/2)` and `|z_n| ≤ (2/15) n^(21/2)`.
 * The leading negative term `- n σ₁₃(n) / 201801600` of magnitude
   `~ n¹⁴ / 2·10⁸` dominates all the other terms for `n` large enough.
 * Finitely many small `n` are checked individually.
@@ -81,11 +81,11 @@ def xSeq (n : ℕ) : ℝ :=
   + 49 * (n : ℝ) ^ 4 * (σ 7 n : ℝ) / 25660800
   - 49 * (n : ℝ) ^ 5 * (σ 5 n : ℝ) / 24883200
 
-/-- `y_n = ∑_{k=1}^{n-1} τ(k) σ_3(n - k)`. -/
+/-- `y_n = ∑_{k=1}^{n-1} τ(k) σ₃(n - k)`. -/
 def ySeq (n : ℕ) : ℝ :=
   ∑ k ∈ Ico 1 n, (τ k : ℝ) * (σ 3 (n - k) : ℝ)
 
-/-- `z_n = ∑_{k=1}^{n-1} τ(k) (n - k) σ_1(n - k)`. -/
+/-- `z_n = ∑_{k=1}^{n-1} τ(k) (n - k) σ₁(n - k)`. -/
 def zSeq (n : ℕ) : ℝ :=
   ∑ k ∈ Ico 1 n, (τ k : ℝ) * ((n : ℝ) - k) * (σ 1 (n - k) : ℝ)
 
@@ -407,20 +407,19 @@ lemma xSeq_le_sharp (n : ℕ) (hn : 1 ≤ n) :
 
 /-! ## Main theorem
 
-`aSeq_neg_of_large` (`n ≥ 10000`) is proved using the sharp bound
-`σₖ(n) ≤ 2 nᵏ` (k ≥ 2) — this is the elementary form of `σₖ(n) < ζ(k) nᵏ`,
-following the user's hint. The proof reduces each correction term to a
-multiple of `t¹⁴ / 1210809600` (one sixth of the dominant negative term),
-showing the five corrections sum to at most `5 t¹⁴ / 1210809600 < t¹⁴ /
-201801600`.
+`aSeq_neg_of_large` (`n ≥ 250`) is proved using the sharp bound
+`σₖ(n) ≤ 2 nᵏ` (`k ≥ 2`) — the elementary form of `σₖ(n) < ζ(k) nᵏ`. The
+proof reduces each correction term to a multiple of `t¹⁴ / 1210809600`
+(one sixth of the dominant negative term), so that the five corrections
+sum to at most `5 t¹⁴ / 1210809600 < t¹⁴ / 201801600`.
 
-`aSeq_neg_of_small` remains open: with `ramanujanTau` treated as `opaque`
-(per the sketch's "assume Deligne's bound without proof" directive), no
-specific values such as `τ(1) = 1, τ(2) = -24, …` are accessible, so the
-finitely-many small-`n` cases cannot be dispatched without either a
-concrete definition or auxiliary axioms providing those values. Note that
-Deligne alone permits `|τ(1)| < 2`, which is loose enough that `a_1 > 0`
-is not contradicted by the bound (even though the actual `τ(1) = 1` makes
+The remaining small-`n` cases `1 ≤ n < 250` are open: with `ramanujanTau`
+treated as `opaque` (per the sketch's "assume Deligne's bound without
+proof" directive), specific values such as `τ(1) = 1, τ(2) = -24, …` are
+inaccessible, so they cannot be dispatched without either a concrete
+definition or auxiliary axioms providing those values. Deligne alone
+permits `|τ(1)| < 1`, which is loose enough that `a_1 > 0` is not
+contradicted by the bound (even though the actual `τ(1) = 1` makes
 `a_1 < 0`).
 -/
 
@@ -442,16 +441,16 @@ private lemma rpow_11_half_le_pow_6 (t : ℝ) (ht : 1 ≤ t) :
   rw [← Real.rpow_natCast t 6]
   exact Real.rpow_le_rpow_of_exponent_le ht (by norm_num)
 
-/-- Effective bound: `aSeq n < 0` for `n ≥ 10000`.
+/-- Effective bound: `aSeq n < 0` for `n ≥ 250`.
 
 Combines `xSeq_le_sharp`, `abs_ySeq_le`, `abs_zSeq_le` and Deligne's bound,
 reducing the corrections to integer-power monomials and combining via
 explicit per-term sub-bounds against `t¹⁴ / 1210809600` (one sixth of the
 leading term). -/
-lemma aSeq_neg_of_large (n : ℕ) (hn : 10000 ≤ n) : aSeq n < 0 := by
+lemma aSeq_neg_of_large (n : ℕ) (hn : 250 ≤ n) : aSeq n < 0 := by
   have hn_pos : 1 ≤ n := by omega
   have ht_pos : (0 : ℝ) < (n : ℝ) := by exact_mod_cast (show 0 < n by omega)
-  have ht10000 : (10000 : ℝ) ≤ (n : ℝ) := by exact_mod_cast hn
+  have ht250 : (250 : ℝ) ≤ (n : ℝ) := by exact_mod_cast hn
   have ht1 : (1 : ℝ) ≤ (n : ℝ) := by linarith
   have hc6_pos : 0 < c₆ := c₆_pos
   have hc7_abs : |c₇| = -c₇ := abs_of_neg c₇_neg
@@ -500,11 +499,11 @@ lemma aSeq_neg_of_large (n : ℕ) (hn : 10000 ≤ n) : aSeq n < 0 := by
   have ht12_nn : (0 : ℝ) ≤ t ^ 12 := by positivity
   have ht11_nn : (0 : ℝ) ≤ t ^ 11 := by positivity
   have ht7_nn : (0 : ℝ) ≤ t ^ 7 := by positivity
-  have ht2 : (10000 : ℝ) ^ 2 ≤ t ^ 2 := pow_le_pow_left₀ (by norm_num) ht10000 2
-  have ht3 : (10000 : ℝ) ^ 3 ≤ t ^ 3 := pow_le_pow_left₀ (by norm_num) ht10000 3
-  have ht7 : (10000 : ℝ) ^ 7 ≤ t ^ 7 := pow_le_pow_left₀ (by norm_num) ht10000 7
+  have ht2 : (250 : ℝ) ^ 2 ≤ t ^ 2 := pow_le_pow_left₀ (by norm_num) ht250 2
+  have ht3 : (250 : ℝ) ^ 3 ≤ t ^ 3 := pow_le_pow_left₀ (by norm_num) ht250 3
+  have ht7 : (250 : ℝ) ^ 7 ≤ t ^ 7 := pow_le_pow_left₀ (by norm_num) ht250 7
   have hb1 : 9062 * t ^ 13 / 47809681920 ≤ t ^ 14 / 1210809600 := by
-    nlinarith [ht10000, ht13_nn, mul_le_mul_of_nonneg_right ht10000 ht13_nn]
+    nlinarith [ht250, ht13_nn, mul_le_mul_of_nonneg_right ht250 ht13_nn]
   have hb2 : 240 * (86619413 / 139015844352000) * ((2 / 15) * t ^ 12) ≤
       t ^ 14 / 1210809600 :=
     by nlinarith [mul_le_mul_of_nonneg_right ht2 ht12_nn, ht12_nn]
