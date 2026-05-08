@@ -29,7 +29,7 @@ The strategy follows the sketch in `sketch.tex`:
 
 * Use the trivial bounds `nᵏ ≤ σₖ(n) ≤ nᵏ⁺¹` (for `n ≥ 1`).
 * Take Deligne's bound `|τ(n)| < σ₀(n) n^(11/2)` as an axiom.
-* These yield `|y_n| ≤ (2/15) n^(23/2)` and `|z_n| ≤ (2/15) n^(21/2)`.
+* These yield `|y_n| ≤ (4/15) n^(21/2)` and `|z_n| ≤ (2/15) n^(21/2)`.
 * The leading negative term `- n σ₁₃(n) / 201801600` of magnitude
   `~ n¹⁴ / 2·10⁸` dominates all the other terms for `n` large enough.
 * Finitely many small `n` are checked individually.
@@ -57,10 +57,7 @@ lemma c₇_neg : c₇ < 0 := by unfold c₇; norm_num
 /--
 Ramanujan's `τ` function. We treat it abstractly: only Deligne's bound
 (stated below as an axiom) is used in this file. -/
-opaque ramanujanTau : ℕ → ℤ
-
-@[inherit_doc]
-local notation "τ" => ramanujanTau
+opaque τ : ℕ → ℤ
 
 /--
 **Deligne's bound** for the Ramanujan tau function:
@@ -68,7 +65,7 @@ local notation "τ" => ramanujanTau
 
 This is taken as an axiom; a proof would require the full force of the
 Weil conjectures (Deligne, 1974). -/
-axiom abs_ramanujanTau_lt (n : ℕ) (hn : 1 ≤ n) :
+axiom abs_tau_lt (n : ℕ) (hn : 1 ≤ n) :
     |(τ n : ℝ)| < (σ 0 n : ℝ) * (n : ℝ) ^ ((11 : ℝ) / 2)
 
 /-! ## The sequences `x`, `y`, `z`, `a` -/
@@ -93,29 +90,11 @@ def zSeq (n : ℕ) : ℝ :=
 def aSeq (n : ℕ) : ℝ :=
   xSeq n + 240 * c₆ * ySeq n + c₇ * zSeq n + c₆ * (τ n : ℝ)
 
-/-! ## Trivial bounds on `σₖ` -/
-
-/-- Lower bound: `nᵏ ≤ σₖ(n)` for `n ≥ 1` (since `n` itself is a divisor). -/
+/-- **Lower bound for `σₖ(n)`**: `nᵏ ≤ σₖ(n)` for `n ≥ 1` (since `n` itself is a divisor). -/
 lemma pow_le_sigma (k n : ℕ) (hn : 1 ≤ n) : (n : ℝ) ^ k ≤ (σ k n : ℝ) := by
   rw [ArithmeticFunction.sigma_apply]
   exact_mod_cast Finset.single_le_sum (f := fun d => d ^ k) (s := n.divisors)
     (fun _ _ => Nat.zero_le _) (Nat.mem_divisors.mpr ⟨dvd_refl n, by omega⟩)
-
-/-- Upper bound: `σₖ(n) ≤ nᵏ⁺¹` (Mathlib lemma, restated for `ℝ`). -/
-lemma sigma_le_pow_succ_real (k n : ℕ) :
-    (σ k n : ℝ) ≤ (n : ℝ) ^ (k + 1) := by
-  exact_mod_cast ArithmeticFunction.sigma_le_pow_succ k n
-
-/-! ### Sharp bound `σₖ(n) ≤ 2 nᵏ` (`k ≥ 2`)
-
-The bijection `d ↔ n/d` on divisors of `n` gives
-
-  `σₖ(n) = ∑_{d ∣ n} dᵏ = ∑_{d ∣ n} (n/d)ᵏ = nᵏ · ∑_{d ∣ n} 1/dᵏ`,
-
-and for `k ≥ 2` the sum is bounded by `2`:
-
-  `∑_{d ∣ n} 1/dᵏ ≤ ∑_{d=1}^{n} 1/dᵏ ≤ 1 + ∑_{d=2}^{n} (1/(d-1) - 1/d) ≤ 2`.
--/
 
 /-- Telescoping identity: `∑_{d=2}^{N} (1/(d-1) - 1/d) = 1 - 1/N` for `N ≥ 1`. -/
 private lemma sum_telescope_one_div (N : ℕ) (hN : 1 ≤ N) :
@@ -191,10 +170,8 @@ private lemma sigma_eq_pow_mul_sum_inv (k : ℕ) (n : ℕ) (hn : 1 ≤ n) :
   rw [Nat.cast_div hd_dvd (by exact_mod_cast hd_pos.ne'), div_pow]
   field_simp
 
-/-- **Sharp σ-bound**: for `k ≥ 2` and `n ≥ 1`, `σₖ(n) ≤ 2 nᵏ`.
-
-This follows from `σₖ(n) = nᵏ · ∑_{d ∣ n} 1/dᵏ` and the bound
-`∑_{d=1}^n 1/dᵏ ≤ 2`. -/
+/-- **Upper bound for `σₖ(n)`**: for `k ≥ 2` and `n ≥ 1`, `σₖ(n) ≤ 2 nᵏ`.
+This follows from `σₖ(n) = nᵏ · ∑_{d ∣ n} 1/dᵏ` and the bound `∑_{d=1}^n 1/dᵏ ≤ 2`. -/
 lemma sigma_le_two_mul_pow {k : ℕ} (hk : 2 ≤ k) (n : ℕ) (hn : 1 ≤ n) :
     (σ k n : ℝ) ≤ 2 * (n : ℝ) ^ k := by
   rw [sigma_eq_pow_mul_sum_inv k n hn]
@@ -207,13 +184,15 @@ lemma sigma_le_two_mul_pow {k : ℕ} (hk : 2 ≤ k) (n : ℕ) (hn : 1 ≤ n) :
       (sum_one_div_pow_Icc_le_two hk n hn)
   nlinarith [mul_le_mul_of_nonneg_left h_sum_le (by positivity : (0:ℝ) ≤ (n:ℝ)^k)]
 
-/-! ## Deligne-style bounds on `|y_n|` and `|z_n|`
+/-! ## Bounds on `|y_n|` and `|z_n|`
 
 From `σ₀(k) ≤ k` we get `|τ(k)| < σ₀(k) k^(11/2) ≤ k · k^(11/2) = k^(13/2)`.
-Combined with `σ₃(n - k) ≤ (n - k)^4 ≤ n^4` and
-`σ₁(n - k) ≤ (n - k)^2 ≤ n^2`, this yields
+The sharp bound `σ₃(m) ≤ 2 m³` (`k = 3 ≥ 2`) gives `σ₃(n - k) ≤ 2 n³`, while
+for `σ₁` no constant-factor bound `σ₁(m) ≤ C m` exists (e.g.
+`σ₁(12) = 28 > 2 · 12`), so we use only the trivial
+`σ₁(n - k) ≤ (n - k)² ≤ n²`. This yields
 
-  `|y_n| ≤ (2/15) n^(23/2)` and `|z_n| ≤ (2/15) n^(21/2)`.
+  `|y_n| ≤ (4/15) n^(21/2)` and `|z_n| ≤ (2/15) n^(21/2)`.
 -/
 
 /-- The sum `∑_{k=1}^{n-1} k^(13/2)` is bounded by `(2/15) n^(15/2)`. -/
@@ -246,9 +225,9 @@ private lemma sum_rpow_thirteenHalves_le (n : ℕ) :
   nlinarith [h_le_int, h_int_eq, h1le, Real.rpow_nonneg (Nat.cast_nonneg n) ((15:ℝ)/2)]
 
 /-- Deligne combined with `σ₀(k) ≤ k`: `|τ(k)| ≤ k^(13/2)` for `k ≥ 1`. -/
-private lemma abs_ramanujanTau_le_pow (k : ℕ) (hk : 1 ≤ k) :
+private lemma abs_tau_le_pow (k : ℕ) (hk : 1 ≤ k) :
     |(τ k : ℝ)| ≤ (k : ℝ) ^ ((13 : ℝ) / 2) := by
-  have hτ := abs_ramanujanTau_lt k hk
+  have hτ := abs_tau_lt k hk
   have hσ0 : (σ 0 k : ℝ) ≤ (k : ℝ) := by
     rw [ArithmeticFunction.sigma_zero_apply]
     exact_mod_cast Nat.card_divisors_le_self k
@@ -259,9 +238,9 @@ private lemma abs_ramanujanTau_le_pow (k : ℕ) (hk : 1 ≤ k) :
         Real.rpow_add_of_nonneg hkpos (by norm_num) (by norm_num), Real.rpow_one]
   nlinarith [hτ, mul_le_mul_of_nonneg_right hσ0 hpow_pos, prod_eq]
 
-/-- `|y_n| ≤ (2/15) n^(23/2)`. -/
+/-- `|y_n| ≤ (4/15) n^(21/2)`. -/
 lemma abs_ySeq_le (n : ℕ) (hn : 1 ≤ n) :
-    |ySeq n| ≤ (2 / 15) * (n : ℝ) ^ ((23 : ℝ) / 2) := by
+    |ySeq n| ≤ (4 / 15) * (n : ℝ) ^ ((21 : ℝ) / 2) := by
   unfold ySeq
   have hn_nn : (0 : ℝ) ≤ (n : ℝ) := Nat.cast_nonneg n
   have step1 :
@@ -273,27 +252,29 @@ lemma abs_ySeq_le (n : ℕ) (hn : 1 ≤ n) :
   have step2 :
       ∀ k ∈ Ico 1 n,
         |(τ k : ℝ)| * (σ 3 (n - k) : ℝ) ≤
-          (k : ℝ) ^ ((13 : ℝ) / 2) * (n : ℝ) ^ 4 := by
+          (k : ℝ) ^ ((13 : ℝ) / 2) * (2 * (n : ℝ) ^ 3) := by
     intro k hk
     rw [Finset.mem_Ico] at hk
-    have hσ3_le : (σ 3 (n - k) : ℝ) ≤ (n : ℝ) ^ 4 := by
-      exact_mod_cast (ArithmeticFunction.sigma_le_pow_succ 3 (n - k)).trans
-        (Nat.pow_le_pow_left (Nat.sub_le n k) 4)
-    exact mul_le_mul (abs_ramanujanTau_le_pow k hk.1) hσ3_le (Nat.cast_nonneg _) (by positivity)
+    have hnk_pos : 1 ≤ n - k := by omega
+    have hσ3_le : (σ 3 (n - k) : ℝ) ≤ 2 * (n : ℝ) ^ 3 := by
+      refine (sigma_le_two_mul_pow (by norm_num) (n - k) hnk_pos).trans ?_
+      gcongr
+      exact_mod_cast Nat.sub_le n k
+    exact mul_le_mul (abs_tau_le_pow k hk.1) hσ3_le (Nat.cast_nonneg _) (by positivity)
   have step3 :
       ∑ k ∈ Ico 1 n, |(τ k : ℝ)| * (σ 3 (n - k) : ℝ) ≤
-        (n : ℝ) ^ 4 * ∑ k ∈ Ico 1 n, (k : ℝ) ^ ((13 : ℝ) / 2) := by
+        2 * (n : ℝ) ^ 3 * ∑ k ∈ Ico 1 n, (k : ℝ) ^ ((13 : ℝ) / 2) := by
     refine (Finset.sum_le_sum step2).trans ?_
     rw [Finset.mul_sum]
     exact Finset.sum_le_sum fun k _ => le_of_eq (by ring)
   have hcombine :
-      (n : ℝ) ^ 4 * (n : ℝ) ^ ((15 : ℝ) / 2) = (n : ℝ) ^ ((23 : ℝ) / 2) := by
-    rw [show ((n : ℝ) ^ 4) = (n : ℝ) ^ ((4 : ℝ)) by norm_cast,
+      (n : ℝ) ^ 3 * (n : ℝ) ^ ((15 : ℝ) / 2) = (n : ℝ) ^ ((21 : ℝ) / 2) := by
+    rw [show ((n : ℝ) ^ 3) = (n : ℝ) ^ ((3 : ℝ)) by norm_cast,
         ← Real.rpow_add_of_nonneg hn_nn (by norm_num) (by norm_num)]
     norm_num
   nlinarith [step1, step3,
     mul_le_mul_of_nonneg_left (sum_rpow_thirteenHalves_le n)
-      (by positivity : (0:ℝ) ≤ (n : ℝ) ^ 4), hcombine]
+      (by positivity : (0:ℝ) ≤ 2 * (n : ℝ) ^ 3), hcombine]
 
 /-- `|z_n| ≤ (2/15) n^(21/2)`. -/
 lemma abs_zSeq_le (n : ℕ) (hn : 1 ≤ n) :
@@ -325,7 +306,7 @@ lemma abs_zSeq_le (n : ℕ) (hn : 1 ≤ n) :
         (Nat.pow_le_pow_left (Nat.sub_le n k) 2)
     have h_a : |(τ k : ℝ)| * ((n : ℝ) - k) ≤
         (k : ℝ) ^ ((13 : ℝ) / 2) * (n : ℝ) :=
-      mul_le_mul (abs_ramanujanTau_le_pow k hk1) (by linarith) hnk_nn (by positivity)
+      mul_le_mul (abs_tau_le_pow k hk1) (by linarith) hnk_nn (by positivity)
     calc |(τ k : ℝ)| * ((n : ℝ) - k) * (σ 1 (n - k) : ℝ)
         ≤ (k : ℝ) ^ ((13 : ℝ) / 2) * (n : ℝ) * (n : ℝ) ^ 2 :=
           mul_le_mul h_a hσ1' (Nat.cast_nonneg _) (by positivity)
@@ -387,7 +368,7 @@ proof reduces each correction term to a multiple of `t¹⁴ / 1210809600`
 (one sixth of the dominant negative term), so that the five corrections
 sum to at most `5 t¹⁴ / 1210809600 < t¹⁴ / 201801600`.
 
-The remaining small-`n` cases `1 ≤ n < 250` are open: with `ramanujanTau`
+The remaining small-`n` cases `1 ≤ n < 250` are open: with `tau`
 treated as `opaque` (per the sketch's "assume Deligne's bound without
 proof" directive), specific values such as `τ(1) = 1, τ(2) = -24, …` are
 inaccessible, so they cannot be dispatched without either a concrete
@@ -396,12 +377,6 @@ permits `|τ(1)| < 1`, which is loose enough that `a_1 > 0` is not
 contradicted by the bound (even though the actual `τ(1) = 1` makes
 `a_1 < 0`).
 -/
-
-/-- For `t ≥ 1`: `t^((23:ℝ)/2) ≤ t^12`. -/
-private lemma rpow_23_half_le_pow_12 (t : ℝ) (ht : 1 ≤ t) :
-    t ^ ((23 : ℝ) / 2) ≤ t ^ 12 := by
-  rw [← Real.rpow_natCast t 12]
-  exact Real.rpow_le_rpow_of_exponent_le ht (by norm_num)
 
 /-- For `t ≥ 1`: `t^((21:ℝ)/2) ≤ t^11`. -/
 private lemma rpow_21_half_le_pow_11 (t : ℝ) (ht : 1 ≤ t) :
@@ -436,10 +411,10 @@ lemma aSeq_neg_of_large (n : ℕ) (hn : 250 ≤ n) : aSeq n < 0 := by
     rw [← abs_mul]; exact le_abs_self _
   have h_tau_le : c₆ * (τ n : ℝ) ≤ c₆ * |(τ n : ℝ)| :=
     mul_le_mul_of_nonneg_left (le_abs_self _) hc6_pos.le
-  have h_y_int : 240 * c₆ * |ySeq n| ≤ 240 * c₆ * ((2 / 15) * (n : ℝ) ^ 12) := by
+  have h_y_int : 240 * c₆ * |ySeq n| ≤ 240 * c₆ * ((4 / 15) * (n : ℝ) ^ 11) := by
     have := (abs_ySeq_le n hn_pos).trans
-      (by nlinarith [rpow_23_half_le_pow_12 (n:ℝ) ht1] :
-        (2 / 15) * (n : ℝ) ^ ((23 : ℝ) / 2) ≤ (2 / 15) * (n : ℝ) ^ 12)
+      (by nlinarith [rpow_21_half_le_pow_11 (n:ℝ) ht1] :
+        (4 / 15) * (n : ℝ) ^ ((21 : ℝ) / 2) ≤ (4 / 15) * (n : ℝ) ^ 11)
     gcongr
   have h_z_int : |c₇| * |zSeq n| ≤ |c₇| * ((2 / 15) * (n : ℝ) ^ 11) := by
     have := (abs_zSeq_le n hn_pos).trans
@@ -449,7 +424,7 @@ lemma aSeq_neg_of_large (n : ℕ) (hn : 250 ≤ n) : aSeq n < 0 := by
   have h_tau_int : c₆ * |(τ n : ℝ)| ≤ c₆ * ((n : ℝ) * (n : ℝ) ^ 6) := by
     have hpow_pos : (0 : ℝ) ≤ (n : ℝ) ^ ((11 : ℝ) / 2) := Real.rpow_nonneg ht_pos.le _
     have h1 : |(τ n : ℝ)| ≤ (n : ℝ) * (n : ℝ) ^ 6 := by
-      nlinarith [abs_ramanujanTau_lt n hn_pos, rpow_11_half_le_pow_6 (n : ℝ) ht1,
+      nlinarith [abs_tau_lt n hn_pos, rpow_11_half_le_pow_6 (n : ℝ) ht1,
         ht_pos.le, mul_le_mul_of_nonneg_right h_σ0 hpow_pos]
     gcongr
   unfold aSeq
@@ -458,7 +433,7 @@ lemma aSeq_neg_of_large (n : ℕ) (hn : 250 ≤ n) : aSeq n < 0 := by
         (-(n : ℝ) ^ 14 / 201801600
          + 9062 * (n : ℝ) ^ 13 / 47809681920
          + 98 * (n : ℝ) ^ 11 / 25660800)
-        + 240 * c₆ * ((2 / 15) * (n : ℝ) ^ 12)
+        + 240 * c₆ * ((4 / 15) * (n : ℝ) ^ 11)
         + |c₇| * ((2 / 15) * (n : ℝ) ^ 11)
         + c₆ * ((n : ℝ) * (n : ℝ) ^ 6) := by
     linarith [xSeq_le_sharp n hn_pos, h_y_le, h_y_int, h_z_le, h_z_int, h_tau_le, h_tau_int]
@@ -470,17 +445,15 @@ lemma aSeq_neg_of_large (n : ℕ) (hn : 250 ≤ n) : aSeq n < 0 := by
   -- Each positive correction is ≤ t^14 / (6 · 201801600); their total is ≤ 5 t^14 /
   -- (6 · 201801600) < t^14 / 201801600.
   have ht13_nn : (0 : ℝ) ≤ t ^ 13 := by positivity
-  have ht12_nn : (0 : ℝ) ≤ t ^ 12 := by positivity
   have ht11_nn : (0 : ℝ) ≤ t ^ 11 := by positivity
   have ht7_nn : (0 : ℝ) ≤ t ^ 7 := by positivity
-  have ht2 : (250 : ℝ) ^ 2 ≤ t ^ 2 := pow_le_pow_left₀ (by norm_num) ht250 2
   have ht3 : (250 : ℝ) ^ 3 ≤ t ^ 3 := pow_le_pow_left₀ (by norm_num) ht250 3
   have ht7 : (250 : ℝ) ^ 7 ≤ t ^ 7 := pow_le_pow_left₀ (by norm_num) ht250 7
   have hb1 : 9062 * t ^ 13 / 47809681920 ≤ t ^ 14 / 1210809600 := by
     nlinarith [ht250, ht13_nn, mul_le_mul_of_nonneg_right ht250 ht13_nn]
-  have hb2 : 240 * (86619413 / 139015844352000) * ((2 / 15) * t ^ 12) ≤
+  have hb2 : 240 * (86619413 / 139015844352000) * ((4 / 15) * t ^ 11) ≤
       t ^ 14 / 1210809600 :=
-    by nlinarith [mul_le_mul_of_nonneg_right ht2 ht12_nn, ht12_nn]
+    by nlinarith [mul_le_mul_of_nonneg_right ht3 ht11_nn, ht11_nn]
   have hb3 : 98 * t ^ 11 / 25660800 ≤ t ^ 14 / 1210809600 := by
     nlinarith [mul_le_mul_of_nonneg_right ht3 ht11_nn, ht11_nn]
   have hb4 : 118801 / 10746432000 * ((2 / 15) * t ^ 11) ≤ t ^ 14 / 1210809600 := by
