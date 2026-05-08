@@ -148,8 +148,8 @@ private lemma sum_one_div_pow_Icc_le_two {k : ℕ} (hk : 2 ≤ k) (n : ℕ) (hn 
     ∑ d ∈ Finset.Icc 1 n, ((1 : ℝ) / (d : ℝ) ^ k) ≤ 2 := by
   have h_split : Finset.Icc 1 n = insert 1 (Finset.Icc 2 n) := by
     ext x; simp [Finset.mem_Icc, Finset.mem_insert]; omega
-  rw [h_split, Finset.sum_insert (by rw [Finset.mem_Icc]; omega),
-    show (1 : ℝ) / (((1 : ℕ) : ℝ)) ^ k = 1 by push_cast; simp]
+  rw [h_split, Finset.sum_insert (by rw [Finset.mem_Icc]; omega), Nat.cast_one, one_pow,
+    div_one]
   have h_bound : ∀ d ∈ Finset.Icc 2 n,
       ((1 : ℝ) / (d : ℝ) ^ k) ≤ (1 : ℝ) / (d : ℝ) ^ 2 := fun d hd => by
     rw [Finset.mem_Icc] at hd
@@ -160,14 +160,14 @@ private lemma sum_one_div_pow_Icc_le_two {k : ℕ} (hk : 2 ≤ k) (n : ℕ) (hn 
 `σₖ(n) = nᵏ · ∑_{d ∣ n} 1/dᵏ`. -/
 private lemma sigma_eq_pow_mul_sum_inv (k : ℕ) (n : ℕ) (hn : 1 ≤ n) :
     (σ k n : ℝ) = (n : ℝ) ^ k * ∑ d ∈ n.divisors, ((1 : ℝ) / (d : ℝ) ^ k) := by
-  rw [show ((σ k n : ℕ) : ℝ) = (((∑ d ∈ n.divisors, (n / d) ^ k : ℕ) : ℕ) : ℝ) by
-        congr 1; exact ArithmeticFunction.sigma_eq_sum_div k n]
+  rw [show (σ k n : ℝ) = ((∑ d ∈ n.divisors, (n / d) ^ k : ℕ) : ℝ) by
+        exact_mod_cast ArithmeticFunction.sigma_eq_sum_div k n]
   push_cast
   rw [Finset.mul_sum]
   refine Finset.sum_congr rfl fun d hd => ?_
   obtain ⟨hd_dvd, _⟩ := Nat.mem_divisors.mp hd
-  have hd_pos : 0 < d := Nat.pos_of_dvd_of_pos hd_dvd (by omega)
-  rw [Nat.cast_div hd_dvd (by exact_mod_cast hd_pos.ne'), div_pow]
+  rw [Nat.cast_div hd_dvd (Nat.cast_ne_zero.mpr (Nat.pos_of_dvd_of_pos hd_dvd (by omega)).ne'),
+    div_pow]
   field_simp
 
 /-- **Upper bound for `σₖ(n)`**: for `k ≥ 2` and `n ≥ 1`, `σₖ(n) ≤ 2 nᵏ`.
@@ -216,8 +216,7 @@ private lemma sum_rpow_thirteenHalves_le (n : ℕ) :
       (a := 1) (b := n) hn.le hmono
   have h_int_eq : ∫ x in ((1 : ℕ) : ℝ)..((n : ℕ) : ℝ), x ^ ((13 : ℝ) / 2) =
       ((n : ℝ) ^ ((15 : ℝ) / 2) - 1) / (15 / 2) := by
-    rw [show (((1 : ℕ) : ℝ)) = (1 : ℝ) from by norm_cast,
-        integral_rpow (Or.inl (by norm_num : -1 < (13 : ℝ) / 2)),
+    rw [Nat.cast_one, integral_rpow (Or.inl (by norm_num : -1 < (13 : ℝ) / 2)),
         show ((13 : ℝ) / 2 + 1) = (15 : ℝ) / 2 from by norm_num, Real.one_rpow]
   have h1le : (1 : ℝ) ≤ (n : ℝ) ^ ((15 : ℝ) / 2) := by
     have := Real.rpow_le_rpow (by norm_num : (0:ℝ) ≤ 1) h1n (by norm_num : (0:ℝ) ≤ (15:ℝ)/2)
@@ -227,16 +226,13 @@ private lemma sum_rpow_thirteenHalves_le (n : ℕ) :
 /-- Deligne combined with `σ₀(k) ≤ k`: `|τ(k)| ≤ k^(13/2)` for `k ≥ 1`. -/
 private lemma abs_tau_le_pow (k : ℕ) (hk : 1 ≤ k) :
     |(τ k : ℝ)| ≤ (k : ℝ) ^ ((13 : ℝ) / 2) := by
-  have hτ := abs_tau_lt k hk
   have hσ0 : (σ 0 k : ℝ) ≤ (k : ℝ) := by
-    rw [ArithmeticFunction.sigma_zero_apply]
-    exact_mod_cast Nat.card_divisors_le_self k
-  have hkpos : (0 : ℝ) ≤ (k : ℝ) := Nat.cast_nonneg k
-  have hpow_pos : (0 : ℝ) ≤ (k : ℝ) ^ ((11 : ℝ) / 2) := Real.rpow_nonneg hkpos _
+    rw [ArithmeticFunction.sigma_zero_apply]; exact_mod_cast Nat.card_divisors_le_self k
   have prod_eq : (k : ℝ) * (k : ℝ) ^ ((11 : ℝ) / 2) = (k : ℝ) ^ ((13 : ℝ) / 2) := by
     rw [show ((13 : ℝ) / 2) = 1 + (11 : ℝ) / 2 by ring,
-        Real.rpow_add_of_nonneg hkpos (by norm_num) (by norm_num), Real.rpow_one]
-  nlinarith [hτ, mul_le_mul_of_nonneg_right hσ0 hpow_pos, prod_eq]
+        Real.rpow_add_of_nonneg (Nat.cast_nonneg k) (by norm_num) (by norm_num), Real.rpow_one]
+  nlinarith [abs_tau_lt k hk, prod_eq,
+    mul_le_mul_of_nonneg_right hσ0 (Real.rpow_nonneg (Nat.cast_nonneg k) ((11:ℝ)/2))]
 
 /-- `|y_n| ≤ (4/15) n^(21/2)`. -/
 lemma abs_ySeq_le (n : ℕ) (hn : 1 ≤ n) :
@@ -248,7 +244,7 @@ lemma abs_ySeq_le (n : ℕ) (hn : 1 ≤ n) :
         ∑ k ∈ Ico 1 n, |(τ k : ℝ)| * (σ 3 (n - k) : ℝ) := by
     refine (abs_sum_le_sum_abs _ _).trans ?_
     refine Finset.sum_le_sum fun k _ => ?_
-    rw [abs_mul, abs_of_nonneg (Nat.cast_nonneg (σ 3 (n - k) : ℕ) : (0:ℝ) ≤ _)]
+    rw [abs_mul, abs_of_nonneg (Nat.cast_nonneg (σ 3 (n - k)) : (0:ℝ) ≤ _)]
   have step2 :
       ∀ k ∈ Ico 1 n,
         |(τ k : ℝ)| * (σ 3 (n - k) : ℝ) ≤
@@ -290,7 +286,7 @@ lemma abs_zSeq_le (n : ℕ) (hn : 1 ≤ n) :
     have hnk_nn : (0 : ℝ) ≤ (n : ℝ) - k := by
       have : (k : ℝ) ≤ (n : ℝ) := by exact_mod_cast hk.2.le
       linarith
-    rw [abs_mul, abs_mul, abs_of_nonneg (Nat.cast_nonneg (σ 1 (n - k) : ℕ) : (0:ℝ) ≤ _),
+    rw [abs_mul, abs_mul, abs_of_nonneg (Nat.cast_nonneg (σ 1 (n - k)) : (0:ℝ) ≤ _),
       abs_of_nonneg hnk_nn]
   have step2 :
       ∀ k ∈ Ico 1 n,
@@ -299,17 +295,16 @@ lemma abs_zSeq_le (n : ℕ) (hn : 1 ≤ n) :
     intro k hk
     rw [Finset.mem_Ico] at hk
     obtain ⟨hk1, hk2⟩ := hk
-    have hk_le : (k : ℝ) ≤ (n : ℝ) := by exact_mod_cast hk2.le
-    have hnk_nn : (0 : ℝ) ≤ (n : ℝ) - k := by linarith
+    have hnk_nn : (0 : ℝ) ≤ (n : ℝ) - k := by
+      have : (k : ℝ) ≤ (n : ℝ) := by exact_mod_cast hk2.le
+      linarith
     have hσ1' : (σ 1 (n - k) : ℝ) ≤ (n : ℝ) ^ 2 := by
       exact_mod_cast (ArithmeticFunction.sigma_le_pow_succ 1 (n - k)).trans
         (Nat.pow_le_pow_left (Nat.sub_le n k) 2)
-    have h_a : |(τ k : ℝ)| * ((n : ℝ) - k) ≤
-        (k : ℝ) ^ ((13 : ℝ) / 2) * (n : ℝ) :=
-      mul_le_mul (abs_tau_le_pow k hk1) (by linarith) hnk_nn (by positivity)
     calc |(τ k : ℝ)| * ((n : ℝ) - k) * (σ 1 (n - k) : ℝ)
         ≤ (k : ℝ) ^ ((13 : ℝ) / 2) * (n : ℝ) * (n : ℝ) ^ 2 :=
-          mul_le_mul h_a hσ1' (Nat.cast_nonneg _) (by positivity)
+          mul_le_mul (mul_le_mul (abs_tau_le_pow k hk1) (by linarith) hnk_nn (by positivity))
+            hσ1' (Nat.cast_nonneg _) (by positivity)
       _ = (k : ℝ) ^ ((13 : ℝ) / 2) * (n : ℝ) ^ 3 := by ring
   have step3 :
       ∑ k ∈ Ico 1 n, |(τ k : ℝ)| * ((n : ℝ) - k) * (σ 1 (n - k) : ℝ) ≤
@@ -347,17 +342,17 @@ lemma xSeq_le_sharp (n : ℕ) (hn : 1 ≤ n) :
   unfold xSeq
   have hn_nn : (0 : ℝ) ≤ (n : ℝ) := Nat.cast_nonneg n
   have m13 : (n : ℝ) ^ 14 ≤ (n : ℝ) * (σ 13 n : ℝ) := by
-    have := mul_le_mul_of_nonneg_left (pow_le_sigma 13 n hn) hn_nn; nlinarith
+    nlinarith [mul_le_mul_of_nonneg_left (pow_le_sigma 13 n hn) hn_nn]
   have m11 : (n : ℝ) ^ 2 * (σ 11 n : ℝ) ≤ 2 * (n : ℝ) ^ 13 := by
-    have h : (σ 11 n : ℝ) ≤ 2 * (n : ℝ) ^ 11 := sigma_le_two_mul_pow (by norm_num) n hn
-    nlinarith [mul_le_mul_of_nonneg_left h (sq_nonneg ((n:ℝ)))]
+    nlinarith [mul_le_mul_of_nonneg_left (sigma_le_two_mul_pow (by norm_num : 2 ≤ 11) n hn)
+      (sq_nonneg (n : ℝ))]
   have m9 : (n : ℝ) ^ 12 ≤ (n : ℝ) ^ 3 * (σ 9 n : ℝ) := by
-    have := mul_le_mul_of_nonneg_left (pow_le_sigma 9 n hn) (pow_nonneg hn_nn 3); nlinarith
+    nlinarith [mul_le_mul_of_nonneg_left (pow_le_sigma 9 n hn) (pow_nonneg hn_nn 3)]
   have m7 : (n : ℝ) ^ 4 * (σ 7 n : ℝ) ≤ 2 * (n : ℝ) ^ 11 := by
-    have h : (σ 7 n : ℝ) ≤ 2 * (n : ℝ) ^ 7 := sigma_le_two_mul_pow (by norm_num) n hn
-    nlinarith [mul_le_mul_of_nonneg_left h (pow_nonneg hn_nn 4)]
+    nlinarith [mul_le_mul_of_nonneg_left (sigma_le_two_mul_pow (by norm_num : 2 ≤ 7) n hn)
+      (pow_nonneg hn_nn 4)]
   have m5 : (n : ℝ) ^ 10 ≤ (n : ℝ) ^ 5 * (σ 5 n : ℝ) := by
-    have := mul_le_mul_of_nonneg_left (pow_le_sigma 5 n hn) (pow_nonneg hn_nn 5); nlinarith
+    nlinarith [mul_le_mul_of_nonneg_left (pow_le_sigma 5 n hn) (pow_nonneg hn_nn 5)]
   nlinarith [m13, m11, m9, m7, m5, sq_nonneg (n : ℝ), pow_nonneg hn_nn 12, pow_nonneg hn_nn 10]
 
 /-! ## Main theorem
@@ -402,13 +397,12 @@ lemma aSeq_neg_of_large (n : ℕ) (hn : 250 ≤ n) : aSeq n < 0 := by
   have ht250 : (250 : ℝ) ≤ (n : ℝ) := by exact_mod_cast hn
   have ht1 : (1 : ℝ) ≤ (n : ℝ) := by linarith
   have hc6_pos : 0 < c₆ := c₆_pos
-  have hc7_abs : |c₇| = -c₇ := abs_of_neg c₇_neg
   have h_σ0 : (σ 0 n : ℝ) ≤ (n : ℝ) := by
     rw [ArithmeticFunction.sigma_zero_apply]; exact_mod_cast Nat.card_divisors_le_self n
   have h_y_le : 240 * c₆ * ySeq n ≤ 240 * c₆ * |ySeq n| :=
     mul_le_mul_of_nonneg_left (le_abs_self _) (by positivity)
-  have h_z_le : c₇ * zSeq n ≤ |c₇| * |zSeq n| := by
-    rw [← abs_mul]; exact le_abs_self _
+  have h_z_le : c₇ * zSeq n ≤ -c₇ * |zSeq n| := by
+    rw [show -c₇ = |c₇| from (abs_of_neg c₇_neg).symm, ← abs_mul]; exact le_abs_self _
   have h_tau_le : c₆ * (τ n : ℝ) ≤ c₆ * |(τ n : ℝ)| :=
     mul_le_mul_of_nonneg_left (le_abs_self _) hc6_pos.le
   have h_y_int : 240 * c₆ * |ySeq n| ≤ 240 * c₆ * ((4 / 15) * (n : ℝ) ^ 11) := by
@@ -416,54 +410,47 @@ lemma aSeq_neg_of_large (n : ℕ) (hn : 250 ≤ n) : aSeq n < 0 := by
       (by nlinarith [rpow_21_half_le_pow_11 (n:ℝ) ht1] :
         (4 / 15) * (n : ℝ) ^ ((21 : ℝ) / 2) ≤ (4 / 15) * (n : ℝ) ^ 11)
     gcongr
-  have h_z_int : |c₇| * |zSeq n| ≤ |c₇| * ((2 / 15) * (n : ℝ) ^ 11) := by
+  have h_z_int : -c₇ * |zSeq n| ≤ -c₇ * ((2 / 15) * (n : ℝ) ^ 11) := by
     have := (abs_zSeq_le n hn_pos).trans
       (by nlinarith [rpow_21_half_le_pow_11 (n:ℝ) ht1] :
         (2 / 15) * (n : ℝ) ^ ((21 : ℝ) / 2) ≤ (2 / 15) * (n : ℝ) ^ 11)
+    have : (0 : ℝ) ≤ -c₇ := by linarith [c₇_neg]
     gcongr
   have h_tau_int : c₆ * |(τ n : ℝ)| ≤ c₆ * ((n : ℝ) * (n : ℝ) ^ 6) := by
-    have hpow_pos : (0 : ℝ) ≤ (n : ℝ) ^ ((11 : ℝ) / 2) := Real.rpow_nonneg ht_pos.le _
     have h1 : |(τ n : ℝ)| ≤ (n : ℝ) * (n : ℝ) ^ 6 := by
-      nlinarith [abs_tau_lt n hn_pos, rpow_11_half_le_pow_6 (n : ℝ) ht1,
-        ht_pos.le, mul_le_mul_of_nonneg_right h_σ0 hpow_pos]
+      nlinarith [abs_tau_lt n hn_pos, rpow_11_half_le_pow_6 (n : ℝ) ht1, ht_pos.le,
+        mul_le_mul_of_nonneg_right h_σ0 (Real.rpow_nonneg ht_pos.le ((11 : ℝ) / 2))]
     gcongr
   unfold aSeq
-  have h_combined :
+  refine lt_of_le_of_lt
+    (by linarith [xSeq_le_sharp n hn_pos, h_y_le, h_y_int, h_z_le, h_z_int, h_tau_le, h_tau_int] :
       xSeq n + 240 * c₆ * ySeq n + c₇ * zSeq n + c₆ * (τ n : ℝ) ≤
         (-(n : ℝ) ^ 14 / 201801600
          + 9062 * (n : ℝ) ^ 13 / 47809681920
          + 98 * (n : ℝ) ^ 11 / 25660800)
         + 240 * c₆ * ((4 / 15) * (n : ℝ) ^ 11)
-        + |c₇| * ((2 / 15) * (n : ℝ) ^ 11)
-        + c₆ * ((n : ℝ) * (n : ℝ) ^ 6) := by
-    linarith [xSeq_le_sharp n hn_pos, h_y_le, h_y_int, h_z_le, h_z_int, h_tau_le, h_tau_int]
-  refine lt_of_le_of_lt h_combined ?_
-  have hc6_val : c₆ = 86619413 / 139015844352000 := rfl
-  have hc7_abs_val : |c₇| = 118801 / 10746432000 := by rw [hc7_abs]; norm_num [c₇]
-  rw [hc6_val, hc7_abs_val]
+        + -c₇ * ((2 / 15) * (n : ℝ) ^ 11)
+        + c₆ * ((n : ℝ) * (n : ℝ) ^ 6)) ?_
+  rw [show -c₇ = (118801 / 10746432000 : ℝ) from by unfold c₇; norm_num]
+  unfold c₆
   set t : ℝ := (n : ℝ)
   -- Each positive correction is ≤ t^14 / (6 · 201801600); their total is ≤ 5 t^14 /
   -- (6 · 201801600) < t^14 / 201801600.
-  have ht13_nn : (0 : ℝ) ≤ t ^ 13 := by positivity
-  have ht11_nn : (0 : ℝ) ≤ t ^ 11 := by positivity
-  have ht7_nn : (0 : ℝ) ≤ t ^ 7 := by positivity
   have ht3 : (250 : ℝ) ^ 3 ≤ t ^ 3 := pow_le_pow_left₀ (by norm_num) ht250 3
-  have ht7 : (250 : ℝ) ^ 7 ≤ t ^ 7 := pow_le_pow_left₀ (by norm_num) ht250 7
+  have ht11_nn : (0 : ℝ) ≤ t ^ 11 := by positivity
   have hb1 : 9062 * t ^ 13 / 47809681920 ≤ t ^ 14 / 1210809600 := by
-    nlinarith [ht250, ht13_nn, mul_le_mul_of_nonneg_right ht250 ht13_nn]
+    nlinarith [mul_le_mul_of_nonneg_right ht250 (by positivity : (0:ℝ) ≤ t^13)]
   have hb2 : 240 * (86619413 / 139015844352000) * ((4 / 15) * t ^ 11) ≤
-      t ^ 14 / 1210809600 :=
-    by nlinarith [mul_le_mul_of_nonneg_right ht3 ht11_nn, ht11_nn]
+      t ^ 14 / 1210809600 := by nlinarith [mul_le_mul_of_nonneg_right ht3 ht11_nn]
   have hb3 : 98 * t ^ 11 / 25660800 ≤ t ^ 14 / 1210809600 := by
-    nlinarith [mul_le_mul_of_nonneg_right ht3 ht11_nn, ht11_nn]
-  have hb4 : 118801 / 10746432000 * ((2 / 15) * t ^ 11) ≤ t ^ 14 / 1210809600 := by
-    nlinarith [mul_le_mul_of_nonneg_right ht3 ht11_nn, ht11_nn]
-  have hb5 : 86619413 / 139015844352000 * (t * t ^ 6) ≤ t ^ 14 / 1210809600 := by
-    nlinarith [mul_le_mul_of_nonneg_right ht7 ht7_nn, ht7_nn]
+    nlinarith [mul_le_mul_of_nonneg_right ht3 ht11_nn]
+  have hb4 : (118801 / 10746432000 : ℝ) * ((2 / 15) * t ^ 11) ≤ t ^ 14 / 1210809600 := by
+    nlinarith [mul_le_mul_of_nonneg_right ht3 ht11_nn]
+  have hb5 : (86619413 / 139015844352000 : ℝ) * (t * t ^ 6) ≤ t ^ 14 / 1210809600 := by
+    nlinarith [mul_le_mul_of_nonneg_right (pow_le_pow_left₀ (by norm_num : (0:ℝ) ≤ 250) ht250 7)
+      (by positivity : (0:ℝ) ≤ t^7)]
   -- Combined: -t^14/201801600 + 5·(t^14/1210809600) = -t^14/1210809600 < 0.
-  have h_eq_neg : -t ^ 14 / 201801600 = -(6 * (t ^ 14 / 1210809600)) := by
-    field_simp; ring
-  have ht14_pos : 0 < t ^ 14 / 1210809600 := by positivity
-  linarith [hb1, hb2, hb3, hb4, hb5, h_eq_neg, ht14_pos]
+  have h_eq_neg : -t ^ 14 / 201801600 = -(6 * (t ^ 14 / 1210809600)) := by field_simp; ring
+  linarith [hb1, hb2, hb3, hb4, hb5, h_eq_neg, (by positivity : (0:ℝ) < t^14/1210809600)]
 
 end
