@@ -108,13 +108,13 @@ lemma sigma_le_pow_succ_real (k n : ℕ) :
 
 /-! ### Sharp bound `σₖ(n) ≤ 2 nᵏ` (`k ≥ 2`)
 
-Following the user's hint, the bijection `d ↔ n/d` on divisors of `n` gives
+The bijection `d ↔ n/d` on divisors of `n` gives
 
-  `σₖ(n) = ∑_{d|n} dᵏ = ∑_{d|n} (n/d)ᵏ = nᵏ · ∑_{d|n} 1/dᵏ`,
+  `σₖ(n) = ∑_{d ∣ n} dᵏ = ∑_{d ∣ n} (n/d)ᵏ = nᵏ · ∑_{d ∣ n} 1/dᵏ`,
 
 and for `k ≥ 2` the sum is bounded by `2`:
 
-  `∑_{d|n} 1/dᵏ ≤ ∑_{d=1}^{n} 1/dᵏ ≤ 1 + ∑_{d=2}^{n}(1/(d-1) - 1/d) ≤ 2`.
+  `∑_{d ∣ n} 1/dᵏ ≤ ∑_{d=1}^{n} 1/dᵏ ≤ 1 + ∑_{d=2}^{n} (1/(d-1) - 1/d) ≤ 2`.
 -/
 
 /-- Telescoping identity: `∑_{d=2}^{N} (1/(d-1) - 1/d) = 1 - 1/N` for `N ≥ 1`. -/
@@ -209,9 +209,11 @@ lemma sigma_le_two_mul_pow {k : ℕ} (hk : 2 ≤ k) (n : ℕ) (hn : 1 ≤ n) :
 
 /-! ## Deligne-style bounds on `|y_n|` and `|z_n|`
 
-We bound `|τ(k)| < σ₀(k) k^(11/2) ≤ k · k^(11/2) = k^(13/2)` using
-`σ₀(k) ≤ k`. Together with `σ₃(n - k) ≤ (n - k)^4 ≤ n^4` and
-`σ₁(n - k) ≤ (n - k)^2 ≤ n^2`, this yields the bounds (∗).
+From `σ₀(k) ≤ k` we get `|τ(k)| < σ₀(k) k^(11/2) ≤ k · k^(11/2) = k^(13/2)`.
+Combined with `σ₃(n - k) ≤ (n - k)^4 ≤ n^4` and
+`σ₁(n - k) ≤ (n - k)^2 ≤ n^2`, this yields
+
+  `|y_n| ≤ (2/15) n^(23/2)` and `|z_n| ≤ (2/15) n^(21/2)`.
 -/
 
 /-- The sum `∑_{k=1}^{n-1} k^(13/2)` is bounded by `(2/15) n^(15/2)`. -/
@@ -345,42 +347,15 @@ lemma abs_zSeq_le (n : ℕ) (hn : 1 ≤ n) :
 
 /-! ## Bounding the `x_n` term
 
-For `n ≥ 1`, every `σₖ(n)` lies between `nᵏ` and `nᵏ⁺¹`. The leading negative
-contribution `- n σ₁₃(n) / 201801600` is at most `- n¹⁴ / 201801600`, and one
-checks that the positive contributions cannot make up for it once `n` is
-large enough.
+For `n ≥ 1`, every `σₖ(n)` lies between `nᵏ` and `nᵏ⁺¹`, with the sharper
+`σₖ(n) ≤ 2 nᵏ` available for `k ≥ 2`. The leading negative contribution
+`- n σ₁₃(n) / 201801600` is at most `- n¹⁴ / 201801600`, and the sharp
+bound on `σ₁₁` makes the positive `+4531 n² σ₁₁` term contribute `O(n¹³)`
+rather than `O(n¹⁴)`, so the leading negative term dominates for large `n`.
 -/
 
-/-- Upper bound on `x_n`: replace each `σₖ(n)` by `n^k` (in negative terms,
-using `σₖ(n) ≥ nᵏ`) or by `nᵏ⁺¹` (in positive terms, using `σₖ(n) ≤ nᵏ⁺¹`). -/
-lemma xSeq_le (n : ℕ) (hn : 1 ≤ n) :
-    xSeq n ≤
-      - (n : ℝ) ^ 14 / 201801600
-      + 4531 * (n : ℝ) ^ 14 / 47809681920
-      - 149 * (n : ℝ) ^ 12 / 228096000
-      + 49 * (n : ℝ) ^ 12 / 25660800
-      - 49 * (n : ℝ) ^ 10 / 24883200 := by
-  unfold xSeq
-  have hn_nn : (0 : ℝ) ≤ (n : ℝ) := Nat.cast_nonneg n
-  have m13 : (n : ℝ) ^ 14 ≤ (n : ℝ) * (σ 13 n : ℝ) := by
-    have := mul_le_mul_of_nonneg_left (pow_le_sigma 13 n hn) hn_nn; nlinarith
-  have m11 : (n : ℝ) ^ 2 * (σ 11 n : ℝ) ≤ (n : ℝ) ^ 14 := by
-    have h : (σ 11 n : ℝ) ≤ (n : ℝ) ^ 12 := sigma_le_pow_succ_real 11 n
-    nlinarith [mul_le_mul_of_nonneg_left h (sq_nonneg ((n:ℝ)))]
-  have m9 : (n : ℝ) ^ 12 ≤ (n : ℝ) ^ 3 * (σ 9 n : ℝ) := by
-    have := mul_le_mul_of_nonneg_left (pow_le_sigma 9 n hn) (pow_nonneg hn_nn 3); nlinarith
-  have m7 : (n : ℝ) ^ 4 * (σ 7 n : ℝ) ≤ (n : ℝ) ^ 12 := by
-    have h : (σ 7 n : ℝ) ≤ (n : ℝ) ^ 8 := sigma_le_pow_succ_real 7 n
-    nlinarith [mul_le_mul_of_nonneg_left h (pow_nonneg hn_nn 4)]
-  have m5 : (n : ℝ) ^ 10 ≤ (n : ℝ) ^ 5 * (σ 5 n : ℝ) := by
-    have := mul_le_mul_of_nonneg_left (pow_le_sigma 5 n hn) (pow_nonneg hn_nn 5); nlinarith
-  nlinarith [m13, m11, m9, m7, m5]
-
-/-! ## Sharp upper bound on `xSeq` -/
-
 /-- Sharp upper bound on `xSeq` using `σₖ(n) ≤ 2 nᵏ` for the positive
-contributions. Compared with `xSeq_le`, the `+4531 n² σ₁₁` term contributes
-`O(n¹³)` rather than `O(n¹⁴)`, so the leading `-n¹⁴ / c₁` is now dominant.
+contributions. The leading `-n¹⁴ / 201801600` is dominant.
 
 For brevity we drop the inner negative terms `-149 n¹² / c₃` and
 `-49 n¹⁰ / c₅`: dropping a non-positive term only loosens an upper bound. -/
@@ -402,8 +377,7 @@ lemma xSeq_le_sharp (n : ℕ) (hn : 1 ≤ n) :
     nlinarith [mul_le_mul_of_nonneg_left h (pow_nonneg hn_nn 4)]
   have m5 : (n : ℝ) ^ 10 ≤ (n : ℝ) ^ 5 * (σ 5 n : ℝ) := by
     have := mul_le_mul_of_nonneg_left (pow_le_sigma 5 n hn) (pow_nonneg hn_nn 5); nlinarith
-  nlinarith [m13, m11, m9, m7, m5, sq_nonneg ((n : ℝ)), pow_nonneg hn_nn 12,
-             pow_nonneg hn_nn 10]
+  nlinarith [m13, m11, m9, m7, m5, sq_nonneg (n : ℝ), pow_nonneg hn_nn 12, pow_nonneg hn_nn 10]
 
 /-! ## Main theorem
 
@@ -465,12 +439,12 @@ lemma aSeq_neg_of_large (n : ℕ) (hn : 250 ≤ n) : aSeq n < 0 := by
   have h_y_int : 240 * c₆ * |ySeq n| ≤ 240 * c₆ * ((2 / 15) * (n : ℝ) ^ 12) := by
     have := (abs_ySeq_le n hn_pos).trans
       (by nlinarith [rpow_23_half_le_pow_12 (n:ℝ) ht1] :
-        (2/15) * (n:ℝ)^((23:ℝ)/2) ≤ (2/15) * (n:ℝ)^12)
+        (2 / 15) * (n : ℝ) ^ ((23 : ℝ) / 2) ≤ (2 / 15) * (n : ℝ) ^ 12)
     gcongr
   have h_z_int : |c₇| * |zSeq n| ≤ |c₇| * ((2 / 15) * (n : ℝ) ^ 11) := by
     have := (abs_zSeq_le n hn_pos).trans
       (by nlinarith [rpow_21_half_le_pow_11 (n:ℝ) ht1] :
-        (2/15) * (n:ℝ)^((21:ℝ)/2) ≤ (2/15) * (n:ℝ)^11)
+        (2 / 15) * (n : ℝ) ^ ((21 : ℝ) / 2) ≤ (2 / 15) * (n : ℝ) ^ 11)
     gcongr
   have h_tau_int : c₆ * |(τ n : ℝ)| ≤ c₆ * ((n : ℝ) * (n : ℝ) ^ 6) := by
     have hpow_pos : (0 : ℝ) ≤ (n : ℝ) ^ ((11 : ℝ) / 2) := Real.rpow_nonneg ht_pos.le _
