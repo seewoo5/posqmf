@@ -27,7 +27,7 @@ expressing the extremal quasimodular form `X_{16,5}`.
 
 The strategy follows the sketch in `sketch.tex`:
 
-* Use the trivial bounds `nᵏ ≤ σₖ(n) ≤ nᵏ⁺¹` (for `n ≥ 1`).
+* Use the trivial bounds `nᵏ ≤ σₖ(n) ≤ 2 * nᵏ` (for `n ≥ 1` and `k ≥ 2`. `σ₁(n) ≤ n²` for `k = 1`).
 * Take Deligne's bound `|τ(n)| < σ₀(n) n^(11/2)` as an axiom.
 * These yield `|y_n| ≤ (4/15) n^(21/2)` and `|z_n| ≤ (2/15) n^(21/2)`.
 * The leading negative term `- n σ₁₃(n) / 201801600` of magnitude
