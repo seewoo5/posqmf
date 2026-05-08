@@ -262,52 +262,42 @@ lemma abs_ySeq_le (n : ℕ) (hn : 1 ≤ n) :
     |ySeq n| ≤ (2 / 15) * (n : ℝ) ^ ((23 : ℝ) / 2) := by
   unfold ySeq
   have hn_nn : (0 : ℝ) ≤ (n : ℝ) := Nat.cast_nonneg n
-  -- Step 1: triangle inequality for sums
   have step1 :
       |∑ k ∈ Ico 1 n, (τ k : ℝ) * (σ 3 (n - k) : ℝ)| ≤
         ∑ k ∈ Ico 1 n, |(τ k : ℝ)| * (σ 3 (n - k) : ℝ) := by
     refine (abs_sum_le_sum_abs _ _).trans ?_
     refine Finset.sum_le_sum fun k _ => ?_
     rw [abs_mul, abs_of_nonneg (Nat.cast_nonneg (σ 3 (n - k) : ℕ) : (0:ℝ) ≤ _)]
-  -- Step 2: bound each term by k^(13/2) * n^4
   have step2 :
       ∀ k ∈ Ico 1 n,
         |(τ k : ℝ)| * (σ 3 (n - k) : ℝ) ≤
           (k : ℝ) ^ ((13 : ℝ) / 2) * (n : ℝ) ^ 4 := by
     intro k hk
     rw [Finset.mem_Ico] at hk
-    have hτ := abs_ramanujanTau_le_pow k hk.1
     have hσ3_le : (σ 3 (n - k) : ℝ) ≤ (n : ℝ) ^ 4 := by
-      have h1 : (σ 3 (n - k) : ℝ) ≤ ((n - k : ℕ) : ℝ) ^ 4 := by
-        exact_mod_cast ArithmeticFunction.sigma_le_pow_succ 3 (n - k)
-      refine h1.trans ?_
-      gcongr
-      exact_mod_cast Nat.sub_le n k
-    have hτ_pow_nn : (0 : ℝ) ≤ (k : ℝ) ^ ((13 : ℝ) / 2) := by positivity
-    exact mul_le_mul hτ hσ3_le (Nat.cast_nonneg _) hτ_pow_nn
-  -- Step 3: sum the bound and factor n^4 out
+      exact_mod_cast (ArithmeticFunction.sigma_le_pow_succ 3 (n - k)).trans
+        (Nat.pow_le_pow_left (Nat.sub_le n k) 4)
+    exact mul_le_mul (abs_ramanujanTau_le_pow k hk.1) hσ3_le (Nat.cast_nonneg _) (by positivity)
   have step3 :
       ∑ k ∈ Ico 1 n, |(τ k : ℝ)| * (σ 3 (n - k) : ℝ) ≤
         (n : ℝ) ^ 4 * ∑ k ∈ Ico 1 n, (k : ℝ) ^ ((13 : ℝ) / 2) := by
     refine (Finset.sum_le_sum step2).trans ?_
     rw [Finset.mul_sum]
     exact Finset.sum_le_sum fun k _ => le_of_eq (by ring)
-  -- Step 4: integral bound on the residual sum, then combine
-  have step4 := sum_rpow_thirteenHalves_le n
   have hcombine :
       (n : ℝ) ^ 4 * (n : ℝ) ^ ((15 : ℝ) / 2) = (n : ℝ) ^ ((23 : ℝ) / 2) := by
     rw [show ((n : ℝ) ^ 4) = (n : ℝ) ^ ((4 : ℝ)) by norm_cast,
         ← Real.rpow_add_of_nonneg hn_nn (by norm_num) (by norm_num)]
     norm_num
   nlinarith [step1, step3,
-    mul_le_mul_of_nonneg_left step4 (by positivity : (0:ℝ) ≤ (n : ℝ) ^ 4), hcombine]
+    mul_le_mul_of_nonneg_left (sum_rpow_thirteenHalves_le n)
+      (by positivity : (0:ℝ) ≤ (n : ℝ) ^ 4), hcombine]
 
 /-- `|z_n| ≤ (2/15) n^(21/2)`. -/
 lemma abs_zSeq_le (n : ℕ) (hn : 1 ≤ n) :
     |zSeq n| ≤ (2 / 15) * (n : ℝ) ^ ((21 : ℝ) / 2) := by
   unfold zSeq
   have hn_nn : (0 : ℝ) ≤ (n : ℝ) := Nat.cast_nonneg n
-  -- Step 1: triangle inequality
   have step1 :
       |∑ k ∈ Ico 1 n, (τ k : ℝ) * ((n : ℝ) - k) * (σ 1 (n - k) : ℝ)| ≤
         ∑ k ∈ Ico 1 n, |(τ k : ℝ)| * ((n : ℝ) - k) * (σ 1 (n - k) : ℝ) := by
@@ -319,7 +309,6 @@ lemma abs_zSeq_le (n : ℕ) (hn : 1 ≤ n) :
       linarith
     rw [abs_mul, abs_mul, abs_of_nonneg (Nat.cast_nonneg (σ 1 (n - k) : ℕ) : (0:ℝ) ≤ _),
       abs_of_nonneg hnk_nn]
-  -- Step 2: bound each term by k^(13/2) * n^3
   have step2 :
       ∀ k ∈ Ico 1 n,
         |(τ k : ℝ)| * ((n : ℝ) - k) * (σ 1 (n - k) : ℝ) ≤
@@ -329,36 +318,30 @@ lemma abs_zSeq_le (n : ℕ) (hn : 1 ≤ n) :
     obtain ⟨hk1, hk2⟩ := hk
     have hk_le : (k : ℝ) ≤ (n : ℝ) := by exact_mod_cast hk2.le
     have hnk_nn : (0 : ℝ) ≤ (n : ℝ) - k := by linarith
-    have hτ := abs_ramanujanTau_le_pow k hk1
     have hσ1' : (σ 1 (n - k) : ℝ) ≤ (n : ℝ) ^ 2 := by
-      have h1 : (σ 1 (n - k) : ℝ) ≤ ((n - k : ℕ) : ℝ) ^ 2 := by
-        exact_mod_cast ArithmeticFunction.sigma_le_pow_succ 1 (n - k)
-      rw [Nat.cast_sub hk2.le] at h1
-      nlinarith [h1]
-    have hτ_pow_nn : (0 : ℝ) ≤ (k : ℝ) ^ ((13 : ℝ) / 2) := by positivity
+      exact_mod_cast (ArithmeticFunction.sigma_le_pow_succ 1 (n - k)).trans
+        (Nat.pow_le_pow_left (Nat.sub_le n k) 2)
     have h_a : |(τ k : ℝ)| * ((n : ℝ) - k) ≤
         (k : ℝ) ^ ((13 : ℝ) / 2) * (n : ℝ) :=
-      mul_le_mul hτ (by linarith) hnk_nn hτ_pow_nn
+      mul_le_mul (abs_ramanujanTau_le_pow k hk1) (by linarith) hnk_nn (by positivity)
     calc |(τ k : ℝ)| * ((n : ℝ) - k) * (σ 1 (n - k) : ℝ)
         ≤ (k : ℝ) ^ ((13 : ℝ) / 2) * (n : ℝ) * (n : ℝ) ^ 2 :=
           mul_le_mul h_a hσ1' (Nat.cast_nonneg _) (by positivity)
       _ = (k : ℝ) ^ ((13 : ℝ) / 2) * (n : ℝ) ^ 3 := by ring
-  -- Step 3: sum and factor out
   have step3 :
       ∑ k ∈ Ico 1 n, |(τ k : ℝ)| * ((n : ℝ) - k) * (σ 1 (n - k) : ℝ) ≤
         (n : ℝ) ^ 3 * ∑ k ∈ Ico 1 n, (k : ℝ) ^ ((13 : ℝ) / 2) := by
     refine (Finset.sum_le_sum step2).trans ?_
     rw [Finset.mul_sum]
     exact Finset.sum_le_sum fun k _ => le_of_eq (by ring)
-  -- Step 4: integral bound, then combine
-  have step4 := sum_rpow_thirteenHalves_le n
   have hcombine :
       (n : ℝ) ^ 3 * (n : ℝ) ^ ((15 : ℝ) / 2) = (n : ℝ) ^ ((21 : ℝ) / 2) := by
     rw [show ((n : ℝ) ^ 3) = (n : ℝ) ^ ((3 : ℝ)) by norm_cast,
         ← Real.rpow_add_of_nonneg hn_nn (by norm_num) (by norm_num)]
     norm_num
   nlinarith [step1, step3,
-    mul_le_mul_of_nonneg_left step4 (by positivity : (0:ℝ) ≤ (n : ℝ) ^ 3), hcombine]
+    mul_le_mul_of_nonneg_left (sum_rpow_thirteenHalves_le n)
+      (by positivity : (0:ℝ) ≤ (n : ℝ) ^ 3), hcombine]
 
 /-! ## Bounding the `x_n` term
 
@@ -474,15 +457,12 @@ lemma aSeq_neg_of_large (n : ℕ) (hn : 10000 ≤ n) : aSeq n < 0 := by
   have hc7_abs : |c₇| = -c₇ := abs_of_neg c₇_neg
   have h_σ0 : (σ 0 n : ℝ) ≤ (n : ℝ) := by
     rw [ArithmeticFunction.sigma_zero_apply]; exact_mod_cast Nat.card_divisors_le_self n
-  -- Sign bounds: replace signed terms by absolute-value bounds.
-  have h_y_le : 240 * c₆ * ySeq n ≤ 240 * c₆ * |ySeq n| := by
-    nlinarith [hc6_pos.le, le_abs_self (ySeq n)]
+  have h_y_le : 240 * c₆ * ySeq n ≤ 240 * c₆ * |ySeq n| :=
+    mul_le_mul_of_nonneg_left (le_abs_self _) (by positivity)
   have h_z_le : c₇ * zSeq n ≤ |c₇| * |zSeq n| := by
-    rw [hc7_abs]
-    nlinarith [c₇_neg, le_abs_self (zSeq n), neg_abs_le (zSeq n)]
-  have h_tau_le : c₆ * (τ n : ℝ) ≤ c₆ * |(τ n : ℝ)| := by
-    nlinarith [hc6_pos.le, le_abs_self ((τ n : ℝ))]
-  -- Combined bounds with rpow folded to integer powers via t ≥ 1.
+    rw [← abs_mul]; exact le_abs_self _
+  have h_tau_le : c₆ * (τ n : ℝ) ≤ c₆ * |(τ n : ℝ)| :=
+    mul_le_mul_of_nonneg_left (le_abs_self _) hc6_pos.le
   have h_y_int : 240 * c₆ * |ySeq n| ≤ 240 * c₆ * ((2 / 15) * (n : ℝ) ^ 12) := by
     have := (abs_ySeq_le n hn_pos).trans
       (by nlinarith [rpow_23_half_le_pow_12 (n:ℝ) ht1] :
@@ -495,11 +475,9 @@ lemma aSeq_neg_of_large (n : ℕ) (hn : 10000 ≤ n) : aSeq n < 0 := by
     gcongr
   have h_tau_int : c₆ * |(τ n : ℝ)| ≤ c₆ * ((n : ℝ) * (n : ℝ) ^ 6) := by
     have hpow_pos : (0 : ℝ) ≤ (n : ℝ) ^ ((11 : ℝ) / 2) := Real.rpow_nonneg ht_pos.le _
-    have h_tau_pow : (n : ℝ) ^ ((11 : ℝ) / 2) ≤ (n : ℝ) ^ 6 :=
-      rpow_11_half_le_pow_6 (n : ℝ) ht1
     have h1 : |(τ n : ℝ)| ≤ (n : ℝ) * (n : ℝ) ^ 6 := by
-      have h_step := mul_le_mul_of_nonneg_right h_σ0 hpow_pos
-      nlinarith [abs_ramanujanTau_lt n hn_pos, h_tau_pow, ht_pos.le, h_step]
+      nlinarith [abs_ramanujanTau_lt n hn_pos, rpow_11_half_le_pow_6 (n : ℝ) ht1,
+        ht_pos.le, mul_le_mul_of_nonneg_right h_σ0 hpow_pos]
     gcongr
   unfold aSeq
   have h_combined :
