@@ -10,6 +10,7 @@ _QM2 = QuasiModularForms(Gamma0(2))
 E2_l2 = _QM2.gen(0)  # E2
 A2_l2 = _QM2.gen(1)  # E2_0 = 2E2(2z) - E2(z)
 E2_2z_l2 = (1/2) * (E2_l2 + A2_l2)  # E2(2z)
+E2_u2_l2 = (E2_l2 + 2 * A2_l2) / 3  # E2^[2](z)
 A4_0_l2 = _QM2.gen(2)  # E4_0 = E4(2z)
 A4_1_l2 = (A2_l2^2 - A4_0_l2) / 48  # \eta(2z)^16 / \eta(z)^8
 E4_l2 = 5 * A2_l2^2 - 4 * A4_0_l2  # E4(z)
