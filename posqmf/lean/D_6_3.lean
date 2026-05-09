@@ -1,4 +1,4 @@
-import posqmf.lean.X_16_5_coeff
+import posqmf.lean.X_16_5
 
 /-!
 # Positivity of `(A_n + B_{n/2}) / 2688` for `n ≥ 5`
