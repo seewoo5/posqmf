@@ -5,6 +5,7 @@ import Mathlib.Analysis.SumIntegralComparisons
 import Mathlib.Data.Real.StarOrdered
 import Mathlib.MeasureTheory.Integral.IntervalIntegral.FundThmCalculus
 import Mathlib.NumberTheory.ArithmeticFunction.Misc
+import posqmf.lean.SigmaBounds
 
 /-!
 # Negativity of the non-leading coefficients of `X_{16,5}`
@@ -89,100 +90,6 @@ def zSeq (n : ℕ) : ℝ :=
 /-- The full sequence `a_n = x_n + 240 c₆ y_n + c₇ z_n + c₆ τ(n)`. -/
 def aSeq (n : ℕ) : ℝ :=
   xSeq n + 240 * c₆ * ySeq n + c₇ * zSeq n + c₆ * (τ n : ℝ)
-
-/-- **Lower bound for `σₖ(n)`**: `nᵏ ≤ σₖ(n)` for `n ≥ 1` (since `n` itself is a divisor). -/
-lemma pow_le_sigma (k n : ℕ) (hn : 1 ≤ n) : (n : ℝ) ^ k ≤ (σ k n : ℝ) := by
-  rw [ArithmeticFunction.sigma_apply]
-  exact_mod_cast Finset.single_le_sum (f := fun d => d ^ k) (s := n.divisors)
-    (fun _ _ => Nat.zero_le _) (Nat.mem_divisors.mpr ⟨dvd_refl n, by omega⟩)
-
-/-- Telescoping identity: `∑_{d=2}^{N} (1/(d-1) - 1/d) = 1 - 1/N` for `N ≥ 1`. -/
-private lemma sum_telescope_one_div (N : ℕ) (hN : 1 ≤ N) :
-    ∑ d ∈ Finset.Icc 2 N, ((1 : ℝ) / ((d - 1 : ℕ) : ℝ) - (1 : ℝ) / (d : ℝ)) =
-      1 - 1 / (N : ℝ) := by
-  induction N, hN using Nat.le_induction with
-  | base => rw [show Finset.Icc 2 1 = ∅ from Finset.Icc_eq_empty_of_lt (by omega)]; simp
-  | succ m hm ih =>
-    by_cases hm2 : 2 ≤ m
-    · have h_split : Finset.Icc 2 (m + 1) = insert (m + 1) (Finset.Icc 2 m) := by
-        ext x; simp [Finset.mem_Icc, Finset.mem_insert]; omega
-      rw [h_split, Finset.sum_insert (by rw [Finset.mem_Icc]; omega), ih,
-        show ((m + 1 - 1 : ℕ) : ℝ) = (m : ℝ) by rw [Nat.add_sub_cancel]]
-      have hm1 : (1 : ℝ) ≤ (m : ℝ) := by exact_mod_cast hm
-      push_cast; field_simp; ring
-    · interval_cases m
-      rw [show Finset.Icc 2 (1 + 1) = {2} from by
-        ext x; rw [Finset.mem_Icc, Finset.mem_singleton]; omega]
-      simp
-
-/-- Bound: `∑_{d=2}^{N} 1/d² ≤ 1`. -/
-private lemma sum_one_div_sq_le_one (N : ℕ) :
-    ∑ d ∈ Finset.Icc 2 N, ((1 : ℝ) / (d : ℝ) ^ 2) ≤ 1 := by
-  rcases Nat.lt_or_ge N 2 with hN | hN
-  · rw [Finset.Icc_eq_empty_of_lt hN]; simp
-  have hbound : ∀ d ∈ Finset.Icc 2 N,
-      ((1 : ℝ) / (d : ℝ) ^ 2) ≤ ((1 : ℝ) / ((d - 1 : ℕ) : ℝ) - (1 : ℝ) / (d : ℝ)) := by
-    intro d hd
-    rw [Finset.mem_Icc] at hd
-    have hd2 : (2 : ℝ) ≤ (d : ℝ) := by exact_mod_cast hd.1
-    have hcast : ((d - 1 : ℕ) : ℝ) = (d : ℝ) - 1 := by
-      rw [Nat.cast_sub (by omega : 1 ≤ d)]; push_cast; ring
-    rw [hcast, div_sub_div _ _ (by linarith) (by linarith), sq,
-      div_le_div_iff₀ (by positivity) (by nlinarith)]
-    nlinarith
-  calc ∑ d ∈ Finset.Icc 2 N, ((1 : ℝ) / (d : ℝ) ^ 2)
-      ≤ ∑ d ∈ Finset.Icc 2 N, ((1 : ℝ) / ((d - 1 : ℕ) : ℝ) - 1 / (d : ℝ)) :=
-        Finset.sum_le_sum hbound
-    _ = 1 - 1 / (N : ℝ) := sum_telescope_one_div N (by omega)
-    _ ≤ 1 := by
-        have : (0 : ℝ) ≤ 1 / (N : ℝ) := by positivity
-        linarith
-
-/-- For `d ≥ 1` and `k ≥ 2`: `1/dᵏ ≤ 1/d²`. -/
-private lemma one_div_pow_le_one_div_sq {d : ℕ} (hd : 1 ≤ d) {k : ℕ} (hk : 2 ≤ k) :
-    ((1 : ℝ) / (d : ℝ) ^ k) ≤ (1 : ℝ) / (d : ℝ) ^ 2 :=
-  one_div_le_one_div_of_le (by positivity) (pow_le_pow_right₀ (by exact_mod_cast hd) hk)
-
-/-- Bound: `∑_{d=1}^{n} 1/dᵏ ≤ 2` for `k ≥ 2`. -/
-private lemma sum_one_div_pow_Icc_le_two {k : ℕ} (hk : 2 ≤ k) (n : ℕ) (hn : 1 ≤ n) :
-    ∑ d ∈ Finset.Icc 1 n, ((1 : ℝ) / (d : ℝ) ^ k) ≤ 2 := by
-  have h_split : Finset.Icc 1 n = insert 1 (Finset.Icc 2 n) := by
-    ext x; simp [Finset.mem_Icc, Finset.mem_insert]; omega
-  rw [h_split, Finset.sum_insert (by rw [Finset.mem_Icc]; omega), Nat.cast_one, one_pow,
-    div_one]
-  have h_bound : ∀ d ∈ Finset.Icc 2 n,
-      ((1 : ℝ) / (d : ℝ) ^ k) ≤ (1 : ℝ) / (d : ℝ) ^ 2 := fun d hd => by
-    rw [Finset.mem_Icc] at hd
-    exact one_div_pow_le_one_div_sq (by omega) hk
-  linarith [Finset.sum_le_sum h_bound, sum_one_div_sq_le_one n]
-
-/-- The bijection `d ↔ n/d` on divisors of `n`, cast to `ℝ`:
-`σₖ(n) = nᵏ · ∑_{d ∣ n} 1/dᵏ`. -/
-private lemma sigma_eq_pow_mul_sum_inv (k : ℕ) (n : ℕ) (hn : 1 ≤ n) :
-    (σ k n : ℝ) = (n : ℝ) ^ k * ∑ d ∈ n.divisors, ((1 : ℝ) / (d : ℝ) ^ k) := by
-  rw [show (σ k n : ℝ) = ((∑ d ∈ n.divisors, (n / d) ^ k : ℕ) : ℝ) by
-        exact_mod_cast ArithmeticFunction.sigma_eq_sum_div k n]
-  push_cast
-  rw [Finset.mul_sum]
-  refine Finset.sum_congr rfl fun d hd => ?_
-  obtain ⟨hd_dvd, _⟩ := Nat.mem_divisors.mp hd
-  rw [Nat.cast_div hd_dvd (Nat.cast_ne_zero.mpr (Nat.pos_of_dvd_of_pos hd_dvd (by omega)).ne'),
-    div_pow]
-  field_simp
-
-/-- **Upper bound for `σₖ(n)`**: for `k ≥ 2` and `n ≥ 1`, `σₖ(n) ≤ 2 nᵏ`.
-This follows from `σₖ(n) = nᵏ · ∑_{d ∣ n} 1/dᵏ` and the bound `∑_{d=1}^n 1/dᵏ ≤ 2`. -/
-lemma sigma_le_two_mul_pow {k : ℕ} (hk : 2 ≤ k) (n : ℕ) (hn : 1 ≤ n) :
-    (σ k n : ℝ) ≤ 2 * (n : ℝ) ^ k := by
-  rw [sigma_eq_pow_mul_sum_inv k n hn]
-  have h_subset : n.divisors ⊆ Finset.Icc 1 n := fun d hd => by
-    rw [Nat.mem_divisors] at hd
-    rw [Finset.mem_Icc]
-    exact ⟨Nat.pos_of_dvd_of_pos hd.1 (by omega), Nat.le_of_dvd (by omega) hd.1⟩
-  have h_sum_le : ∑ d ∈ n.divisors, ((1 : ℝ) / (d : ℝ) ^ k) ≤ 2 :=
-    le_trans (Finset.sum_le_sum_of_subset_of_nonneg h_subset (fun _ _ _ => by positivity))
-      (sum_one_div_pow_Icc_le_two hk n hn)
-  nlinarith [mul_le_mul_of_nonneg_left h_sum_le (by positivity : (0:ℝ) ≤ (n:ℝ)^k)]
 
 /-! ## Bounds on `|y_n|` and `|z_n|`
 
