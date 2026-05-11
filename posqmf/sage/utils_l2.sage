@@ -12,8 +12,8 @@ E2_2z = (1/4) * (2 * E2_ + H2 + 2 * H4)  # E2(2z)
 E4_2z = (1/16) * (H2^2 + 16 * H2 * H4 + 16 * H4^2)  # E4(2z)
 E6_2z = (-1/64) * (H2 + 2 * H4) * (H2^2 - 32 * H2 * H4 - 32 * H4^2)  # E6(2z)
 
-# Weight
 def qm2_weight(qm):
+    """Return the weight of a homogeneous level Gamma(2) quasimodular form."""
     w = None
     for (a, b, e) in qm.dict().keys():
         if w is None:
@@ -22,15 +22,15 @@ def qm2_weight(qm):
             assert w == 2 * a + 2 * b + 2 * e
     return w
 
-# Depth
 def qm2_depth(qm):
+    """Return the depth of a level Gamma(2) quasimodular form."""
     dp = 0
     for (_, _, e) in qm.dict().keys():
         dp = max(e, dp)
     return dp
 
-# Derivative of level 2 quasimodular form
 def qm2_derivative(qm):
+    """Return the derivative of a level Gamma(2) quasimodular form."""
     r = QM2(0)
     for (a, b, e), coeff in qm.dict().items():
         r += (coeff / 6) * H2^a * H4^b * ((a - 2 * b) * H2 + (2 * a - b) * H4 + (a + b) * E2_) * E2_^e
@@ -38,16 +38,15 @@ def qm2_derivative(qm):
             r += coeff * H2^a * H4^b * e * E2_^(e-1) * (E2_^2 - E4_) / 12
     return r
 
-# Serre derivative
 def qm2_serre_derivative(qm, k=None):
+    """Compute the level Gamma(2) Serre derivative with weight `k`."""
     if k is None:
-        # Serre derivative that preserves depth
         k = qm2_weight(qm) - qm2_depth(qm)
     return qm2_derivative(qm) - (k / 12) * E2_ * qm
 
 
-# Iterative Serre derivative
 def qm2_serre_derivative_fold(qm, r, k=None):
+    """Compute the iterative level Gamma(2) Serre derivative."""
     assert r >= 0
     if r == 0:
         return qm
@@ -102,7 +101,7 @@ for i in range(1, prec):
     E6ser -= 504 * sigma(i, 5) * qh^(2 * i)
 
 def qm2_q_series(qm, prec=20):
-    # Recall that the series is in q^(1/2)
+    """Return the q-series expansion (in `q^(1/2)`) up to precision `prec`."""
     r = qh - qh
     H2ser_ = H2ser.series(qh, prec)
     H4ser_ = H4ser.series(qh, prec)
@@ -111,20 +110,20 @@ def qm2_q_series(qm, prec=20):
         r += coeff * H2ser_^a * H4ser_^b * E2ser_^e
     return r.series(qh, prec)
 
-# Fourier coefficients
 def qm2_coefficients(qm, prec=20):
+    """Return Fourier coefficients from the level Gamma(2) q-series expansion."""
     return qm2_q_series(qm, prec).list()
 
-# Cusp order
 def qm2_cusp_order(qm):
+    """Return the cusp order for a level Gamma(2) quasimodular form."""
     N = 50
     c = qm2_q_series(qm, N).list()
     for i in range(N):
         if c[i] != 0:
             return i / 2
 
-# First nonzero Fourier coefficient
 def qm2_first_nonzero_coeff(qm):
+    """Return the first nonzero Fourier coefficient."""
     N = 100
     c = qm2_q_series(qm, N).list()
     for i in range(N):
@@ -132,9 +131,11 @@ def qm2_first_nonzero_coeff(qm):
             return Rational(c[i])
 
 def qm2_normalize(qm):
+    """Normalize so that the first nonzero Fourier coefficient is 1."""
     return qm / qm2_first_nonzero_coeff(qm)
 
 def print_qm2(qm, name, prec=30):
+    """Print q-expansion, weight, depth, cusp order, and polynomial data."""
     print(name + "\n")
     print("q_expansion", qm2_q_series(qm, prec), "\n")
     print("weight", qm2_weight(qm))
@@ -146,9 +147,11 @@ def print_qm2(qm, name, prec=30):
         print("polynomial", qm.factor(), "\n")
 
 def dim_m2(w):
+    """Return dimension of modular forms of level Gamma(2) and weight `w`."""
     return w / 2 + 1
 
 def dim_qm2(w, s=None):
+    """Return dimension of quasimodular forms of level Gamma(2), weight `w`, depth `<= s`."""
     if s is None:
         s = w / 2
     d = 0
@@ -157,19 +160,19 @@ def dim_qm2(w, s=None):
     return d
 
 def qm2_find_lin_comb(qm, ls):
+    """Express `qm` as a linear combination of forms in `ls`."""
     w = qm2_weight(qm)
     s = qm2_depth(qm)
     N = dim_qm2(w, s)
     m = matrix([qm2_q_series(qm_, N).list()[:N] for qm_ in ls])
     c_ = vector(qm2_q_series(qm, N).list())
     x_ = m.solve_left(c_)
-    # check if we get the right result
     r = sum(Rational(x_[j]) * ls[j] for j in range(len(ls)))
     assert r == qm
     return x_
 
 def qm2_find_lin_comb_coeff(coeffs, ls):
-    # Find linear combination when first few coefficients are known
+    """Find a linear combination in `ls` from initial q-series coefficients."""
     N = len(coeffs)
     m = matrix([qm2_q_series(qm_, N).list() for qm_ in ls])
     c_ = vector(coeffs)
@@ -181,6 +184,7 @@ def qm2_find_lin_comb_coeff(coeffs, ls):
     return x_
 
 def qm2_to_func(qm, prec=100):
+    """Convert a level Gamma(2) quasimodular form to a function on the positive imaginary axis."""
     qser = qm2_q_series(qm, prec=prec)
     c = qser.list()
     func = c[0]
@@ -188,8 +192,8 @@ def qm2_to_func(qm, prec=100):
         func += c[i] * exp(-i * pi * t)  # note q^(1/2) = e^(sqrt(-1) * pi * z)
     return func
 
-# components
 def qm2_modular_components(qm):
+    """Return placeholder modular-component pair `(tG, psi)` for a level Gamma(2) form."""
     d = qm.dict()
     tG = QM2(0)
     psi = QM2(0)
@@ -197,15 +201,15 @@ def qm2_modular_components(qm):
         psi += coeff * H2^a * H4^b * E2_^e
     return tG, psi
 
-# Rewrite level 1 quasimodular forms as level Gamma(2) forms
 def l1_to_l2(qm):
+    """Rewrite a level 1 quasimodular form as a level Gamma(2) form."""
     r = QM2(0)
     for (d2, d4, d6), coeff in qm.polynomial().dict().items():
         r += coeff * E2_^d2 * E4_^d4 * E6_^d6
     return r
 
-# f(z) to f(2z)
 def double_argument(qm):
+    """Map `f(z)` to `f(2z)` for level 1 quasimodular forms represented at level Gamma(2)."""
     r = QM2(0)
     for (d2, d4, d6), coeff in qm.polynomial().dict().items():
         r += coeff * E2_2z^d2 * E4_2z^d4 * E6_2z^d6
