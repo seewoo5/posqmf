@@ -66,8 +66,10 @@ $$
 
 ## Lean codes
 
-The lean codes under the directory `lean` verifies several inequalities arise in the paper "Inequalities involving polynomials and quasimodular forms".
+The lean codes under the directory `lean` verifies several inequalities on quasimodular forms and their coefficients.
 
-- `polymod_monotone.lean` verifies (41).
-- `polymod_ineq1.lean` verifies (60).
-- `polymod_ineq2.lean` verifies (61).
+- `polymod_monotone.lean` verifies (41) of "Inequalities involving polynomials and quasimodular forms".
+- `polymod_ineq1.lean` verifies (60) of "Inequalities involving polynomials and quasimodular forms".
+- `polymod_ineq2.lean` verifies (61) of "Inequalities involving polynomials and quasimodular forms".
+- `X_16_5.lean` verifies that the extremal quasimodular form $X_{16, 5}$ of weight $16$ and depth $5$ has negative coefficients for $n \ge 250$. Negativity for $8 \le n < 250$ is checked separately in `miscellaneous.ipynb`.
+- `D_6_3.lean` verifies the positivity of the coefficients of $\mathcal{D}_{6, 3}$.
