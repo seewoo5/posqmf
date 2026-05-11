@@ -28,8 +28,8 @@ def qm_l2_serre_derivative_u2(qm, k=None):
         k = qm.weight() - qm.depth()
     return qm.derivative() - (k / 4) * E2_u2_l2 * qm
 
-# Basis of quasimodular forms of level Gamma0(2), weight w, and depth <= s
 def qm_l2_basis(weight, depth):
+    """Return a basis for level Gamma0(2) quasimodular forms of given weight/depth."""
     basis = []
     for r in range(depth + 1):
         w_ = weight - 2 * r
@@ -39,33 +39,33 @@ def qm_l2_basis(weight, depth):
                 basis.append(E2_l2^r * A2_l2^i * A4_0_l2^j)
     return basis
 
-# Dimension of the space of quasimodular forms of level Gamma0(2), weight w, and depth <= s
 def dim_qm_l2(weight, depth):
+    """Return the dimension for level Gamma0(2) quasimodular forms of given weight/depth."""
     d = 0
     for r in range(depth + 1):
-        # dim M_w(Gamma0(2)) = w // 4 + 1
         d += (weight - 2 * r) // 4 + 1
     return d
 
 def is_extremal_qm_l2(qm):
-    # Check if a given quasimodular form is extremal
+    """Check whether a level Gamma0(2) quasimodular form is extremal."""
     d = dim_qm_l2(qm.weight(), qm.depth())
     order = qm_cusp_order(qm)
     return d - 1 == order
 
 @lru_cache(maxsize=None)
 def extremal_qm_l2_d1(w):
+    """Return the depth-1 extremal quasimodular form at level Gamma0(2)."""
     if w == 2:
         D_2 = (A2_l2 - E2_l2) / 48
         return D_2
     else:
-        # D_{w} = (w) / (8 (w-1)^2) * ((5w-9)/12 * A2 * D_{w-2} - \partial_{w-3} D_{w-2})
         D_wm2 = extremal_qm_l2_d1(w - 2)
         res = ((5 * w - 9) / 12) * A2_l2 * D_wm2 - qm_l2_serre_derivative(D_wm2, w - 3)
         res *= w / (8 * (w - 1)^2)
         return res
 
 def extremal_qm_l2(weight, depth):
+    """Return the extremal quasimodular form for level Gamma0(2)."""
     if depth == 1:
         extqm = extremal_qm_l2_d1(weight)
     else:
@@ -129,11 +129,9 @@ def qm_l3_basis(weight, depth):
     for r in range(depth + 1):
         w_ = weight - 2 * r
         for i in range(w_ // 2 + 1):
-            # j = 0
             if (w_ - 2 * i) % 6 == 0:
                 k = (w_ - 2 * i) // 6
                 basis.append(E2_l3^r * B2_l3^i * B6_2_l3^k)
-            # j = 1
             if (w_ - 2 * i - 4) % 6 == 0:
                 k = (w_ - 2 * i - 4) // 6
                 basis.append(E2_l3^r * B2_l3^i * B4_1_l3 * B6_2_l3^k)
@@ -152,12 +150,13 @@ def dim_qm_l3(weight, depth):
     return d
 
 def is_extremal_qm_l3(qm):
-    # Check if a given quasimodular form is extremal
+    """Check whether a level Gamma0(3) quasimodular form is extremal."""
     d = dim_qm_l3(qm.weight(), qm.depth())
     order = qm_cusp_order(qm)
     return d - 1 == order
 
 def extremal_qm_l3(weight, depth):
+    """Return the extremal quasimodular form for level Gamma0(3)."""
     bs = qm_l3_basis(weight, depth)
     d = len(bs)
     m = matrix([qm_coefficients(b, d) for b in bs])

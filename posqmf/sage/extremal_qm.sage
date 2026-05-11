@@ -4,10 +4,9 @@ from functools import lru_cache
 
 load(os.path.dirname(os.path.abspath(__file__)) + "/sage/utils_l1.sage")
 
-# Extremal quasimodular forms
 def is_extremal_qm(qm):
-    # Check if a given quasimodular form is extremal (in the sense of Kaneko-Koike)
-    s = qm_depth(qm)
+    """Check whether a quasimodular form is extremal."""
+    s = qm.depth()
     w = qm.weight()
     d = dim_qm(w, s)
     order = qm_cusp_order(qm)
@@ -63,8 +62,10 @@ def _extremal_qm_d2(w):
 
 @lru_cache(maxsize=None)
 def extremal_qm(weight, depth):
-    # Find the extremal qmf (if exists) for given weight and depth
-    # The result is normalized so that first nonzero coefficient is 1
+    """
+    Find the extremal quasimodular form for given weight and depth.
+    The result is normalized so that its first nonzero coefficient is 1.
+    """
     assert (0 <= depth <= weight/2 and 2 * (depth + 1) != weight), "inappropriate weight and depths"
     
     if depth == 1:
@@ -82,8 +83,10 @@ def extremal_qm(weight, depth):
     return ans
 
 def is_extremal_qm_unique(weight, depth):
-    # check if extremal quasimodular form of weight `w` and depth `s` is unique
-    # by considering q-coefficient matrix of basis.
+    """
+    Check uniqueness of the extremal quasimodular form for weight/depth.
+    This is tested using invertibility of the q-coefficient matrix of a basis.
+    """
     bs = qm_basis(weight, depth)
     d = dim_qm(weight, depth)
     m = matrix([qm_coefficients(qm_, d) for qm_ in bs])
