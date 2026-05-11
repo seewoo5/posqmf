@@ -23,6 +23,11 @@ def qm_l2_serre_derivative(qm, k=None):
         k = qm.weight() - qm.depth()
     return qm.derivative() - (k / 12) * E2_l2 * qm
 
+def qm_l2_serre_derivative_u2(qm, k=None):
+    if k is None:
+        k = qm.weight() - qm.depth()
+    return qm.derivative() - (k / 4) * E2_u2_l2 * qm
+
 # Basis of quasimodular forms of level Gamma0(2), weight w, and depth <= s
 def qm_l2_basis(weight, depth):
     basis = []
@@ -94,6 +99,8 @@ def qm_l1_to_l2(qm):
 _QM3 = QuasiModularForms(Gamma0(3))
 E2_l3 = _QM3.gen(0)  # E2
 B2_l3 = _QM3.gen(1)  # (3E2(3z) - E2(z)) / 2
+E2_3z_l3 = (2 * B2_l3 + E2_l3) / 3  # E2(3z)
+E2_u3_l3 = (E2_l3 + 3 * B2_l3) / 4  # E2^[3](z)
 B4_0_l3 = _QM3.gen(2)  # E4_0 = E4(3z)
 B6_0_l3 = _QM3.gen(3)  # E6_0 = E6(3z)
 B4_1_l3 = (B2_l3^2 - B4_0_l3) / 24  # q + 9q^2 = 27q^3 + 73q^4 + ...
@@ -106,6 +113,11 @@ def qm_l3_serre_derivative(qm, k=None):
     if k is None:
         k = qm.weight() - qm.depth()
     return qm.derivative() - (k / 12) * E2_l3 * qm
+
+def qm_l3_serre_derivative_u3(qm, k=None):
+    if k is None:
+        k = qm.weight() - qm.depth()
+    return qm.derivative() - (k / 3) * E2_u3_l3 * qm
 
 def qm_l3_basis(weight, depth):
     """
@@ -156,6 +168,12 @@ def extremal_qm_l3(weight, depth):
         raise ValueError("The resulting quasimodular form is not extremal")
     return extqm
 
+def qm_triple_argument(qm):
+    """f(z) -> f(3z)"""
+    r = _QM3(0)
+    for (d2, d4, d6), coeff in qm.polynomial().dict().items():
+        r += coeff * E2_3z_l3^d2 * B4_0_l3^d4 * B6_0_l3^d6
+    return r
 
 def is_extremal_qm_unique_level(weight, depth, level=1):
     """
