@@ -15,10 +15,9 @@ def extremal_eisenstein_series(weight):
     assert weight % 2 == 0 and weight >= 4, "Weight must be even and >= 4"
     w = weight
     basis = ModularForms(weight=weight).basis()
-    # The last basis element is the Eisenstein series, and the rest are Victor-Miller basis.
-    l = len(basis)
+    d = len(basis)  # d = l + 1
     cs = []
-    for n in range(1, l):
+    for n in range(1, d):
         coeff = (2 * w) / bernoulli(w) * sigma(n, w - 1)
         cs.append(coeff)
     r = sum(c * b for (c, b) in zip(cs, basis[:-1]))
@@ -34,12 +33,9 @@ def jenkins_rouse_coeff_threshold(weight):
     here with slightly larger constant.
     """
     assert weight % 2 == 0 and weight >= 16, "Weight must be even >= 16"
-    if weight % 12 == 2:
-        cusp_dim = weight // 12 - 1
-    else:
-        cusp_dim = weight // 12
+    l = cusp_dim(weight)
     thres = exp(59.169 / (weight - 2))
-    thres *= (cusp_dim ^ 3 * log(weight)) ^ (1 / (weight - 2))
+    thres *= (l ^ 3 * log(weight)) ^ (1 / (weight - 2))
     thres *= 1.0242382 * cusp_dim
     return float(thres)
 
