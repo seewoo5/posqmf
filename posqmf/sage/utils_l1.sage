@@ -7,7 +7,6 @@ Disc = (1 / 1728) * (E4 ^ 3 - E6 ^ 2)  # discriminant form
 t = var('t')  # variable for the positive imaginary axis
 
 
-# Fourier coefficients
 def qm_coefficients(qm, prec=20):
     """Return the first `prec` Fourier coefficients of a quasimodular form."""
     qexp = qm.q_expansion(prec)

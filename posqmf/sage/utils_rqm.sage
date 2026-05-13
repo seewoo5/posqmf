@@ -33,7 +33,7 @@ def rqm_depth(rqm):
     """Return the depth of a rational quasimodular form expression."""
     dp = 0
     for qm in rqm.dict().values():
-        dp = max(dp, qm_depth(qm))
+        dp = max(dp, qm.depth())
     return dp
 
 def rqm_derivative(rqm):
