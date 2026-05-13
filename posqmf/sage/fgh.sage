@@ -1,51 +1,14 @@
 import os
-import sys
 from functools import lru_cache
 
-_THIS_DIR = os.path.dirname(os.path.abspath(__file__))
-
-
-def _load_sage_dependency(name):
-    candidates = [
-        os.path.join(_THIS_DIR, "sage", name),          # when preparsed to posqmf/*.py
-        os.path.join(_THIS_DIR, name),                  # when loaded from posqmf/sage/*.sage
-        os.path.join(os.getcwd(), "posqmf", "sage", name),
-        os.path.join(os.getcwd(), "sage", name),
-    ]
-    for path in candidates:
-        path = os.path.abspath(path)
-        if os.path.exists(path):
-            load(path)
-            return
-    raise OSError(f"Could not locate dependency {name}")
-
-
-# Prefer preparsed Python modules when available.
-import_roots = [
-    os.getcwd(),
-    os.path.abspath(os.path.join(_THIS_DIR, "..")),      # when _THIS_DIR is .../posqmf
-    os.path.abspath(os.path.join(_THIS_DIR, "..", "..")), # when _THIS_DIR is .../posqmf/sage
-]
-for root in import_roots:
-    if root not in sys.path:
-        sys.path.insert(0, root)
-
-try:
-    from posqmf.utils_l1 import *
-    from posqmf.utils_l2 import *
-except Exception:
-    _load_sage_dependency("utils_l1.sage")
-    _load_sage_dependency("utils_l2.sage")
-
-try:
-    from posqmf.utils_l2_LS import *
-except Exception:
-    _load_sage_dependency("utils_l2_LS.sage")
+load(os.path.dirname(os.path.abspath(__file__)) + "/sage/utils_l1.sage")
+load(os.path.dirname(os.path.abspath(__file__)) + "/sage/utils_l2.sage")
+load(os.path.dirname(os.path.abspath(__file__)) + "/sage/utils_l2_LS.sage")
 
 
 @lru_cache
 def F(w):
-    # quasimiodular form for (-1)^(d/4)-eigenform of Fourier transform by Feigenbaum-Grabner-Hardin
+    """FGH quasimodular form for the (-1)^(d/4)-eigenform family."""
     if w == 8:
         r = (E2^2 * E4 - 2 * E2 * E6 + E4^2) / 1728
     elif w == 10:
@@ -87,8 +50,12 @@ def F(w):
 
 @lru_cache
 def Ftilde(w):
-    # For F_w = A_{w} + B_{w-2} E_2 + C_{w-4} E_2^2, we have
-    # \tilde{F}_{w-2} = B_{w-2} + 2 C_{w-4} E_2
+    r"""
+    Extract \tilde{F}_w from F_{w+2}.
+
+    If F_{w+2} = A_{w+2} + B_w E_2 + C_{w-2} E_2^2, then
+    \tilde{F}_w = B_w + 2 C_{w-2} E_2.
+    """
     F_wp2 = F(w + 2)
     comps = modular_comp(F_wp2)
     B_w = comps[1]
@@ -97,11 +64,8 @@ def Ftilde(w):
 
 @lru_cache
 def G(w):
-    r"""
-    Level Gamma(2) analog in QM2_LS with explicit initial values and recurrences.
-    """
+    """FGH quasimodular form for the (-1)^(d/4+1)-eigenform family."""
     assert w % 2 == 0 and w >= 4, "Weight must be even and >= 4"
-
     if w == 4:
         r = (H2 / 2^5) * (H2 + 2 * H4)
     elif w == 6:

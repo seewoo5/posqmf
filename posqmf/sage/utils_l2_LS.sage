@@ -1,43 +1,7 @@
 import os
-import sys
 
-_THIS_DIR = os.path.dirname(os.path.abspath(__file__))
-_load_error = None
+load(os.path.dirname(os.path.abspath(__file__)) + "/sage/utils_l2.sage")
 
-# Importing the preparsed Python module is the most robust path because
-# __file__ inside that module points to its real location.
-try:
-    _IMPORT_ROOTS = [
-        os.getcwd(),
-        os.path.abspath(os.path.join(_THIS_DIR, "..")),      # when _THIS_DIR is .../posqmf
-        os.path.abspath(os.path.join(_THIS_DIR, "..", "..")) # when _THIS_DIR is .../posqmf/sage
-    ]
-    for _root in _IMPORT_ROOTS:
-        if _root not in sys.path:
-            sys.path.insert(0, _root)
-    from posqmf.utils_l2 import *
-except Exception as err:
-    _load_error = err
-    _LOAD_CANDIDATES = [
-        os.path.join(_THIS_DIR, "sage", "utils_l2.sage"),         # when preparsed to posqmf/*.py
-        os.path.join(_THIS_DIR, "utils_l2.sage"),                 # when loaded from posqmf/sage/*.sage
-        os.path.join(os.getcwd(), "posqmf", "sage", "utils_l2.sage"),
-        os.path.join(os.getcwd(), "sage", "utils_l2.sage"),
-    ]
-    for _path in _LOAD_CANDIDATES:
-        _path = os.path.abspath(_path)
-        if not os.path.exists(_path):
-            continue
-        try:
-            load(_path)
-            _load_error = None
-            break
-        except Exception as err2:
-            _load_error = err2
-    else:
-        if _load_error is None:
-            raise OSError("Could not locate utils_l2.sage or posqmf.utils_l2")
-        raise OSError("Found utils_l2 candidate paths, but loading failed") from _load_error
 
 r"""
 Module over QM2 with basis {1, LS}.
@@ -52,32 +16,7 @@ The q-expansion of LS is (in terms of qh = q^{1/2}):
 where qh is the level-2 half-power parameter from utils_l2.sage.
 """
 
-# ============================================================================
-# Ring with LS variable
-# ============================================================================
-
 QM2_LS.<LS> = QM2['LS']
-
-
-def ls_make(A=0, B=0):
-    """Create module element A + B * LS in QM2_LS."""
-    return QM2_LS(A) + QM2_LS(B) * LS
-
-
-def _ls_coerce(f):
-    r"""
-    Coerce into QM2_LS.
-
-    Accepted inputs:
-      - elements of QM2_LS,
-      - elements of QM2 (embedded as constant polynomials),
-      - tuples/lists (A, B), interpreted as A + B * LS.
-    """
-    if isinstance(f, (tuple, list)):
-        if len(f) != 2:
-            raise ValueError("Tuple/list input must be length 2: (A, B)")
-        return ls_make(f[0], f[1])
-    return QM2_LS(f)
 
 
 def ls_components(f, strict=True):
@@ -86,8 +25,7 @@ def ls_components(f, strict=True):
 
     If strict=True, raise an error if f has LS-degree >= 2.
     """
-    p = _ls_coerce(f)
-    d = p.dict()
+    d = f.dict()
     A = QM2(d.get(0, 0))
     B = QM2(d.get(1, 0))
     if strict:
@@ -97,10 +35,6 @@ def ls_components(f, strict=True):
     return A, B
 
 
-# ============================================================================
-# Derivative
-# ============================================================================
-
 def ls_weight(f):
     r"""
     Weight of a homogeneous QM2_LS element.
@@ -108,9 +42,8 @@ def ls_weight(f):
     LS is treated as weight 0, so all nonzero QM2 coefficients must have the
     same weight. Returns 0 for the zero element.
     """
-    p = _ls_coerce(f)
     w = None
-    for _, coeff in p.dict().items():
+    for _, coeff in f.dict().items():
         c = QM2(coeff)
         if c == 0:
             continue
@@ -131,13 +64,12 @@ def ls_depth(f):
     r"""
     Depth of a QM2_LS element, defined as max depth among QM2 coefficients.
     """
-    p = _ls_coerce(f)
-    dp = 0
-    for _, coeff in p.dict().items():
+    df = 0
+    for _, coeff in f.dict().items():
         c = QM2(coeff)
         if c != 0:
-            dp = max(dp, qm2_depth(c))
-    return dp
+            df = max(df, qm2_depth(c))
+    return df
 
 
 def ls_derivative(f):
@@ -149,10 +81,9 @@ def ls_derivative(f):
       D(LS) = -H2/2,
     and Leibniz rule.
     """
-    p = _ls_coerce(f)
     r = QM2_LS(0)
     dLS = -H2 / 2
-    for j, coeff in p.dict().items():
+    for j, coeff in f.dict().items():
         c = QM2(coeff)
         if c == 0:
             continue
@@ -170,15 +101,10 @@ def ls_serre_derivative(f, k=None):
 
     If k is None, infer k from ls_weight(f).
     """
-    p = _ls_coerce(f)
     if k is None:
-        k = ls_weight(p)
-    return ls_derivative(p) - QM2_LS((k / 12) * E2_) * p
+        k = ls_weight(f)
+    return ls_derivative(f) - QM2_LS((k / 12) * E2_) * f
 
-
-# ============================================================================
-# q-expansion
-# ============================================================================
 
 def ls_basis_q_series(prec=40):
     r"""
@@ -213,14 +139,13 @@ def ls_q_series(f, prec=40):
     For f = sum_{j >= 0} C_j * LS^j with C_j in QM2,
     evaluates LS at ls_basis_q_series(prec) and returns O(qh^prec).
     """
-    p = _ls_coerce(f)
     N = int(prec)
     if N <= 0:
         return (qh - qh).series(qh, N)
 
     LS_q = ls_basis_q_series(N)
     r = qh - qh
-    for j, coeff in p.dict().items():
+    for j, coeff in f.dict().items():
         if coeff == 0:
             continue
         r += qm2_q_series(QM2(coeff), N) * (LS_q^j)
@@ -261,7 +186,7 @@ def ls_first_nonzero_coeff(f, prec=50):
 def ls_normalize(f):
     """Normalize so that the first nonzero qh-coefficient is 1."""
     c = ls_first_nonzero_coeff(f)
-    return _ls_coerce(f) / c
+    return f / c
 
 
 def ls_to_func(f, prec=100):
@@ -282,17 +207,16 @@ def ls_to_func(f, prec=100):
 
 def print_ls(f, name, prec=30):
     """Print info about a QM2_LS element (expects linear form for A/B display)."""
-    p = _ls_coerce(f)
-    A, B = ls_components(p, strict=True)
+    A, B = ls_components(f, strict=True)
     print(name + "\n")
-    print("element", p)
-    print("q_expansion", ls_q_series(p, prec), "\n")
+    print("element", f)
+    print("q_expansion", ls_q_series(f, prec), "\n")
     try:
-        print("weight", ls_weight(p))
+        print("weight", ls_weight(f))
     except ValueError:
         print("weight", "inhomogeneous")
-    print("depth", ls_depth(p))
-    print("cusp order", ls_cusp_order(p))
+    print("depth", ls_depth(f))
+    print("cusp order", ls_cusp_order(f))
     print("\n" + "=" * 35 + " Components (f = A + B * LS): " + "=" * 35 + "\n")
     print_qm2(A, "A (constant part)", prec)
     print_qm2(B, "B (LS part)", prec)
