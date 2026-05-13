@@ -118,11 +118,6 @@ def ls_basis_q_series(prec=40):
     if N <= 0:
         return (qh - qh).series(qh, N)
 
-    # utils_l2.sage precomputes LSser up to global `prec`.
-    precomputed_prec = int(globals().get("prec", 0))
-    if N <= precomputed_prec:
-        return LSser.series(qh, N)
-
     r = qh - qh
     for k in range((N - 1) // 2 + 1):
         m = 2 * k + 1

@@ -14,38 +14,29 @@ def F(w):
     elif w == 10:
         r = (- E2^2 * E6 + 2 * E2 * E4^2 - E4 * E6) / 1728
     elif w == 12:
-        r = (1 / 6000) * (E2 * E4 - E6)^2
-        r /= 1728
-        r *= 20
+        r = (E2 * E4 - E6)^2 / 518400
     elif w == 14:
-        r = -(E2^2 * E4 * E6 - E2 * (E4^3 + E6^2) + E4^2 * E6)
-        r /= 8400
-        r /= 1728
-        r *= 20
+        r = -(E2^2 * E4 * E6 - E2 * (E4^3 + E6^2) + E4^2 * E6) / 725760
     elif w == 16:
-        r = (1 / 2540160000) * (49 * E2^2 * E4^3 - 25 * E2^2 * E6^2 - 48 * E2 * E4^2 * E6 - 25 * E4^4 + 49 * E4 * E6^2)
-        r /= 1728
-        r *= 1200
+        r = (49 * E2^2 * E4^3 - 25 * E2^2 * E6^2 - 48 * E2 * E4^2 * E6 - 25 * E4^4 + 49 * E4 * E6^2) / 3657830400
     elif w == 18:
-        r = (12 * E2^2 * E4^2 * E6 - E2 * (5 * E4^4 + 19 * E4 * E6^2) + 5 * E4^3 * E6 + 7 * E6^3)
-        r /= -1995840000
-        r /= 1728
-        r *= 1200
+        r = -(12 * E2^2 * E4^2 * E6 - E2 * (5 * E4^4 + 19 * E4 * E6^2) + 5 * E4^3 * E6 + 7 * E6^3) / 2874009600
     elif w % 4 == 0:
         w_ = w - 4
         fw_ = F(w_)
         ssfw_ = qm_serre_derivative(qm_serre_derivative(fw_, w_ - 2), w_)
         r = (w_ - 5) * (w_ - 6) * E4 * fw_ - 36 * ssfw_
         r *= w_ * (w_ - 4) / (192 * (w_ + 2) * (w_ - 3) * (w_ - 5) * (w_ - 10))
-        assert qm_cusp_order(r, prec=(w - 4) / 4 + 5) == (w - 4) / 4
     else:  # w % 4 == 2:
         w_ = w - 2
         fw_ = F(w_ - 2)
         ssfw_ = qm_serre_derivative(qm_serre_derivative(fw_, w_ - 4), w_ - 2)
         r = (w_ - 10) * (w_ - 11) * E4 * fw_ - 36 * ssfw_
         r *= (w_ - 4) * (w_ - 8) / (192 * (w_ - 5) * (w_ - 6) * (w_ - 7) * (w_ - 18))
-        assert qm_cusp_order(r, prec=(w - 6) / 4 + 5) == (w - 6) / 4
-    
+    if w % 4 == 0:
+        assert qm_cusp_order(r, prec=(w - 4) / 4 + 5) == (w - 4) // 4
+    else:
+        assert qm_cusp_order(r, prec=(w - 6) / 4 + 5) == (w - 6) // 4
     return r
 
 @lru_cache
@@ -99,7 +90,12 @@ def G(w):
         ss = ls_serre_derivative(ls_serre_derivative(Gu, u), u + 2)
         r = ((u - 4) * (u - 3) / 36) * E4_ * Gu - ss
         r *= 3 * (u - 2) * (u + 2) / (16 * (u - 8) * (u - 3) * (u - 1) * (u + 4))
-    return QM2_LS(r)
+    r = QM2_LS(r)
+    if w % 4 == 0:
+        assert ls_cusp_order(r, prec=(w - 2) // 2 + 5) == (w - 2) / 4
+    else:
+        assert ls_cusp_order(r, prec=(w - 4) // 2 + 5) == (w - 4) / 4
+    return r
 
 @lru_cache
 def Gtilde(w):
@@ -149,5 +145,9 @@ def Y(w):
         u = w - 2
         Yu = Y(u)
         r = (6 / (u + 3)) * ls_serre_derivative(Yu, u)
-
-    return QM2_LS(r)
+    r = QM2_LS(r)
+    if w % 4 == 0:
+        assert ls_cusp_order(r, prec=(w + 2) // 2 + 5) == (w + 2) / 4
+    else:
+        assert ls_cusp_order(r, prec=w // 2 + 5) == w / 4
+    return r

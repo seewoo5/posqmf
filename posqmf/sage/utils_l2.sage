@@ -81,12 +81,6 @@ for i in range(1, prec):
     H4ser += (-1)^i * r4(i) * qh^i
 H2ser = H3ser - H4ser
 
-# q-series of log lambda_S
-LSser = qh
-for i in range(1, prec):
-    LSser += (sigma(2 * i + 1, 1) / (2 * i + 1)) * qh^(2 * i + 1)
-LSser *= (-16)
-
 # q-series of Eisenstein series
 E2ser = 1
 for i in range(1, prec):
