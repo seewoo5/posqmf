@@ -36,7 +36,7 @@ def jenkins_rouse_coeff_threshold(weight):
     l = cusp_dim(weight)
     thres = exp(59.169 / (weight - 2))
     thres *= (l ^ 3 * log(weight)) ^ (1 / (weight - 2))
-    thres *= 1.0242382 * cusp_dim
+    thres *= 1.0242382 * l
     return float(thres)
 
 def check_extremal_eisenstein_series_completely_positive(weight):

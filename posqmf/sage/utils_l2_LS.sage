@@ -64,21 +64,6 @@ def ls_make(A=0, B=0):
     return QM2_LS(A) + QM2_LS(B) * LS
 
 
-def ls_zero():
-    """Return the zero element."""
-    return QM2_LS(0)
-
-
-def ls_one():
-    """Return the basis element 1."""
-    return QM2_LS(1)
-
-
-def ls_from_ls():
-    """Return the element LS itself."""
-    return LS
-
-
 def _ls_coerce(f):
     r"""
     Coerce into QM2_LS.
@@ -110,37 +95,6 @@ def ls_components(f, strict=True):
             if k >= 2 and v != 0:
                 raise ValueError("Expected a linear element A + B*LS, but LS^2 term exists")
     return A, B
-
-
-def ls_add(f, g):
-    """Add two QM2_LS elements."""
-    return _ls_coerce(f) + _ls_coerce(g)
-
-
-def ls_sub(f, g):
-    """Subtract two QM2_LS elements."""
-    return _ls_coerce(f) - _ls_coerce(g)
-
-
-def ls_neg(f):
-    """Negate a QM2_LS element."""
-    return -_ls_coerce(f)
-
-
-def ls_scale(c, f):
-    """Multiply by a QM2 scalar."""
-    c = QM2(c)
-    return QM2_LS(c) * _ls_coerce(f)
-
-
-def ls_is_zero(f):
-    """Check if a QM2_LS element is zero."""
-    return _ls_coerce(f) == 0
-
-
-def ls_are_same(f, g):
-    """Check if two QM2_LS elements are equal."""
-    return _ls_coerce(f) == _ls_coerce(g)
 
 
 # ============================================================================
@@ -338,13 +292,15 @@ def print_ls(f, name, prec=30):
     except ValueError:
         print("weight", "inhomogeneous")
     print("depth", ls_depth(p))
-    print("A (constant part):", A)
-    print("B (LS part):", B)
     print("cusp order", ls_cusp_order(p))
-    print()
+    print("\n" + "=" * 35 + " Components (f = A + B * LS): " + "=" * 35 + "\n")
+    print_qm2(A, "A (constant part)", prec)
+    print_qm2(B, "B (LS part)", prec)
+    print("=" * 100)
 
 
 # Convenient named basis elements
-LS_0 = ls_zero()
-LS_1 = ls_one()
-LS = ls_from_ls()
+E2_LS = QM2_LS(E2_)
+E4_LS = QM2_LS(E4_)
+E6_LS = QM2_LS(E6_)
+Disc_LS = QM2_LS(Disc_)
