@@ -35,6 +35,7 @@ Functions for the Feigenbaum-Grabner-Hardin families of quasimodular forms used 
 - `F`, `G`, and `Y` compute $F_w$, $G_w$, and $Y_w$, respectively.
 
 - `Ftilde` and `Gtilde` compute $\widetilde{F}_{w}$ and $\widetilde{G}_{w}$, respectively.
+
 ### `utils_l1.sage`
 
 Functions for level 1 quasimodular forms, including depths, $q$-expansion, (Serre) derivative.
@@ -62,9 +63,9 @@ It uses the identities between Eisenstein series and Jacobi theta functions.
 
 ### `utils_l2_LS.sage`
 
-Functions for the ring `QM2_LS = QM2[LS]`, where elements are represented as polynomials in `LS` with coefficients in the level $\Gamma(2)$ quasimodular form ring.
+Functions for the ring `QM2_LS = QM2[LS]`, used to compute $G_w$ and $Y_w$ in `fgh.sage`.
 
-- `ls_components` extracts the two components $A$ and $B$ from an element $A + B \cdot LS$.
+- `ls_components` extracts the two components $A$ and $B$ from an element $A + B \cdot \mathcal{L}_S$.
 
 - `ls_q_series`, `ls_coefficients`, and `ls_cusp_order` compute $q^{1/2}$-expansions, coefficients, and cusp orders.
 
