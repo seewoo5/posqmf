@@ -111,7 +111,8 @@ def print_qm(qm, name, prec=20):
         print("weight", qm.weight())
     else:
         print("weight", qm.weights_list())
-    print("depth", qm.depth())
+    if qm.is_homogeneous():
+        print("depth", qm.depth())
     print("cusp order", qm_cusp_order(qm))
     print("polynomial", qm.polynomial().factor(), "\n")
 
