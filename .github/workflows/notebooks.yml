@@ -1,0 +1,63 @@
+name: Notebooks
+
+on:
+  pull_request:
+    branches: ["main"]
+  workflow_dispatch:
+
+jobs:
+  execute:
+    name: Execute Sage notebooks
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    defaults:
+      run:
+        shell: bash -el {0}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up conda
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          miniforge-version: latest
+          use-mamba: true
+          activate-environment: posqmf-notebooks
+          channels: conda-forge
+          channel-priority: strict
+          auto-update-conda: false
+
+      - name: Install Sage and Jupyter tools
+        run: mamba install -y sage=10.6 nbconvert ipykernel
+
+      - name: Register Sage Jupyter kernel
+        run: |
+          sage -python -c "from sage.repl.ipython_kernel.install import SageKernelSpec; SageKernelSpec.update(prefix='$CONDA_PREFIX')"
+          jupyter kernelspec list
+
+      - name: Generate Python modules from Sage sources
+        run: sh preparse.sh
+
+      - name: Execute root notebooks
+        run: |
+          set -euo pipefail
+          mkdir -p executed-notebooks
+          for notebook in *.ipynb; do
+            echo "::group::${notebook}"
+            jupyter nbconvert \
+              --to notebook \
+              --execute "${notebook}" \
+              --output-dir executed-notebooks \
+              --ExecutePreprocessor.kernel_name=sagemath \
+              --ExecutePreprocessor.timeout=-1
+            echo "::endgroup::"
+          done
+
+      - name: Upload executed notebooks
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: executed-notebooks
+          path: executed-notebooks/
+          if-no-files-found: ignore
