@@ -6,7 +6,7 @@ The sage codes under the directory `sage` provides several functions for computa
 
 - `extremal_eisenstein_series` compute extremal Eisenstein series of given weight, i.e. a modular form of weight $w$ with $q$-expansion $1 + O(q^{l})$ where $l$ is the dimension of the space of modular forms of weight $w$. It simply solve linear system on the coefficients of basis of the corresponding space of modular forms.
 
-- `jenkins_rouse_coeff_threshold` computes threshold $n_0$ for extremal Eisenstein series of given weight due to Jenkins and Rouse. If $n \ge n_0$, then $a_n > 0$, where $a_n$ is the $n$-th Fourier coefficient of the extremal Eisenstein series of given weight. Note that there are some minor errors in the original paper, and we use the corrected version here with slightly larger constant.
+- `jenkins_rouse_coeff_threshold` computes threshold $n_0$ for extremal Eisenstein series of given weight due to Jenkins and Rouse, where the coefficients $a_n$ has consistent signs for $n \ge n_0$. Note that there are some minor errors in the original paper, and we use the corrected version here with slightly larger constant.
 
 - `check_extremal_eisenstein_series_completely_positive` checks if the Fourier coefficients of the extremal Eisenstein series of given weight have desired signs (positive for $w \equiv 0 \pmod{4}$, negative for $w \equiv 2 \pmod{4}$) using Jenkins-Rouse coefficient threshold.
 
@@ -32,10 +32,9 @@ Functions for extremal quasimodular forms of level $\Gamma_0(2)$ and $\Gamma_0(3
 
 Functions for the Feigenbaum-Grabner-Hardin families of quasimodular forms used in the sign uncertainty principle computations.
 
-- `F`, `G`, and `Y` compute the main recursive families.
+- `F`, `G`, and `Y` compute $F_w$, $G_w$, and $Y_w$, respectively.
 
-- `Ftilde` and `Gtilde` compute the related extracted or auxiliary level 1 families.
-
+- `Ftilde` and `Gtilde` compute $\widetilde{F}_{w}$ and $\widetilde{G}_{w}$, respectively.
 ### `utils_l1.sage`
 
 Functions for level 1 quasimodular forms, including depths, $q$-expansion, (Serre) derivative.
