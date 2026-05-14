@@ -14,6 +14,28 @@ The sage codes under the directory `sage` provides several functions for computa
 
 - `extremal_qm` computes an extremal quasimodular form of given weight and depth (Kaneko-Koike). For the case of depth 1 and 2, it uses the recurrence relations in Grabner's paper "Quasimodular forms as solutions of modular differential equations". For other weights and depths (possibly larger than 4), it simply solve linear system on the coefficients of basis of the corresponding space of quasimodular forms.
 
+### `extremal_qm_high_level.sage`
+
+Functions for extremal quasimodular forms of level $\Gamma_0(2)$ and $\Gamma_0(3)$.
+
+- `extremal_qm_l2` and `extremal_qm_l3` compute extremal quasimodular forms of given weight and depth at levels $\Gamma_0(2)$ and $\Gamma_0(3)$.
+
+- `qm_l2_basis` and `qm_l3_basis` return bases of the corresponding spaces of quasimodular forms.
+
+- `is_extremal_qm_unique_level` checks uniqueness of extremal quasimodular forms at levels $1$, $2$, and $3$.
+
+### `victor_miller_basis.sage`
+
+- `l2_victor_miller_basis` and `l3_victor_miller_basis` compute Victor-Miller bases for modular forms of levels $\Gamma_0(2)$ and $\Gamma_0(3)$.
+
+### `fgh.sage`
+
+Functions for the Feigenbaum-Grabner-Hardin families of quasimodular forms used in the sign uncertainty principle computations.
+
+- `F`, `G`, and `Y` compute the main recursive families.
+
+- `Ftilde` and `Gtilde` compute the related extracted or auxiliary level 1 families.
+
 ### `utils_l1.sage`
 
 Functions for level 1 quasimodular forms, including depths, $q$-expansion, (Serre) derivative.
@@ -38,6 +60,16 @@ $q$-expansions are given in terms of `qh`, which corresponds to $q^{1/2}$.
 It uses the identities between Eisenstein series and Jacobi theta functions.
 
 - `double_argument` returns $F(2z)$ for a given level 1 quasimodular form $F(z)$.
+
+### `utils_l2_LS.sage`
+
+Functions for the ring `QM2_LS = QM2[LS]`, where elements are represented as polynomials in `LS` with coefficients in the level $\Gamma(2)$ quasimodular form ring.
+
+- `ls_components` extracts the two components $A$ and $B$ from an element $A + B \cdot LS$.
+
+- `ls_q_series`, `ls_coefficients`, and `ls_cusp_order` compute $q^{1/2}$-expansions, coefficients, and cusp orders.
+
+- `ls_derivative` and `ls_serre_derivative` extend the derivative and Serre derivative to `QM2_LS`.
 
 ### `utils_rqm.sage`
 
