@@ -132,8 +132,10 @@ def qm_find_lin_comb_coeffs(w, s, coeffs, ls=None, prec=100):
     except ValueError:
         raise ValueError("The given coefficients are not in the span of the given quasimodular forms")
 
-def qm_find_lin_comb(qm, ls, prec=100):
+def qm_find_lin_comb(qm, ls, prec=100, N=None):
     """Express `qm` as a linear combination of quasimodular forms in `ls`."""
+    if N is not None:
+        prec = N
     w = qm.weight()
     s = qm.depth()
     m = matrix([qm_.coefficients(list(range(prec))) for qm_ in ls])
