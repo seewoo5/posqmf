@@ -17,7 +17,7 @@ if [[ -f $INIT_FILE ]]; then
   echo "Removed existing $INIT_FILE."
 fi
 touch "$INIT_FILE"
-echo "from __future__ import absolute_import\n" > "$INIT_FILE"
+printf "from __future__ import absolute_import\n\n" > "$INIT_FILE"
 echo "Created new $INIT_FILE with absolute import statement."
 
 # Loop over all .sage files in the source directory
