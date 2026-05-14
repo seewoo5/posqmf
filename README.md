@@ -20,14 +20,9 @@ from posqmf import *
 
 `polymod.ipynb` checkes the identities in the paper [Inequalities involving polynomials and quasimodular forms](https://arxiv.org/abs/2602.10536).
 
-`polymod_ineq1.lean`, `polymod_ineq2.lean`, and `polymod_monotone.lean` files under `posqmf/lean` provides formal proof of some inequalities in the paper. 
-Lean files are initially written by AxiomProver and manually golfed afterwards., which can be checked by `lake exe cache get && lake build`.
-
 ## `extremal_qm_high_level.ipynb`
 
 `extremal_qm_high_level.ipynb` contains codes related to Chapter 7 of my thesis, which checks the uniqueness and identities related to the extremal quasimodular forms of level $\Gamma_0(N)$ and depth $s$, where $(N, s) \in \{(2, 1), (2, 2), (3, 1), (4, 1)\}$. It also computes Victor-Miller basis for level $\Gamma_0(2)$ and $\Gamma_0(3)$.
-
-See also `posqmf/lean/D_6_3.lean`.
 
 ## `uncertainty_principle.ipynb`
 
@@ -40,5 +35,3 @@ Also, it contains codes checking signs of Fourier coefficients of extremal eisen
 
 - Uniqueness of extremal quasimodular forms of weight $\le 200$ and depth $5 \le s \le 10$.
 - Non-positiveness of $X_{16, 5}$.
-
-See also `posqmf/lean/X_16_5.lean`.

@@ -67,9 +67,12 @@ $$
 ## Lean codes
 
 The lean codes under the directory `lean` verifies several inequalities on quasimodular forms and their coefficients.
+The first three files were initially written by AxiomProver and manually golfed afterwards.
+`X_16_5.lean` and `D_6_3.lean` were written by Claude Opus 4.7.
 
 - `polymod_monotone.lean` verifies (41) of "Inequalities involving polynomials and quasimodular forms".
 - `polymod_ineq1.lean` verifies (60) of "Inequalities involving polynomials and quasimodular forms".
 - `polymod_ineq2.lean` verifies (61) of "Inequalities involving polynomials and quasimodular forms".
 - `X_16_5.lean` verifies that the extremal quasimodular form $X_{16, 5}$ of weight $16$ and depth $5$ has negative coefficients for $n \ge 250$. Negativity for $8 \le n < 250$ is checked separately in `miscellaneous.ipynb`.
 - `D_6_3.lean` verifies the positivity of the coefficients of $\mathcal{D}_{6, 3}$.
+- `SigmaBounds.lean` include basic inequalities for the divisor sum function, which are used in the above two files.
