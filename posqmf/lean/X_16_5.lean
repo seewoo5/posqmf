@@ -62,12 +62,12 @@ opaque τ : ℕ → ℤ
 
 /--
 **Deligne's bound** for the Ramanujan tau function:
-`|τ(n)| < σ₀(n) n^(11/2)` for `n ≥ 1`.
+`|τ(n)| ≤ σ₀(n) n^(11/2)` for `n ≥ 1`.
 
 This is taken as an axiom; a proof would require the full force of the
 Weil conjectures (Deligne, 1974). -/
 axiom abs_tau_lt (n : ℕ) (hn : 1 ≤ n) :
-    |(τ n : ℝ)| < (σ 0 n : ℝ) * (n : ℝ) ^ ((11 : ℝ) / 2)
+    |(τ n : ℝ)| ≤ (σ 0 n : ℝ) * (n : ℝ) ^ ((11 : ℝ) / 2)
 
 /-! ## The sequences `x`, `y`, `z`, `a` -/
 
