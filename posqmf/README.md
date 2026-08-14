@@ -108,3 +108,15 @@ The first three files were initially written by AxiomProver and manually golfed 
 - `X_16_5.lean` verifies that the extremal quasimodular form $X_{16, 5}$ of weight $16$ and depth $5$ has negative coefficients for $n \ge 250$. Negativity for $8 \le n < 250$ is checked separately in `miscellaneous.ipynb`.
 - `D_6_3.lean` verifies the positivity of the coefficients of $\mathcal{D}_{6, 3}$.
 - `SigmaBounds.lean` include basic inequalities for the divisor sum function, which are used in the above two files.
+
+### `KanekoZagier`
+
+The directory `lean/KanekoZagier` formalizes the operator bookkeeping of "Positive quasimodular forms and the sign uncertainty principle", at the level of formal $q$-expansions: $\mathbb{R}[[q]]$ is the ring of $q$-series, $D = q \frac{d}{dq}$, and $E_2, E_4, E_6$ are the explicit divisor-sum series. (Mathlib's `D` and Serre derivative are differential operators on functions on the upper half plane, which carry analytic content that none of these identities need.)
+
+- `Basic.lean` defines $D$ and proves the Leibniz rule and the convolution lemma used in all coefficient computations.
+- `Eisenstein.lean` defines $E_2, E_4, E_6$ and computes $[q^n](E \cdot G)$ for $E \in \\{E_2, E_4, E_6, E_2', E_2'', E_4'\\}$.
+- `Ramanujan.lean` states Ramanujan's identities $E_2' = (E_2^2 - E_4)/12$, $E_4' = (E_2E_4 - E_6)/3$, $E_6' = (E_2E_6 - E_4^2)/2$ **as axioms**, together with the reductions they yield.
+- `Serre.lean` defines $\partial_k$ and $\partial_k^r$, proves the product rule and Ramanujan's identities in Serre form, and expands $\partial_k^2$ and $\partial_k^3$ in terms of $D$.
+- `Operators.lean` defines $L_{2,k}^{\alpha}$ and $L_{3,k}^{(\alpha,\beta)}$ by their $D$-forms and proves that these agree with their Serre-derivative forms.
+- `Coefficients.lean` proves the Fourier coefficient formulas `lem:KZ2_coeff` and `lem:KZ3_coeff` (Lemma 2.2 and Lemma 2.3). These do **not** depend on the Ramanujan axioms.
+- `Intertwine.lean` proves the intertwining relation between second- and third-order Kaneko-Zagier operators under the four constraints on parameters (Lemma 2.4).

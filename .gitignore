@@ -3,4 +3,4 @@
 .ipynb_checkpoints
 .lake
 
-posqmf/*.py
+*.py
