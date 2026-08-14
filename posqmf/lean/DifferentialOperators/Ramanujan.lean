@@ -1,5 +1,5 @@
 import Mathlib.Tactic.Module
-import posqmf.lean.KanekoZagier.Eisenstein
+import posqmf.lean.DifferentialOperators.Eisenstein
 
 /-!
 # Ramanujan's identities

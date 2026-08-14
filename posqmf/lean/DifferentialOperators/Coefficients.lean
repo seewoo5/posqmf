@@ -1,4 +1,4 @@
-import posqmf.lean.KanekoZagier.Operators
+import posqmf.lean.DifferentialOperators.KanekoZagier
 
 /-!
 # Fourier coefficients of the Kaneko--Zagier operators

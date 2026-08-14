@@ -1,4 +1,4 @@
-import posqmf.lean.KanekoZagier.Operators
+import posqmf.lean.DifferentialOperators.KanekoZagier
 
 /-!
 # The intertwining criterion for the Kaneko--Zagier operators
@@ -10,7 +10,7 @@ the Serre-derivative normal forms
 `L_{2,k}^γ = ∂_k² + C E₄`,  `L_{3,k}^{(α,β)} = ∂_k³ + A E₄∂_k + B E₆`,
 
 where `A`, `B`, `C` are the shifted parameters defined below; the `D`-forms `L2` and `L3` of
-`Operators.lean` are recovered by `L2_eq_L2S` and `L3_eq_L3S`.
+`KanekoZagier.lean` are recovered by `L2_eq_L2S` and `L3_eq_L3S`.
 
 ## Main results
 
@@ -148,7 +148,7 @@ def shiftB' (k α' β' : ℝ) : ℝ := β' + k / 12 * α' - k ^ 2 * (k + 3) / 86
 /-- `C' := γ' - (k+6)(k+8)/144`, the `E₄` coefficient of `L_{2,k+6}^{γ'}`. -/
 def shiftC' (k γ' : ℝ) : ℝ := γ' - (k + 6) * (k + 8) / 144
 
-/-- **The intertwining criterion** for the `D`-forms of `Operators.lean`: the four constraints on
+/-- **The intertwining criterion** for the `D`-forms of `KanekoZagier.lean`: the four constraints on
 the shifted parameters imply
 `L_{3,k+4}^{(α,β)} L_{2,k}^{γ} = L_{2,k+6}^{γ'} L_{3,k}^{(α',β')}`. -/
 theorem L3_comp_L2_eq_L2_comp_L3 (k α β γ α' β' γ' : ℝ)

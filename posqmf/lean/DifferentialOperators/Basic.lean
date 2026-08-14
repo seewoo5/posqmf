@@ -40,7 +40,17 @@ lemma coeff_D (n : ℕ) (f : ℝ⟦X⟧) : coeff n (D f) = (n : ℝ) * coeff n f
 lemma D_mk (c : ℕ → ℝ) : D (mk c) = mk fun n ↦ (n : ℝ) * c n := by ext n; simp
 
 @[simp]
+lemma D_zero : D 0 = 0 := by ext n; simp
+
+@[simp]
 lemma D_one : D 1 = 0 := by ext n; simp
+
+@[simp]
+lemma D_C (a : ℝ) : D (PowerSeries.C a) = 0 := by
+  ext n
+  obtain rfl | hn := eq_or_ne n 0
+  · simp
+  · simp [PowerSeries.coeff_C, hn]
 
 lemma D_add (f g : ℝ⟦X⟧) : D (f + g) = D f + D g := by ext n; simp [mul_add]
 

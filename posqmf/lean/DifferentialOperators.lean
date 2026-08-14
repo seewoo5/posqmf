@@ -1,10 +1,10 @@
-import posqmf.lean.KanekoZagier.Basic
-import posqmf.lean.KanekoZagier.Coefficients
-import posqmf.lean.KanekoZagier.Eisenstein
-import posqmf.lean.KanekoZagier.Intertwine
-import posqmf.lean.KanekoZagier.Operators
-import posqmf.lean.KanekoZagier.Ramanujan
-import posqmf.lean.KanekoZagier.Serre
+import posqmf.lean.DifferentialOperators.Basic
+import posqmf.lean.DifferentialOperators.Coefficients
+import posqmf.lean.DifferentialOperators.Eisenstein
+import posqmf.lean.DifferentialOperators.Intertwine
+import posqmf.lean.DifferentialOperators.KanekoZagier
+import posqmf.lean.DifferentialOperators.Ramanujan
+import posqmf.lean.DifferentialOperators.Serre
 
 /-!
 # Kaneko--Zagier operators on formal `q`-expansions
@@ -24,7 +24,7 @@ take place.
 | `Eisenstein` | `E₂`, `E₄`, `E₆`, their derivatives, and coefficients of products with them |
 | `Ramanujan` | Ramanujan's identities (axioms) and the reductions they give |
 | `Serre` | `∂_k`, `∂_k^r`, the product rule, and `∂_k²`, `∂_k³` written out in `D`-form |
-| `Operators` | `L_{2,k}^α`, `L_{3,k}^{(α,β)}` and the `D`-form `=` Serre-form theorems |
+| `KanekoZagier` | `L_{2,k}^α`, `L_{3,k}^{(α,β)}` and the `D`-form `=` Serre-form theorems |
 | `Coefficients` | Fourier coefficients of the two operators |
 | `Intertwine` | `∂_k⁵` normal forms of the composed operators, intertwining criterion (`⟸`) |
 

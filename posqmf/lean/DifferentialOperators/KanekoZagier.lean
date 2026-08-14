@@ -1,4 +1,4 @@
-import posqmf.lean.KanekoZagier.Serre
+import posqmf.lean.DifferentialOperators.Serre
 
 /-!
 # The Kaneko--Zagier operators `L_{2,k}^α` and `L_{3,k}^{(α,β)}`
@@ -37,6 +37,14 @@ def L3 (k α β : ℝ) (f : ℝ⟦X⟧) : ℝ⟦X⟧ :=
   D (D (D f)) - ((k + 2) / 4) • (E2 * D (D f))
     + (((k + 1) * (k + 2) / 4) • D E2 + α • E4) * D f
     - ((k * (k + 1) * (k + 2) / 24) • D (D E2) + (k * α / 4) • D E4 - β • E6) * f
+
+@[simp] lemma L2_zero (k α : ℝ) : L2 k α 0 = 0 := by simp [L2]
+
+@[simp] lemma L3_zero (k α β : ℝ) : L3 k α β 0 = 0 := by simp [L3]
+
+lemma L3_smul (k α β c : ℝ) (f : ℝ⟦X⟧) : L3 k α β (c • f) = c • L3 k α β f := by
+  simp only [L3, D_smul, mul_smul_comm, smul_sub, smul_add, smul_smul]
+  module
 
 /-- **Serre form of the second-order operator**: `L_{2,k}^α = ∂_k² - (k(k+2)/144 - α)E₄`. -/
 theorem L2_eq_serre (k α : ℝ) (f : ℝ⟦X⟧) :

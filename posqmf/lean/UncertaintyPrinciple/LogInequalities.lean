@@ -44,19 +44,19 @@ private lemma pos_of_hasDerivAt_pos {f g : ℝ → ℝ} (h0 : f 0 = 0)
     exact (hd y hy.le).deriv ▸ hg y hy
   simpa [h0] using hmono self_mem_Ici (mem_Ici.2 hx.le) hx
 
-private lemma quadratic_pos (x : ℝ) : (0 : ℝ) < x ^ 2 + x + 1 := by
+private lemma quadratic_pos (x : ℝ) : 0 < x ^ 2 + x + 1 := by
   nlinarith [sq_nonneg (2 * x + 1)]
 
 private lemma hasDerivAt_log_one_add {x : ℝ} (hx : 0 ≤ x) :
     HasDerivAt (fun t : ℝ ↦ log (1 + t)) (1 / (1 + x)) x := by
-  simpa using ((hasDerivAt_id x).const_add (1 : ℝ)).log (by linarith : (0 : ℝ) < 1 + x).ne'
+  simpa using ((hasDerivAt_id x).const_add (1 : ℝ)).log (by linarith : 0 < 1 + x).ne'
 
 /-! ### The basic inequality -/
 
 private lemma hasDerivAt_logIneq1 (x : ℝ) (hx : 0 ≤ x) :
     HasDerivAt (fun t : ℝ ↦ log (1 + t) - 2 * t / (t + 2))
       (x ^ 2 / ((x + 1) * (x + 2) ^ 2)) x := by
-  have h2 : (0 : ℝ) < x + 2 := by linarith
+  have h2 : 0 < x + 2 := by linarith
   have hdiv : HasDerivAt (fun t : ℝ ↦ 2 * t / (t + 2)) (4 / (x + 2) ^ 2) x := by
     have h := ((hasDerivAt_id x).const_mul (2 : ℝ)).div ((hasDerivAt_id x).add_const (2 : ℝ)) h2.ne'
     norm_num at h
@@ -79,7 +79,7 @@ theorem log_ineq_Y4 {x : ℝ} (hx : 0 < x) :
     x * (x + 2) / (2 * (x ^ 2 + x + 1)) < log (1 + x) :=
   calc x * (x + 2) / (2 * (x ^ 2 + x + 1))
       = 2 * x / (x + 2) - 3 * x ^ 3 / (2 * (x + 2) * (x ^ 2 + x + 1)) := by
-        field_simp [(by linarith : (0 : ℝ) < x + 2).ne', (quadratic_pos x).ne']
+        field_simp [(by linarith : 0 < x + 2).ne', (quadratic_pos x).ne']
         ring
     _ < 2 * x / (x + 2) := sub_lt_self _ (by positivity)
     _ < log (1 + x) := log_ineq1 hx
@@ -135,8 +135,8 @@ the factor `x+2` then cancels exactly and leaves `x³(22x²+x+1)/6 > 0`. -/
 theorem log_ineq_Y10 {x : ℝ} (hx : 1 ≤ x) :
     (2 * x ^ 5 + 11 * x ^ 4 - x ^ 3 - 24 * x ^ 2 - 12 * x) / 6
       < -((x ^ 2 + x + 1) * (2 * x + 1) * (x + 2) * (1 - x)) * log (1 + x) := by
-  have hx0 : (0 : ℝ) < x := by linarith
-  have hc : (0 : ℝ) ≤ -((x ^ 2 + x + 1) * (2 * x + 1) * (x + 2) * (1 - x)) := by
+  have hx0 : 0 < x := by linarith
+  have hc : 0 ≤ -((x ^ 2 + x + 1) * (2 * x + 1) * (x + 2) * (1 - x)) := by
     rw [show -((x ^ 2 + x + 1) * (2 * x + 1) * (x + 2) * (1 - x))
       = (x ^ 2 + x + 1) * (2 * x + 1) * (x + 2) * (x - 1) by ring]
     exact mul_nonneg (mul_nonneg (mul_nonneg (quadratic_pos x).le (by linarith)) (by linarith))
@@ -144,7 +144,7 @@ theorem log_ineq_Y10 {x : ℝ} (hx : 1 ≤ x) :
   calc (2 * x ^ 5 + 11 * x ^ 4 - x ^ 3 - 24 * x ^ 2 - 12 * x) / 6
       = -((x ^ 2 + x + 1) * (2 * x + 1) * (x + 2) * (1 - x)) * (2 * x / (x + 2))
           - x ^ 3 * (22 * x ^ 2 + x + 1) / 6 := by
-        field_simp [(by linarith : (0 : ℝ) < x + 2).ne']
+        field_simp [(by linarith : 0 < x + 2).ne']
         ring
     _ < -((x ^ 2 + x + 1) * (2 * x + 1) * (x + 2) * (1 - x)) * (2 * x / (x + 2)) :=
         sub_lt_self _ (by positivity)

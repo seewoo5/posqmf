@@ -26,6 +26,14 @@ lemma pow_le_sigma (k n : ℕ) (hn : 1 ≤ n) : (n : ℝ) ^ k ≤ (σ k n : ℝ)
   exact_mod_cast single_le_sum (f := (· ^ k)) (fun _ _ => Nat.zero_le _)
     (n.mem_divisors.mpr ⟨dvd_refl n, by omega⟩)
 
+/-- `σₖ(n) ≥ 1` for `n ≥ 1`. -/
+lemma one_le_sigma {k n : ℕ} (hn : 1 ≤ n) : (1 : ℝ) ≤ (σ k n : ℝ) :=
+  le_trans (one_le_pow₀ (by exact_mod_cast hn)) (pow_le_sigma k n hn)
+
+/-- `σₖ(n) > 0` for `n ≥ 1`. -/
+lemma sigma_pos {k n : ℕ} (hn : 1 ≤ n) : (0 : ℝ) < (σ k n : ℝ) :=
+  lt_of_lt_of_le one_pos (one_le_sigma hn)
+
 private lemma sum_telescope_one_div (N : ℕ) (hN : 1 ≤ N) :
     ∑ d ∈ Icc 2 N, ((1 : ℝ) / ((d - 1 : ℕ) : ℝ) - 1 / (d : ℝ)) = 1 - 1 / (N : ℝ) := by
   induction N, hN using Nat.le_induction with

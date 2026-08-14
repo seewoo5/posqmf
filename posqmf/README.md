@@ -109,14 +109,26 @@ The first three files were initially written by AxiomProver and manually golfed 
 - `D_6_3.lean` verifies the positivity of the coefficients of $\mathcal{D}_{6, 3}$.
 - `SigmaBounds.lean` include basic inequalities for the divisor sum function, which are used in the above two files.
 
-### `KanekoZagier`
+### `DifferentialOperators`
 
-The directory `lean/KanekoZagier` formalizes the operator bookkeeping of "Positive quasimodular forms and the sign uncertainty principle", at the level of formal $q$-expansions: $\mathbb{R}[[q]]$ is the ring of $q$-series, $D = q \frac{d}{dq}$, and $E_2, E_4, E_6$ are the explicit divisor-sum series. (Mathlib's `D` and Serre derivative are differential operators on functions on the upper half plane, which carry analytic content that none of these identities need.)
+The directory `lean/DifferentialOperators` formalizes the operator bookkeeping of "Positive quasimodular forms and the sign uncertainty principle", at the level of formal $q$-expansions: $\mathbb{R}[[q]]$ is the ring of $q$-series, $D = q \frac{d}{dq}$, and $E_2, E_4, E_6$ are the explicit divisor-sum series. (Mathlib's `D` and Serre derivative are differential operators on functions on the upper half plane, which carry analytic content that none of these identities need.)
 
 - `Basic.lean` defines $D$ and proves the Leibniz rule and the convolution lemma used in all coefficient computations.
 - `Eisenstein.lean` defines $E_2, E_4, E_6$ and computes $[q^n](E \cdot G)$ for $E \in \\{E_2, E_4, E_6, E_2', E_2'', E_4'\\}$.
 - `Ramanujan.lean` states Ramanujan's identities $E_2' = (E_2^2 - E_4)/12$, $E_4' = (E_2E_4 - E_6)/3$, $E_6' = (E_2E_6 - E_4^2)/2$ **as axioms**, together with the reductions they yield.
 - `Serre.lean` defines $\partial_k$ and $\partial_k^r$, proves the product rule and Ramanujan's identities in Serre form, and expands $\partial_k^2$ and $\partial_k^3$ in terms of $D$.
-- `Operators.lean` defines $L_{2,k}^{\alpha}$ and $L_{3,k}^{(\alpha,\beta)}$ by their $D$-forms and proves that these agree with their Serre-derivative forms.
+- `KanekoZagier.lean` defines the Kaneko-Zagier operators $L_{2,k}^{\alpha}$ and $L_{3,k}^{(\alpha,\beta)}$ by their $D$-forms and proves that these agree with their Serre-derivative forms.
 - `Coefficients.lean` proves the Fourier coefficient formulas `lem:KZ2_coeff` and `lem:KZ3_coeff` (Lemma 2.2 and Lemma 2.3). These do **not** depend on the Ramanujan axioms.
 - `Intertwine.lean` proves the intertwining relation between second- and third-order Kaneko-Zagier operators under the four constraints on parameters (Lemma 2.4).
+- `QuasiModular.lean` sets up the polynomial model $\mathbb{R}[E_2, E_4, E_6]$, which is needed because $\delta = \partial/\partial E_2$ is not an operator on $q$-series. It carries $D$, $\delta$, the Euler weight operator, and the Serre derivative, proves the commutator identities $[\delta, D] = \frac{1}{12}E$ and $\delta\partial_k F = \partial_k\delta F + \frac{w-k}{12}F$, and defines the algebra map to $q$-expansions that ties the two layers together.
+
+### `UncertaintyPrinciple`
+
+The directory `lean/UncertaintyPrinciple` formalizes the coefficient-positivity arguments of "Positive quasimodular forms and the sign uncertainty principle" that sit on top of the operator layer.
+
+- `LogInequalities.lean` proves the four elementary logarithm inequalities behind the base cases of the positivity of $Y_w$ (Lemma 4.10 and the $Y_4$, $Y_8$, $Y_{10}$ cases of Theorem 4.11), via the mean value theorem.
+- `FtildePositivity.lean` proves positivity of the Fourier coefficients of $\widetilde{F}_{w-2}$ (Proposition 4.5): the specialized coefficient formulas, all sign analysis, the boundary estimate with its quartic, the base case $\widetilde{F}_{10} = \frac{1}{360}E_4X_{6,1}$, and the induction. The recurrence for $\widetilde{F}$ (Lemma 4.4, which needs $\delta = \partial/\partial E_2$) and the vanishing order and normalization of $F_w$ enter as explicit hypotheses, all of which `FtildeRecurrence.lean` discharges.
+- `FtildeRecurrence.lean` defines the family $F_{4N+12}$ in the polynomial model by its recurrence, sets $\widetilde{F}_{w-2} := \delta F_w$, and discharges every hypothesis of `FtildePositivity.lean`: the recurrence (by applying $\delta$ to the definition), the base case $F_{12} = \frac{1}{57600}(E_4')^2$, the vanishing order, and the normalization. The last of these needs the modular linear differential equation $L_{3,w-2}^{((w-4)/4,\,0)}F_w = 0$, which is proved here by checking it on $F_{12}$ and propagating it along the recurrence with the intertwining lemma.
+- `GtildePositivity.lean` proves nonnegativity of the Fourier coefficients of $\widetilde{G}_w$ (Propositions 4.21 and 4.22), including the $A_w$/$B_w$ kernel expansions and the elimination of the boundary coefficient through the third-order equation, plus strict positivity of the constant term. The recurrence and the third-order equation for $\widetilde{G}_w$ enter as explicit hypotheses.
+
+All results in the two positivity files depend only on Lean's standard axioms; in particular the Ramanujan axioms of `DifferentialOperators/Ramanujan.lean` are not used there. `FtildeRecurrence.lean` does use them, since the bridge $q$-expansion map from the polynomial model is what turns $DE_2, DE_4, DE_6$ into polynomials in $E_2, E_4, E_6$.

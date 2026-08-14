@@ -1,4 +1,4 @@
-import posqmf.lean.KanekoZagier.Ramanujan
+import posqmf.lean.DifferentialOperators.Ramanujan
 
 /-!
 # The Serre derivative on formal `q`-expansions
@@ -15,7 +15,8 @@ number: all the identities below are polynomial in `k`.
   `D`, `E₂`, `E₄`, `E₆`.  These are the computations behind the two Kaneko--Zagier operators.
 -/
 
-open PowerSeries
+open ArithmeticFunction Finset PowerSeries
+open scoped sigma
 
 namespace KanekoZagier
 
@@ -50,6 +51,13 @@ lemma serreD_add (k : ℝ) (f g : ℝ⟦X⟧) : serreD k (f + g) = serreD k f + 
 
 lemma serreD_smul (k c : ℝ) (f : ℝ⟦X⟧) : serreD k (c • f) = c • serreD k f := by
   simp only [serreD, D_smul, mul_smul_comm, smul_sub, smul_smul]; ring_nf
+
+/-- The Fourier coefficients of the Serre derivative, with the `E₂`-convolution written out. -/
+lemma coeff_serreD (k : ℝ) (f : ℝ⟦X⟧) (n : ℕ) :
+    coeff n (serreD k f)
+      = (n : ℝ) * coeff n f
+        - k / 12 * (coeff n f - 24 * ∑ j ∈ range n, (σ 1 (n - j) : ℝ) * coeff j f) := by
+  rw [serreD, map_sub, PowerSeries.coeff_smul, smul_eq_mul, coeff_D, coeff_E2_mul]
 
 /-- One more Serre derivative on top of an iterate: `∂_{k+2r}(∂_k^r F) = ∂_k^{r+1}F`.  The weight is
 supplied as a hypothesis so that the lemma applies whatever form `k + 2r` happens to take. -/
