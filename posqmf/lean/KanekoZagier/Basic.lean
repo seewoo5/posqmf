@@ -20,7 +20,7 @@ role of the ring of `q`-expansions (so the formal variable `X` is `q`).
 * `KanekoZagier.D_mul`: `D` satisfies the Leibniz rule.
 * `KanekoZagier.coeff_mk_mul`: for a series `f` with vanishing constant term,
   `[qⁿ](f * G) = ∑_{j < n} ([qⁿ⁻ʲ]f) · ([qʲ]G)`.  This is the shape in which every coefficient
-  computation of `Mathlib`-free Kaneko--Zagier bookkeeping is carried out.
+  computation in this directory is carried out.
 -/
 
 open Finset PowerSeries
@@ -59,7 +59,7 @@ lemma D_mul (f g : ℝ⟦X⟧) : D (f * g) = D f * g + f * D g := by
 
 /-- Coefficients of a product with a series of the shape `∑_{n ≥ 1} c n qⁿ`.  Since the constant
 term of `mk c` vanishes, the `j = n` term of the convolution drops out and the sum runs over
-`j < n` only, which is exactly the shape of `lem:KZ2_coeff` and `lem:KZ3_coeff`. -/
+`j < n` only, which is exactly the shape of the two coefficient formulas in `Coefficients.lean`. -/
 lemma coeff_mk_mul (c : ℕ → ℝ) (h0 : c 0 = 0) (G : ℝ⟦X⟧) (n : ℕ) :
     coeff n (mk c * G) = ∑ j ∈ range n, c (n - j) * coeff j G := by
   rw [PowerSeries.coeff_mul, ← Finset.Nat.sum_antidiagonal_swap,

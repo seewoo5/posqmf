@@ -10,10 +10,9 @@ number: all the identities below are polynomial in `k`.
 ## Main results
 
 * `KanekoZagier.serreD_mul`: the product rule `∂_{w₁+w₂}(FG) = (∂_{w₁}F)G + F(∂_{w₂}G)`.
-* `KanekoZagier.serreD_E2`, `serreD_E4`, `serreD_E6`: Ramanujan's identities in Serre form,
-  `eqn:ramanujan_serre`.
+* `KanekoZagier.serreD_E2`, `serreD_E4`, `serreD_E6`: Ramanujan's identities in Serre form.
 * `KanekoZagier.serreD_two_eq`, `serreD_three_eq`: the expansions of `∂_k²` and `∂_k³` in terms of
-  `D`, `E₂`, `E₄`, `E₆`.  These are the computations behind `eqn:KZ2_def` and `eqn:KZ3_def_serre`.
+  `D`, `E₂`, `E₄`, `E₆`.  These are the computations behind the two Kaneko--Zagier operators.
 -/
 
 open PowerSeries
@@ -65,7 +64,7 @@ lemma serreD_mul (w₁ w₂ : ℝ) (f g : ℝ⟦X⟧) :
   simp only [serreD, D_mul, sub_mul, mul_sub, smul_mul_assoc, mul_smul_comm, add_smul, add_div]
   ring_nf
 
-/-! ### Ramanujan's identities in Serre form (`eqn:ramanujan_serre`) -/
+/-! ### Ramanujan's identities in Serre form -/
 
 lemma serreD_E2 : serreD 1 E2 = (-1 / 12 : ℝ) • E4 := by
   rw [serreD, ramanujan_E2]; module
@@ -106,7 +105,7 @@ lemma serreD_E4_sq_mul (v w : ℝ) (hv : v = w + 8) (f : ℝ⟦X⟧) :
 
 /-- The twofold Serre derivative written out in terms of `D`:
 `∂_k²F = F'' - ((k+1)/6)E₂F' + (k(k+1)/12)E₂'F + (k(k+2)/144)E₄F`.
-Comparing with `eqn:KZ2_def` this is exactly `L_{2,k} = ∂_k² - (k(k+2)/144)E₄`. -/
+Comparing with `L2` this is exactly `L_{2,k} = ∂_k² - (k(k+2)/144)E₄`. -/
 theorem serreD_two_eq (k : ℝ) (f : ℝ⟦X⟧) :
     serreDIter k 2 f = D (D f) - ((k + 1) / 6) • (E2 * D f) + (k * (k + 1) / 12) • (D E2 * f)
       + (k * (k + 2) / 144) • (E4 * f) := by

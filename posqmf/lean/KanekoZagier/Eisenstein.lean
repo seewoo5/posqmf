@@ -4,7 +4,7 @@ import posqmf.lean.KanekoZagier.Basic
 /-!
 # The Eisenstein series `E₂`, `E₄`, `E₆` as formal `q`-expansions
 
-Following `eqn:e2fourier`--`eqn:e6fourier` of the paper we set
+Following the paper we set
 
 * `E₂ = 1 - 24 ∑_{n ≥ 1} σ₁(n) qⁿ`,
 * `E₄ = 1 + 240 ∑_{n ≥ 1} σ₃(n) qⁿ`,
@@ -16,7 +16,7 @@ as elements of `ℝ⟦X⟧`.  Since Mathlib's `ArithmeticFunction.sigma` sends `
 ## Main results
 
 The `coeff_*_mul` lemmas record `[qⁿ](E * G)` for `E` each of `E₂`, `E₄`, `E₆`, `DE₂`, `D²E₂`,
-`DE₄` in the shape used by `lem:KZ2_coeff` and `lem:KZ3_coeff`: a diagonal contribution plus a
+`DE₄` in the shape used by the coefficient formulas of `Coefficients.lean`: a diagonal term plus a
 strictly lower triangular convolution against `σ₁`, `σ₃` or `σ₅`.
 -/
 
@@ -30,13 +30,13 @@ noncomputable section
 /-- The cuspidal series `∑_{n ≥ 1} σ_k(n) qⁿ`. -/
 def qSigma (k : ℕ) : ℝ⟦X⟧ := mk fun n ↦ (σ k n : ℝ)
 
-/-- The quasimodular Eisenstein series `E₂ = 1 - 24 ∑_{n ≥ 1} σ₁(n) qⁿ` (`eqn:e2fourier`). -/
+/-- The quasimodular Eisenstein series `E₂ = 1 - 24 ∑_{n ≥ 1} σ₁(n) qⁿ`. -/
 def E2 : ℝ⟦X⟧ := 1 - (24 : ℝ) • qSigma 1
 
-/-- The Eisenstein series `E₄ = 1 + 240 ∑_{n ≥ 1} σ₃(n) qⁿ` (`eqn:e4fourier`). -/
+/-- The Eisenstein series `E₄ = 1 + 240 ∑_{n ≥ 1} σ₃(n) qⁿ`. -/
 def E4 : ℝ⟦X⟧ := 1 + (240 : ℝ) • qSigma 3
 
-/-- The Eisenstein series `E₆ = 1 - 504 ∑_{n ≥ 1} σ₅(n) qⁿ` (`eqn:e6fourier`). -/
+/-- The Eisenstein series `E₆ = 1 - 504 ∑_{n ≥ 1} σ₅(n) qⁿ`. -/
 def E6 : ℝ⟦X⟧ := 1 - (504 : ℝ) • qSigma 5
 
 @[simp]
@@ -53,7 +53,7 @@ example : coeff 2 E6 = -16632 := by norm_num [E6, show σ 5 2 = 33 by decide]
 
 /-! ### `D` applied to the Eisenstein series
 
-Only the finitely many derivatives occurring in `eqn:KZ2_def` and `eqn:KZ3_def` are needed,
+Only the finitely many derivatives occurring in the two Kaneko--Zagier operators are needed,
 namely `E₂'`, `E₂''` and `E₄'`. -/
 
 lemma D_E2 : D E2 = (-24 : ℝ) • mk fun m ↦ (m : ℝ) * (σ 1 m : ℝ) := by

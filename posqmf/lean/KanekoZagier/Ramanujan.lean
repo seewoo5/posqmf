@@ -4,7 +4,7 @@ import posqmf.lean.KanekoZagier.Eisenstein
 /-!
 # Ramanujan's identities
 
-The three identities `eqn:ramanujan`
+The three identities
 
 `E₂' = (E₂² - E₄)/12`,  `E₄' = (E₂E₄ - E₆)/3`,  `E₆' = (E₂E₆ - E₄²)/2`
 
@@ -30,21 +30,21 @@ open PowerSeries
 
 namespace KanekoZagier
 
-/-- **Ramanujan's identity** `E₂' = (E₂² - E₄)/12` (`eqn:ramanujan`), taken as an axiom. -/
+/-- **Ramanujan's identity** `E₂' = (E₂² - E₄)/12`, taken as an axiom. -/
 axiom ramanujan_E2 : D E2 = (1 / 12 : ℝ) • (E2 * E2 - E4)
 
-/-- **Ramanujan's identity** `E₄' = (E₂E₄ - E₆)/3` (`eqn:ramanujan`), taken as an axiom. -/
+/-- **Ramanujan's identity** `E₄' = (E₂E₄ - E₆)/3`, taken as an axiom. -/
 axiom ramanujan_E4 : D E4 = (1 / 3 : ℝ) • (E2 * E4 - E6)
 
-/-- **Ramanujan's identity** `E₆' = (E₂E₆ - E₄²)/2` (`eqn:ramanujan`), taken as an axiom. -/
+/-- **Ramanujan's identity** `E₆' = (E₂E₆ - E₄²)/2`, taken as an axiom. -/
 axiom ramanujan_E6 : D E6 = (1 / 2 : ℝ) • (E2 * E6 - E4 * E4)
 
-/-- `E₂² = 12E₂' + E₄`, the form of `eqn:ramanujan` used to eliminate `E₂²`. -/
+/-- `E₂² = 12E₂' + E₄`, the form of Ramanujan's identity used to eliminate `E₂²`. -/
 lemma E2_mul_E2 : E2 * E2 = (12 : ℝ) • D E2 + E4 := by
   rw [ramanujan_E2, smul_smul]
   norm_num
 
-/-- `E₂E₄ = 3E₄' + E₆`, the form of `eqn:ramanujan` used to eliminate `E₂E₄`. -/
+/-- `E₂E₄ = 3E₄' + E₆`, the form of Ramanujan's identity used to eliminate `E₂E₄`. -/
 lemma E2_mul_E4 : E2 * E4 = (3 : ℝ) • D E4 + E6 := by
   rw [ramanujan_E4, smul_smul]
   norm_num

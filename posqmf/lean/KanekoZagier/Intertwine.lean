@@ -3,23 +3,21 @@ import posqmf.lean.KanekoZagier.Operators
 /-!
 # The intertwining criterion for the Kaneko--Zagier operators
 
-This file proves the computational content of `lem:intertwine` (items 1.4 and the sufficiency half
-of 1.5 of the verification plan).  Following the paper we work throughout with the Serre-derivative
-normal forms
+This file proves the computational content of the intertwining criterion (item 1.4 and the
+sufficiency half of 1.5 of the verification plan).  Following the paper we work throughout with
+the Serre-derivative normal forms
 
 `L_{2,k}^γ = ∂_k² + C E₄`,  `L_{3,k}^{(α,β)} = ∂_k³ + A E₄∂_k + B E₆`,
 
-where `A`, `B`, `C` are the shifted parameters of `lem:intertwine`; the `D`-forms `L2` and `L3` of
+where `A`, `B`, `C` are the shifted parameters defined below; the `D`-forms `L2` and `L3` of
 `Operators.lean` are recovered by `L2_eq_L2S` and `L3_eq_L3S`.
 
 ## Main results
 
-* `KanekoZagier.L3S_comp_L2S`: `eqn:intertwine_lhs`, the `∂_k`-normal form of
-  `L_{3,k+4}^{(α,β)} L_{2,k}^γ`.
-* `KanekoZagier.L2S_comp_L3S`: `eqn:intertwine_rhs`, the `∂_k`-normal form of
-  `L_{2,k+6}^{γ'} L_{3,k}^{(α',β')}`.
-* `KanekoZagier.L3S_comp_L2S_eq_L2S_comp_L3S`: the four constraints
-  `eqn:intertwine_constraints` imply the intertwining relation `eqn:intertwine`.
+* `KanekoZagier.L3S_comp_L2S`: the `∂_k`-normal form of `L_{3,k+4}^{(α,β)} L_{2,k}^γ`.
+* `KanekoZagier.L2S_comp_L3S`: the `∂_k`-normal form of `L_{2,k+6}^{γ'} L_{3,k}^{(α',β')}`.
+* `KanekoZagier.L3S_comp_L2S_eq_L2S_comp_L3S`: the four constraints on the shifted parameters
+  imply the intertwining relation.
 * `KanekoZagier.L3_comp_L2_eq_L2_comp_L3`: the same statement for the `D`-forms `L2`, `L3`, with
   the shifted parameters spelled out.
 
@@ -51,7 +49,7 @@ lemma L3_eq_L3S (k α β : ℝ) (f : ℝ⟦X⟧) :
 
 /-! ### The two normal forms -/
 
-/-- **`eqn:intertwine_lhs`.**  The `∂_k`-normal form of `L_{3,k+4}^{(α,β)} L_{2,k}^{γ}`:
+/-- **The `∂_k`-normal form of `L_{3,k+4}^{(α,β)} L_{2,k}^{γ}`:**
 `∂_k⁵ + (A+C)E₄∂_k³ + (B−C)E₆∂_k² + C(A+1/2)E₄²∂_k + C(B − A/3 − 1/9)E₄E₆`. -/
 theorem L3S_comp_L2S (k A B C : ℝ) (f : ℝ⟦X⟧) :
     L3S (k + 4) A B (L2S k C f)
@@ -84,7 +82,7 @@ theorem L3S_comp_L2S (k A B C : ℝ) (f : ℝ⟦X⟧) :
   ring_nf
   module
 
-/-- **`eqn:intertwine_rhs`.**  The `∂_k`-normal form of `L_{2,k+6}^{γ'} L_{3,k}^{(α',β')}`:
+/-- **The `∂_k`-normal form of `L_{2,k+6}^{γ'} L_{3,k}^{(α',β')}`:**
 `∂_k⁵ + (A'+C')E₄∂_k³ + (B' − 2A'/3)E₆∂_k² + (A'(C'+1/6) − B')E₄²∂_k + B'(C'+1/3)E₄E₆`. -/
 theorem L2S_comp_L3S (k A' B' C' : ℝ) (f : ℝ⟦X⟧) :
     L2S (k + 6) C' (L3S k A' B' f)
@@ -119,8 +117,8 @@ theorem L2S_comp_L3S (k A' B' C' : ℝ) (f : ℝ⟦X⟧) :
 
 /-! ### The intertwining relation -/
 
-/-- **`lem:intertwine`, sufficiency.**  The four constraints `eqn:intertwine_constraints` imply
-`eqn:intertwine`, that is `L_{3,k+4}^{(α,β)} L_{2,k}^γ = L_{2,k+6}^{γ'} L_{3,k}^{(α',β')}`. -/
+/-- **The intertwining criterion, sufficiency.**  The four constraints on the shifted parameters
+imply `L_{3,k+4}^{(α,β)} L_{2,k}^γ = L_{2,k+6}^{γ'} L_{3,k}^{(α',β')}`. -/
 theorem L3S_comp_L2S_eq_L2S_comp_L3S (k A B C A' B' C' : ℝ)
     (h₁ : A + C = A' + C')
     (h₂ : B - C = B' - 2 * A' / 3)
@@ -130,7 +128,7 @@ theorem L3S_comp_L2S_eq_L2S_comp_L3S (k A B C A' B' C' : ℝ)
     L3S (k + 4) A B (L2S k C f) = L2S (k + 6) C' (L3S k A' B' f) := by
   rw [L3S_comp_L2S, L2S_comp_L3S, h₁, h₂, h₃, h₄]
 
-/-! ### The shifted parameters of `lem:intertwine` -/
+/-! ### The shifted parameters -/
 
 /-- `A := α - (3k²+36k+104)/144`, the `E₄∂` coefficient of `L_{3,k+4}^{(α,β)}`. -/
 def shiftA (k α : ℝ) : ℝ := α - (3 * k ^ 2 + 36 * k + 104) / 144
@@ -150,8 +148,8 @@ def shiftB' (k α' β' : ℝ) : ℝ := β' + k / 12 * α' - k ^ 2 * (k + 3) / 86
 /-- `C' := γ' - (k+6)(k+8)/144`, the `E₄` coefficient of `L_{2,k+6}^{γ'}`. -/
 def shiftC' (k γ' : ℝ) : ℝ := γ' - (k + 6) * (k + 8) / 144
 
-/-- **`eqn:intertwine`** for the `D`-forms of `Operators.lean`: the four constraints
-`eqn:intertwine_constraints` on the shifted parameters imply
+/-- **The intertwining criterion** for the `D`-forms of `Operators.lean`: the four constraints on
+the shifted parameters imply
 `L_{3,k+4}^{(α,β)} L_{2,k}^{γ} = L_{2,k+6}^{γ'} L_{3,k}^{(α',β')}`. -/
 theorem L3_comp_L2_eq_L2_comp_L3 (k α β γ α' β' γ' : ℝ)
     (h₁ : shiftA k α + shiftC k γ = shiftA' k α' + shiftC' k γ')
