@@ -39,7 +39,7 @@ private lemma pos_of_hasDerivAt_pos {f g : ℝ → ℝ} (h0 : f 0 = 0)
     {x : ℝ} (hx : 0 < x) : 0 < f x := by
   have hmono : StrictMonoOn f (Ici 0) := by
     refine strictMonoOn_of_deriv_pos (convex_Ici 0)
-      (fun y hy => (hd y hy).continuousAt.continuousWithinAt) fun y hy => ?_
+      (fun y hy ↦ (hd y hy).continuousAt.continuousWithinAt) fun y hy ↦ ?_
     rw [interior_Ici] at hy
     exact (hd y hy.le).deriv ▸ hg y hy
   simpa [h0] using hmono self_mem_Ici (mem_Ici.2 hx.le) hx
@@ -48,16 +48,16 @@ private lemma quadratic_pos (x : ℝ) : (0 : ℝ) < x ^ 2 + x + 1 := by
   nlinarith [sq_nonneg (2 * x + 1)]
 
 private lemma hasDerivAt_log_one_add {x : ℝ} (hx : 0 ≤ x) :
-    HasDerivAt (fun t : ℝ => log (1 + t)) (1 / (1 + x)) x := by
+    HasDerivAt (fun t : ℝ ↦ log (1 + t)) (1 / (1 + x)) x := by
   simpa using ((hasDerivAt_id x).const_add (1 : ℝ)).log (by linarith : (0 : ℝ) < 1 + x).ne'
 
 /-! ### The basic inequality -/
 
 private lemma hasDerivAt_logIneq1 (x : ℝ) (hx : 0 ≤ x) :
-    HasDerivAt (fun t : ℝ => log (1 + t) - 2 * t / (t + 2))
+    HasDerivAt (fun t : ℝ ↦ log (1 + t) - 2 * t / (t + 2))
       (x ^ 2 / ((x + 1) * (x + 2) ^ 2)) x := by
   have h2 : (0 : ℝ) < x + 2 := by linarith
-  have hdiv : HasDerivAt (fun t : ℝ => 2 * t / (t + 2)) (4 / (x + 2) ^ 2) x := by
+  have hdiv : HasDerivAt (fun t : ℝ ↦ 2 * t / (t + 2)) (4 / (x + 2) ^ 2) x := by
     have h := ((hasDerivAt_id x).const_mul (2 : ℝ)).div ((hasDerivAt_id x).add_const (2 : ℝ)) h2.ne'
     norm_num at h
     convert h using 1
@@ -69,24 +69,26 @@ private lemma hasDerivAt_logIneq1 (x : ℝ) (hx : 0 ≤ x) :
 
 /-- **The basic inequality**: `log(1+x) > 2x/(x+2)` for every `x > 0`. -/
 theorem log_ineq1 {x : ℝ} (hx : 0 < x) : 2 * x / (x + 2) < log (1 + x) := by
-  linarith [pos_of_hasDerivAt_pos (f := fun t : ℝ => log (1 + t) - 2 * t / (t + 2))
-    (g := fun t : ℝ => t ^ 2 / ((t + 1) * (t + 2) ^ 2)) (by simp) hasDerivAt_logIneq1
-    (fun y hy => div_pos (pow_pos hy 2) (mul_pos (by linarith) (pow_pos (by linarith) 2))) hx]
+  linarith [pos_of_hasDerivAt_pos (f := fun t : ℝ ↦ log (1 + t) - 2 * t / (t + 2))
+    (g := fun t : ℝ ↦ t ^ 2 / ((t + 1) * (t + 2) ^ 2)) (by simp) hasDerivAt_logIneq1
+    (fun y hy ↦ div_pos (pow_pos hy 2) (mul_pos (by linarith) (pow_pos (by linarith) 2))) hx]
 
 /-- **The `Y_4` base case**: `log(1+x) > x(x+2)/(2(x²+x+1))` for every `x > 0`.
 The gap against `log_ineq1` is exactly `3x³/(2(x+2)(x²+x+1))`. -/
 theorem log_ineq_Y4 {x : ℝ} (hx : 0 < x) :
-    x * (x + 2) / (2 * (x ^ 2 + x + 1)) < log (1 + x) := by
-  have hgap : x * (x + 2) / (2 * (x ^ 2 + x + 1)) < 2 * x / (x + 2) := by
-    rw [div_lt_div_iff₀ (by linarith [quadratic_pos x]) (by linarith)]
-    nlinarith [pow_pos hx 3]
-  linarith [log_ineq1 hx]
+    x * (x + 2) / (2 * (x ^ 2 + x + 1)) < log (1 + x) :=
+  calc x * (x + 2) / (2 * (x ^ 2 + x + 1))
+      = 2 * x / (x + 2) - 3 * x ^ 3 / (2 * (x + 2) * (x ^ 2 + x + 1)) := by
+        field_simp [(by linarith : (0 : ℝ) < x + 2).ne', (quadratic_pos x).ne']
+        ring
+    _ < 2 * x / (x + 2) := sub_lt_self _ (by positivity)
+    _ < log (1 + x) := log_ineq1 hx
 
 private lemma hasDerivAt_logIneqY8 (x : ℝ) (hx : 0 ≤ x) :
-    HasDerivAt (fun t : ℝ => log (1 + t)
+    HasDerivAt (fun t : ℝ ↦ log (1 + t)
         - (11 * t ^ 4 + 28 * t ^ 3 + 18 * t ^ 2 + 12 * t) / (12 * (t ^ 2 + t + 1) ^ 2))
       (x ^ 4 * (2 * x ^ 2 + 7 * x + 7) / (2 * (x + 1) * (x ^ 2 + x + 1) ^ 3)) x := by
-  have hnum : HasDerivAt (fun t : ℝ => 11 * t ^ 4 + 28 * t ^ 3 + 18 * t ^ 2 + 12 * t)
+  have hnum : HasDerivAt (fun t : ℝ ↦ 11 * t ^ 4 + 28 * t ^ 3 + 18 * t ^ 2 + 12 * t)
       (44 * x ^ 3 + 84 * x ^ 2 + 36 * x + 12) x := by
     have h := ((((hasDerivAt_pow 4 x).const_mul (11 : ℝ)).add
       ((hasDerivAt_pow 3 x).const_mul (28 : ℝ))).add
@@ -94,7 +96,7 @@ private lemma hasDerivAt_logIneqY8 (x : ℝ) (hx : 0 ≤ x) :
     norm_num at h
     convert h using 1
     ring
-  have hd : HasDerivAt (fun t : ℝ => 12 * (t ^ 2 + t + 1) ^ 2)
+  have hd : HasDerivAt (fun t : ℝ ↦ 12 * (t ^ 2 + t + 1) ^ 2)
       (24 * (x ^ 2 + x + 1) * (2 * x + 1)) x := by
     have h := ((((hasDerivAt_pow 2 x).add (hasDerivAt_id x)).add_const (1 : ℝ)).pow 2).const_mul
       (12 : ℝ)
@@ -111,16 +113,20 @@ private lemma hasDerivAt_logIneqY8 (x : ℝ) (hx : 0 ≤ x) :
 theorem log_ineq_Y8 {x : ℝ} (hx : 0 < x) :
     (11 * x ^ 4 + 28 * x ^ 3 + 18 * x ^ 2 + 12 * x) / 12
       < (x ^ 2 + x + 1) ^ 2 * log (1 + x) := by
-  have key := pos_of_hasDerivAt_pos
-    (f := fun t : ℝ => log (1 + t)
+  have key : (11 * x ^ 4 + 28 * x ^ 3 + 18 * x ^ 2 + 12 * x) / (12 * (x ^ 2 + x + 1) ^ 2)
+      < log (1 + x) := sub_pos.mp <| pos_of_hasDerivAt_pos
+    (f := fun t : ℝ ↦ log (1 + t)
       - (11 * t ^ 4 + 28 * t ^ 3 + 18 * t ^ 2 + 12 * t) / (12 * (t ^ 2 + t + 1) ^ 2))
-    (g := fun t : ℝ => t ^ 4 * (2 * t ^ 2 + 7 * t + 7) / (2 * (t + 1) * (t ^ 2 + t + 1) ^ 3))
+    (g := fun t : ℝ ↦ t ^ 4 * (2 * t ^ 2 + 7 * t + 7) / (2 * (t + 1) * (t ^ 2 + t + 1) ^ 3))
     (by norm_num) hasDerivAt_logIneqY8
-    (fun y hy => div_pos (mul_pos (pow_pos hy 4) (by nlinarith))
+    (fun y hy ↦ div_pos (mul_pos (pow_pos hy 4) (by nlinarith))
       (mul_pos (mul_pos (by norm_num) (by linarith)) (pow_pos (quadratic_pos y) 3))) hx
-  rw [sub_pos, div_lt_iff₀ (mul_pos (by norm_num) (pow_pos (quadratic_pos x) 2))] at key
-  rw [div_lt_iff₀ (by norm_num : (0 : ℝ) < 12)]
-  nlinarith [key]
+  calc (11 * x ^ 4 + 28 * x ^ 3 + 18 * x ^ 2 + 12 * x) / 12
+      = (x ^ 2 + x + 1) ^ 2
+          * ((11 * x ^ 4 + 28 * x ^ 3 + 18 * x ^ 2 + 12 * x) / (12 * (x ^ 2 + x + 1) ^ 2)) := by
+        field_simp [(quadratic_pos x).ne']
+    _ < (x ^ 2 + x + 1) ^ 2 * log (1 + x) :=
+        mul_lt_mul_of_pos_left key (pow_pos (quadratic_pos x) 2)
 
 /-- **The `Y_10` base case**:
 `-(x²+x+1)(2x+1)(x+2)(1-x) log(1+x) > (2x⁵+11x⁴-x³-24x²-12x)/6` for every `x ≥ 1`.
@@ -135,9 +141,14 @@ theorem log_ineq_Y10 {x : ℝ} (hx : 1 ≤ x) :
       = (x ^ 2 + x + 1) * (2 * x + 1) * (x + 2) * (x - 1) by ring]
     exact mul_nonneg (mul_nonneg (mul_nonneg (quadratic_pos x).le (by linarith)) (by linarith))
       (by linarith)
-  have hsub := mul_le_mul_of_nonneg_left (log_ineq1 hx0).le hc
-  rw [show -((x ^ 2 + x + 1) * (2 * x + 1) * (x + 2) * (1 - x)) * (2 * x / (x + 2))
-    = 2 * x * (x ^ 2 + x + 1) * (2 * x + 1) * (x - 1) by field_simp; ring] at hsub
-  nlinarith [hsub, mul_pos (pow_pos hx0 3) (by nlinarith : (0 : ℝ) < 22 * x ^ 2 + x + 1)]
+  calc (2 * x ^ 5 + 11 * x ^ 4 - x ^ 3 - 24 * x ^ 2 - 12 * x) / 6
+      = -((x ^ 2 + x + 1) * (2 * x + 1) * (x + 2) * (1 - x)) * (2 * x / (x + 2))
+          - x ^ 3 * (22 * x ^ 2 + x + 1) / 6 := by
+        field_simp [(by linarith : (0 : ℝ) < x + 2).ne']
+        ring
+    _ < -((x ^ 2 + x + 1) * (2 * x + 1) * (x + 2) * (1 - x)) * (2 * x / (x + 2)) :=
+        sub_lt_self _ (by positivity)
+    _ ≤ -((x ^ 2 + x + 1) * (2 * x + 1) * (x + 2) * (1 - x)) * log (1 + x) :=
+        mul_le_mul_of_nonneg_left (log_ineq1 hx0).le hc
 
 end UncertaintyPrinciple
