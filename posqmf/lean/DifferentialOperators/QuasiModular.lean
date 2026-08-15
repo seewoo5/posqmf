@@ -116,6 +116,8 @@ accumulates when weights are added up. -/
 lemma HasWeight.congr_weight {G : QM} {a b : ℝ} (h : HasWeight G a) (hab : a = b) : HasWeight G b :=
   hab ▸ h
 
+lemma hasWeight_zero {a : ℝ} : HasWeight (0 : QM) a := by simp [HasWeight]
+
 lemma hasWeight_one : HasWeight (1 : QM) 0 := by simp [HasWeight]
 
 lemma HasWeight.pow {G : QM} {a : ℝ} (hG : HasWeight G a) (n : ℕ) :

@@ -34,8 +34,11 @@ namespace of the layer it works in: `KanekoZagier` and `QuasiModular` both name 
   `(1/6)∂_wF_w + (1/6)∂_{w-2}F_w = (1/3)∂_{w-1}F_w` happens; and `qexp` transports the resulting
   polynomial identity to `ℝ⟦X⟧`, landing exactly on `ftildeStep`.
 
-Weights are indexed by `N : ℕ` with `w = 4N + 12`, so that `w/4 - 3 = N`, `w/4 - 2 = N + 1` and
-`w/4 - 1 = N + 2`; this keeps every index a genuine natural number.
+In `QExpansion` weights are indexed by `N : ℕ` with `w = 4N + 12`, so that `w/4 - 3 = N`,
+`w/4 - 2 = N + 1` and `w/4 - 1 = N + 2`; this keeps every index a genuine natural number.
+`PolynomialModel` instead indexes by the weight itself: `fFam N` is the paper's `F_{4N}`, so that
+`fFam 2` is `F₈`, `fFam 3` is `F₁₂`, and the statements here can be read directly against the
+paper.  `F₀` and `F₄` do not exist and are set to zero.
 
 ## Main results
 
@@ -47,7 +50,7 @@ Weights are indexed by `N : ℕ` with `w = 4N + 12`, so that `w/4 - 3 = N`, `w/4
 * `UncertaintyPrinciple.delta_fStep` and `qexp_delta_fStep`: the recurrence for `F̃`, in the
   polynomial model and on `q`-expansions.
 * `UncertaintyPrinciple.mldeF`: the third-order equation `L_{3,w-2}^{((w-4)/4,0)}F_w = 0`, proved by
-  the intertwining criterion from an explicit check on `F₁₂`.
+  the intertwining criterion from an explicit check on `F₈`.
 * `UncertaintyPrinciple.coeff_fSeries_eq_zero` and `coeff_fSeries_eq_one`: the vanishing order and
   the normalisation of `F_w`.
 * `UncertaintyPrinciple.coeff_ftildeSeries_pos` and `coeff_ftildeSeries_boundary`: the conclusion,
@@ -375,6 +378,17 @@ theorem qexp_delta_fStep {w : ℝ} {Fw : QM} (h : HasWeight Fw w) :
 
 /-! ### The family and its base case -/
 
+/-- `F₈ = (1/1728)(E₂²E₄ - 2E₂E₆ + E₄²)`. -/
+def F₈ : QM := (1 / 1728 : ℝ) • (E₂ ^ 2 * E₄ - (2 : ℝ) • (E₂ * E₆) + E₄ ^ 2)
+
+lemma hasWeight_F₈ : HasWeight F₈ 8 :=
+  have h1 : HasWeight (E₂ ^ 2 * E₄) 8 := HasWeight.congr_weight
+    ((HasWeight.pow hasWeight_E₂ 2).mul hasWeight_E₄) (by norm_num)
+  have h2 : HasWeight ((2 : ℝ) • (E₂ * E₆)) 8 := HasWeight.smul _
+    (HasWeight.congr_weight (hasWeight_E₂.mul hasWeight_E₆) (by norm_num))
+  HasWeight.smul _ <| (h1.sub h2).add
+    (HasWeight.congr_weight (HasWeight.pow hasWeight_E₄ 2) (by norm_num))
+
 /-- `F₁₂ = (1/518400)(E₂²E₄² - 2E₂E₄E₆ + E₆²)`. -/
 def F₁₂ : QM :=
   (1 / 518400 : ℝ) • (E₂ ^ 2 * E₄ ^ 2 - (2 : ℝ) • (E₂ * E₄ * E₆) + E₆ ^ 2)
@@ -398,31 +412,92 @@ theorem qexp_delta_F₁₂ : qexp (delta F₁₂) = ftilde₁₀ := by
   simp only [mul_comm, mul_left_comm]
   module
 
-/-- The family `F_{4N+12}`, generated from `F₁₂` by the recurrence. -/
-def Ffam : ℕ → QM
-  | 0 => F₁₂
-  | N + 1 => fStep (4 * (N : ℝ) + 12) (Ffam N)
+-- The Serre-derivative chain of `F₈` is expanded one derivative at a time: doing all three in a
+-- single `simp` call exceeds the default heartbeat budget.
+private lemma serreD_F₈ : serreD 6 F₈ =
+    (2 / 3456 : ℝ) • (E₂ * E₄ ^ 2) - (1 / 3456 : ℝ) • (E₂ ^ 2 * E₆)
+      - (1 / 3456 : ℝ) • (E₄ * E₆) := by
+  simp only [F₈, pow_succ, pow_zero, one_mul, serreD, Derivation.map_smul, map_sub, map_add,
+    Derivation.leibniz, smul_eq_mul, D_E₂, D_E₄, D_E₆, smul_smul, smul_sub, smul_add,
+    mul_smul_comm, mul_sub, mul_add]
+  simp only [mul_comm, mul_left_comm]
+  module
 
-lemma hasWeight_Ffam (N : ℕ) : HasWeight (Ffam N) (4 * (N : ℝ) + 12) := by
-  induction N with
-  | zero => simpa using hasWeight_F₁₂
-  | succ N ih => exact HasWeight.congr_weight (hasWeight_fStep ih) (by push_cast; ring)
+private lemma serreD_serreD_F₈ : serreD 8 (serreD 6 F₈) =
+    (2 / 10368 : ℝ) • (E₂ ^ 2 * E₄ ^ 2) - (4 / 10368 : ℝ) • (E₂ * E₄ * E₆)
+      + (1 / 10368 : ℝ) • E₄ ^ 3 + (1 / 10368 : ℝ) • E₆ ^ 2 := by
+  rw [serreD_F₈]
+  simp only [pow_succ, pow_zero, one_mul, serreD, Derivation.map_smul, map_sub,
+    Derivation.leibniz, smul_eq_mul, D_E₂, D_E₄, D_E₆, smul_smul, smul_sub, smul_add,
+    mul_smul_comm, mul_sub, mul_add]
+  simp only [mul_comm, mul_left_comm]
+  module
+
+private lemma serreD_serreD_serreD_F₈ : serreD 10 (serreD 8 (serreD 6 F₈)) =
+    (11 / 62208 : ℝ) • (E₂ * E₄ ^ 3) + (9 / 62208 : ℝ) • (E₂ * E₆ ^ 2)
+      - (10 / 62208 : ℝ) • (E₂ ^ 2 * E₄ * E₆) - (10 / 62208 : ℝ) • (E₄ ^ 2 * E₆) := by
+  rw [serreD_serreD_F₈]
+  simp only [pow_succ, pow_zero, one_mul, serreD, Derivation.map_smul, map_sub, map_add,
+    Derivation.leibniz, smul_eq_mul, D_E₂, D_E₄, D_E₆, smul_smul, smul_sub, smul_add,
+    mul_smul_comm, mul_sub, mul_add]
+  simp only [mul_comm, mul_left_comm]
+  module
+
+/-- The family `F_{4N}` of Feigenbaum--Grabner--Hardin, generated from `F₈` by the recurrence.
+
+`F₀` and `F₄` are not part of the family; setting them to zero makes the index match the weight, so
+that `fFam N` is `F_{4N}` and the statements below can be read directly against the paper. -/
+def fFam : ℕ → QM
+  | 0 => 0
+  | 1 => 0
+  | 2 => F₈
+  | N + 3 => fStep (4 * ((N + 2 : ℕ) : ℝ)) (fFam (N + 2))
+
+lemma hasWeight_fFam : ∀ N : ℕ, HasWeight (fFam N) (4 * N)
+  | 0 => hasWeight_zero
+  | 1 => hasWeight_zero
+  | 2 => by norm_num; exact hasWeight_F₈
+  | N + 3 => HasWeight.congr_weight (hasWeight_fStep (hasWeight_fFam (N + 2)))
+      (by push_cast; ring)
+
+private lemma fStep_F₈ : fStep 8 F₈ = F₁₂ := by
+  rw [fStep, SFp, show (8 : ℝ) - 2 = 6 by norm_num, serreD_serreD_F₈, F₈, F₁₂, cF]
+  norm_num
+  simp only [smul_smul, smul_sub, smul_add, mul_smul_comm, mul_sub, mul_add,
+    pow_succ, pow_zero, one_mul]
+  simp only [mul_comm, mul_left_comm]
+  module
+
+/-- The recurrence carries `F₈` to `F₁₂`, so the family generated here agrees with the second
+explicit form in the paper. -/
+lemma fFam_three : fFam 3 = F₁₂ := by
+  change fStep (4 * (((0 + 2 : ℕ) : ℝ))) (fFam 2) = F₁₂
+  rw [show (4 : ℝ) * (((0 + 2 : ℕ) : ℝ)) = 8 by norm_num]
+  exact fStep_F₈
 
 /-- The `q`-expansion of `F̃`, i.e. of `δF_w`. -/
-def ftildeSeries (N : ℕ) : ℝ⟦X⟧ := qexp (delta (Ffam N))
+def ftildeSeries (N : ℕ) : ℝ⟦X⟧ := qexp (delta (fFam N))
 
 /-- The `q`-expansion of `F_w`. -/
-def fSeries (N : ℕ) : ℝ⟦X⟧ := qexp (Ffam N)
+def fSeries (N : ℕ) : ℝ⟦X⟧ := qexp (fFam N)
 
-/-- **The recurrence hypothesis of `ftildePos`, discharged.** -/
-theorem ftildeSeries_succ (N : ℕ) :
-    ftildeSeries (N + 1) = ftildeStep (4 * (N : ℝ) + 12) (fSeries N) (ftildeSeries N) := by
-  rw [ftildeSeries, ftildeSeries, fSeries, Ffam, qexp_delta_fStep (hasWeight_Ffam N)]
+/-- **The recurrence hypothesis of `ftildePos`, discharged.**  It holds from `F₈` on, that is for
+`N ≥ 2`. -/
+theorem ftildeSeries_succ {N : ℕ} (hN : 2 ≤ N) :
+    ftildeSeries (N + 1) = ftildeStep (4 * (N : ℝ)) (fSeries N) (ftildeSeries N) := by
+  obtain ⟨M, rfl⟩ : ∃ M, N = M + 2 := ⟨N - 2, by omega⟩
+  change qexp (delta (fFam (M + 3))) = _
+  rw [fFam, qexp_delta_fStep (hasWeight_fFam (M + 2))]
+  rfl
 
-/-- **The base case of `ftildePos`, discharged.** -/
-theorem ftildeSeries_zero : ftildeSeries 0 = ftilde₁₀ := qexp_delta_F₁₂
+/-- **The base case of `ftildePos`, discharged**: `F̃₁₀ = δF₁₂`. -/
+theorem ftildeSeries_three : ftildeSeries 3 = ftilde₁₀ := by
+  rw [ftildeSeries, fFam_three]; exact qexp_delta_F₁₂
 
-/-! ### Vanishing order of `F_w` -/
+/-! ### Vanishing order of `F_w`
+
+The paper's `F_w` vanishes to order `⌊w/4⌋ - 1` at the cusp, so `fFam N`, of weight `4N`, vanishes
+to order `N - 1`: its coefficients below index `N - 1` are zero and the one at `N - 1` is `1`. -/
 
 lemma qexp_fStep (w : ℝ) (F : QM) : qexp (fStep w F) = cF w • SF w (qexp F) := by
   rw [fStep, map_smul, qexp_SFp]
@@ -432,48 +507,55 @@ lemma coeff_SF (w : ℝ) (f : ℝ⟦X⟧) (n : ℕ) :
       + ∑ j ∈ range n, KanekoZagier.K2 (w - 2) (alphaF w) n j * coeff j f) := by
   rw [SF, map_neg, KanekoZagier.coeff_L2]
 
-/-- The diagonal coefficient vanishes at the cusp index; this is what makes the vanishing order
-of `F_w` increase by one at each step of the recurrence. -/
-lemma kappa2_F_zero {N : ℕ} {w : ℝ} (hw : w = 4 * N + 12) :
-    KanekoZagier.kappa2 (w - 2) (alphaF w) (N + 2) = 0 := by
+/-- The diagonal coefficient vanishes at the cusp index `w/4 - 1`; this is what makes the vanishing
+order of `F_w` increase by one at each step of the recurrence. -/
+lemma kappa2_F_zero {N : ℕ} {w : ℝ} (hw : w = 4 * N + 8) :
+    KanekoZagier.kappa2 (w - 2) (alphaF w) (N + 1) = 0 := by
   rw [kappa2_F, hw]; push_cast; ring
 
-/-- `F₁₂ = (1/57600)(E₄')²`: the quadratic `E₂²E₄² - 2E₂E₄E₆ + E₆²` is `(E₂E₄-E₆)²`, and
-Ramanujan turns `E₂E₄-E₆` into `3E₄'`. -/
-lemma qexp_F₁₂ : qexp F₁₂
-    = (PowerSeries.mk fun m ↦ (m : ℝ) * (ArithmeticFunction.sigma 3 m : ℝ))
-      * (PowerSeries.mk fun m ↦ (m : ℝ) * (ArithmeticFunction.sigma 3 m : ℝ)) := by
-  simp only [F₁₂, map_smul, map_sub, map_add, map_mul, map_pow, qexp_E₂, qexp_E₄, qexp_E₆,
-    (eq_inv_smul_iff₀ (by norm_num : (240 : ℝ) ≠ 0)).2 KanekoZagier.D_E₄.symm,
-    KanekoZagier.ramanujan_E₄, two_smul, smul_mul_assoc, mul_smul_comm, smul_smul]
-  ring_nf
+/-- `F₈ = E₄''/240`, so `F₈ = ∑_{n ≥ 1} n²σ₃(n)qⁿ`. -/
+lemma F₈_eq : F₈ = (1 / 240 : ℝ) • D (D E₄) := by
+  simp only [F₈, D_E₂, D_E₄, D_E₆, Derivation.map_smul, map_sub, Derivation.leibniz, smul_eq_mul,
+    smul_smul, smul_sub, mul_smul_comm, mul_sub, pow_succ, pow_zero, one_mul]
+  simp only [mul_comm, mul_left_comm]
+  module
 
-lemma coeff_qexp_F₁₂ (n : ℕ) : coeff n (qexp F₁₂)
-    = ∑ j ∈ range n, (((n - j : ℕ) : ℝ) * (ArithmeticFunction.sigma 3 (n - j) : ℝ))
-        * ((j : ℝ) * (ArithmeticFunction.sigma 3 j : ℝ)) := by
-  rw [qexp_F₁₂, KanekoZagier.coeff_mk_mul _ (by simp) _ n]
-  exact Finset.sum_congr rfl fun j _ ↦ by rw [coeff_mk]
+lemma coeff_qexp_F₈ {n : ℕ} (hn : 1 ≤ n) :
+    coeff n (qexp F₈) = (n : ℝ) ^ 2 * (ArithmeticFunction.sigma 3 n : ℝ) := by
+  rw [F₈_eq, map_smul, qexp_D, qexp_D, qexp_E₄, PowerSeries.coeff_smul, smul_eq_mul,
+    KanekoZagier.coeff_D, KanekoZagier.coeff_D, coeff_E₄_of_pos hn]
+  ring
 
-/-- **The vanishing order of `F_w`**, proved rather than assumed: `F_{4N+12}` vanishes to order
-`N+2` at the cusp. -/
-theorem coeff_fSeries_eq_zero (N : ℕ) : ∀ k, k ≤ N + 1 → coeff k (fSeries N) = 0 := by
-  induction N with
-  | zero => intro k hk; interval_cases k <;> simp [fSeries, Ffam, coeff_qexp_F₁₂]
-  | succ N ih =>
-    intro k hk
-    have ih' : ∀ j, j ≤ N + 1 → coeff j (qexp (Ffam N)) = 0 := ih
-    rw [fSeries, Ffam, qexp_fStep, PowerSeries.coeff_smul, smul_eq_mul, coeff_SF,
-      Finset.sum_eq_zero fun j hj ↦ by rw [Finset.mem_range] at hj; rw [ih' j (by omega), mul_zero]]
-    obtain hlt | rfl : k ≤ N + 1 ∨ k = N + 2 := by omega
-    · rw [ih' k hlt]; ring
-    · rw [kappa2_F_zero rfl]; ring
+@[simp] lemma coeff_qexp_F₈_zero : coeff 0 (qexp F₈) = 0 := by
+  rw [F₈_eq, map_smul, qexp_D, PowerSeries.coeff_smul, smul_eq_mul, KanekoZagier.coeff_D]
+  simp
+
+/-- **The vanishing order of `F_w`**, proved rather than assumed. -/
+theorem coeff_fSeries_eq_zero : ∀ N k : ℕ, k + 2 ≤ N → coeff k (fSeries N) = 0
+  | 0, _, h => absurd h (by omega)
+  | 1, _, h => absurd h (by omega)
+  | 2, k, h => by
+    obtain rfl : k = 0 := by omega
+    exact coeff_qexp_F₈_zero
+  | N + 3, k, h => by
+    have ih : ∀ j, j + 2 ≤ N + 2 → coeff j (qexp (fFam (N + 2))) = 0 :=
+      fun j hj ↦ coeff_fSeries_eq_zero (N + 2) j hj
+    rw [fSeries, fFam, qexp_fStep, PowerSeries.coeff_smul, smul_eq_mul, coeff_SF,
+      Finset.sum_eq_zero fun j hj ↦ by
+        rw [Finset.mem_range] at hj; rw [ih j (by omega), mul_zero]]
+    obtain hlt | rfl : k + 2 ≤ N + 2 ∨ k = N + 1 := by omega
+    · rw [ih k hlt]; ring
+    · rw [show (4 : ℝ) * ((N + 2 : ℕ) : ℝ) = 4 * (N : ℝ) + 8 by push_cast; ring,
+        kappa2_F_zero rfl]
+      ring
 
 /-! ### The modular linear differential equation for `F_w`
 
-The vanishing order above needed nothing but the recurrence.  The normalisation `b_{w/4-1} = 1`
-does: the recurrence expresses `[q^{w/4}]F_{w+4}` in terms of the *second* nonzero coefficient of
-`F_w`, which the recurrence alone does not determine.  What determines it is the third-order
-equation `L_{3,w-2}^{((w-4)/4,0)}F_w = 0`, which relates the coefficients of a single `F_w`.
+The vanishing order above needed nothing but the recurrence.  The normalisation does: the
+recurrence expresses the leading coefficient of `F_{w+4}` in terms of the *second* nonzero
+coefficient of `F_w`, which the recurrence alone does not determine.  What determines it is the
+third-order equation `L_{3,w-2}^{((w-4)/4,0)}F_w = 0` of the paper, which relates the coefficients
+of a single `F_w`.
 
 That equation propagates along the recurrence by the intertwining criterion: the triples
 `(α,β,γ) = (w/4, 0, -(w-10)(w-4)/48)` and `(α',β',γ') = ((w-4)/4, 0, -w(w-10)/48)` satisfy the
@@ -492,50 +574,17 @@ lemma qexp_L3p (k α β : ℝ) (G : QM) :
     map_add, map_add, map_smul, map_smul, map_mul, map_mul, qexp_E₄, qexp_E₆, qexp_serreD,
     qexp_serreD, qexp_serreD]
 
--- `L3p_F₁₂` needs the triple Serre derivative of `F₁₂`; it is expanded one derivative at a time
--- because expanding all three in a single `simp` call exceeds the default heartbeat budget.
-private lemma serreD_F₁₂ : serreD 10 F₁₂ =
-    -(1 / 622080 : ℝ) • (E₂ ^ 2 * E₄ * E₆) + (1 / 622080 : ℝ) • (E₂ * E₄ ^ 3)
-      + (1 / 622080 : ℝ) • (E₂ * E₆ ^ 2) - (1 / 622080 : ℝ) • (E₄ ^ 2 * E₆) := by
-  simp only [F₁₂, pow_succ, pow_zero, one_mul, serreD, Derivation.map_smul, map_sub, map_add,
-    Derivation.leibniz, smul_eq_mul, D_E₂, D_E₄, D_E₆, smul_smul, smul_sub, smul_add,
-    mul_smul_comm, mul_sub, mul_add]
+/-- The base case of the differential equation, checked on the explicit `F₈`. -/
+lemma L3p_F₈ : L3p 6 1 0 F₈ = 0 := by
+  rw [L3p, show (6 : ℝ) + 4 = 10 by norm_num, show (6 : ℝ) + 2 = 8 by norm_num,
+    serreD_serreD_serreD_F₈, serreD_F₈, F₈]
+  simp only [pow_succ, pow_zero, one_mul, smul_smul, smul_sub, smul_add,
+    mul_smul_comm, mul_sub, mul_add, sub_mul, add_mul]
   simp only [mul_comm, mul_left_comm]
   module
 
-private lemma serreD_serreD_F₁₂ : serreD 12 (serreD 10 F₁₂) =
-    (7 / 7464960 : ℝ) • (E₂ ^ 2 * E₄ ^ 3) + (5 / 7464960 : ℝ) • (E₂ ^ 2 * E₆ ^ 2)
-      - (24 / 7464960 : ℝ) • (E₂ * E₄ ^ 2 * E₆) + (5 / 7464960 : ℝ) • E₄ ^ 4
-      + (7 / 7464960 : ℝ) • (E₄ * E₆ ^ 2) := by
-  rw [serreD_F₁₂]
-  simp only [pow_succ, pow_zero, one_mul, serreD, Derivation.map_smul, map_sub, map_add,
-    Derivation.leibniz, smul_eq_mul, D_E₂, D_E₄, D_E₆, smul_smul, smul_sub, smul_add,
-    mul_smul_comm, mul_sub, mul_add]
-  simp only [mul_comm, mul_left_comm]
-  module
-
-private lemma serreD_serreD_serreD_F₁₂ : serreD 14 (serreD 12 (serreD 10 F₁₂)) =
-    (35 / 22394880 : ℝ) • (E₂ * E₄ ^ 4) + (49 / 22394880 : ℝ) • (E₂ * E₄ * E₆ ^ 2)
-      - (42 / 22394880 : ℝ) • (E₂ ^ 2 * E₄ ^ 2 * E₆) - (35 / 22394880 : ℝ) • (E₄ ^ 3 * E₆)
-      - (7 / 22394880 : ℝ) • E₆ ^ 3 := by
-  rw [serreD_serreD_F₁₂]
-  simp only [pow_succ, pow_zero, one_mul, serreD, Derivation.map_smul, map_sub, map_add,
-    Derivation.leibniz, smul_eq_mul, D_E₂, D_E₄, D_E₆, smul_smul, smul_sub, smul_add,
-    mul_smul_comm, mul_sub, mul_add]
-  simp only [mul_comm, mul_left_comm]
-  module
-
-/-- The base case of the differential equation, checked on the explicit `F₁₂`. -/
-lemma L3p_F₁₂ : L3p 10 2 0 F₁₂ = 0 := by
-  rw [L3p, show (10 : ℝ) + 4 = 14 by norm_num, show (10 : ℝ) + 2 = 12 by norm_num,
-    serreD_serreD_serreD_F₁₂, serreD_F₁₂, F₁₂]
-  simp only [pow_succ, pow_zero, one_mul, smul_smul, smul_sub, smul_add, smul_neg, neg_smul,
-    mul_neg, mul_smul_comm, mul_sub, mul_add, sub_mul, add_mul]
-  simp only [mul_comm, mul_left_comm]
-  module
-
-lemma mldeF_zero : KanekoZagier.L3 10 2 0 (fSeries 0) = 0 := by
-  rw [fSeries, Ffam, ← qexp_L3p, L3p_F₁₂, map_zero]
+lemma mldeF_zero : KanekoZagier.L3 6 1 0 (fSeries 2) = 0 := by
+  rw [fSeries, show fFam 2 = F₈ from rfl, ← qexp_L3p, L3p_F₈, map_zero]
 
 /-- The differential equation propagates along the recurrence, by the intertwining criterion. -/
 lemma mldeF_step {w : ℝ} {f : ℝ⟦X⟧} (h : KanekoZagier.L3 (w - 2) ((w - 4) / 4) 0 f = 0) :
@@ -548,98 +597,106 @@ lemma mldeF_step {w : ℝ} {f : ℝ⟦X⟧} (h : KanekoZagier.L3 (w - 2) ((w - 4
       KanekoZagier.shiftA', KanekoZagier.shiftB', KanekoZagier.shiftC', alphaF]
     ring
 
-/-- **The differential equation for `F_w`**, for every `w = 4N + 12`. -/
+/-- **The differential equation for `F_w`**, for every `w = 4N + 8`. -/
 theorem mldeF (N : ℕ) :
-    KanekoZagier.L3 (4 * (N : ℝ) + 10) ((4 * (N : ℝ) + 8) / 4) 0 (fSeries N) = 0 := by
+    KanekoZagier.L3 (4 * (N : ℝ) + 6) ((4 * (N : ℝ) + 4) / 4) 0 (fSeries (N + 2)) = 0 := by
   induction N with
-  | zero => norm_num; exact mldeF_zero
+  | zero => simpa using mldeF_zero
   | succ N ih =>
-    have := mldeF_step (w := 4 * (N : ℝ) + 12) (by
-      rw [show 4 * (N : ℝ) + 12 - 2 = 4 * (N : ℝ) + 10 by ring,
-        show (4 * (N : ℝ) + 12 - 4) / 4 = (4 * (N : ℝ) + 8) / 4 by ring]
+    have := mldeF_step (w := 4 * (N : ℝ) + 8) (by
+      rw [show 4 * (N : ℝ) + 8 - 2 = 4 * (N : ℝ) + 6 by ring,
+        show (4 * (N : ℝ) + 8 - 4) / 4 = (4 * (N : ℝ) + 4) / 4 by ring]
       exact ih)
-    rw [show 4 * (N : ℝ) + 12 + 2 = 4 * ((N : ℝ) + 1) + 10 by ring,
-      show (4 * (N : ℝ) + 12) / 4 = (4 * ((N : ℝ) + 1) + 8) / 4 by ring] at this
-    rw [fSeries, Ffam, qexp_fStep]
+    rw [show 4 * (N : ℝ) + 8 + 2 = 4 * ((N : ℝ) + 1) + 6 by ring,
+      show (4 * (N : ℝ) + 8) / 4 = (4 * ((N : ℝ) + 1) + 4) / 4 by ring] at this
+    rw [fSeries, fFam, qexp_fStep,
+      show (4 : ℝ) * ((N + 2 : ℕ) : ℝ) = 4 * (N : ℝ) + 8 by push_cast; ring]
     push_cast
     exact this
 
 /-! ### The normalisation of `F_w`
 
-At the index `n = w/4` the diagonal coefficient `κ₃` of the third-order equation is `(N+2)(N+3)`,
-which is nonzero, so the equation determines the second nonzero coefficient of `F_w` from the first.
+At the index `w/4` the diagonal coefficient `κ₃` of the third-order equation is `(N+1)(N+2)`, which
+is nonzero, so the equation determines the second nonzero coefficient of `F_w` from the first.
 Feeding that value back into the recurrence produces `1` again, one index further along. -/
 
 lemma kappa3_F (N : ℕ) :
-    KanekoZagier.kappa3 (4 * (N : ℝ) + 10) ((4 * (N : ℝ) + 8) / 4) 0 (N + 3)
-      = ((N : ℝ) + 2) * ((N : ℝ) + 3) := by
+    KanekoZagier.kappa3 (4 * (N : ℝ) + 6) ((4 * (N : ℝ) + 4) / 4) 0 (N + 2)
+      = ((N : ℝ) + 1) * ((N : ℝ) + 2) := by
   rw [KanekoZagier.kappa3]; push_cast; ring
 
 lemma K3_F (N : ℕ) :
-    KanekoZagier.K3 (4 * (N : ℝ) + 10) ((4 * (N : ℝ) + 8) / 4) 0 (N + 3) (N + 2)
-      = -8 * ((N : ℝ) ^ 3 + 6 * N ^ 2 + 23 * N + 27) := by
-  rw [KanekoZagier.K3, show N + 3 - (N + 2) = 1 by omega]
+    KanekoZagier.K3 (4 * (N : ℝ) + 6) ((4 * (N : ℝ) + 4) / 4) 0 (N + 2) (N + 1)
+      = -8 * ((N : ℝ) ^ 3 + 3 * N ^ 2 + 14 * N + 9) := by
+  rw [KanekoZagier.K3, show N + 2 - (N + 1) = 1 by omega]
   norm_num
   ring
 
 lemma kappa2_F_cusp (N : ℕ) :
-    KanekoZagier.kappa2 (4 * (N : ℝ) + 12 - 2) (alphaF (4 * (N : ℝ) + 12)) (N + 3)
-      = (8 * (N : ℝ) + 19) / 6 := by
+    KanekoZagier.kappa2 (4 * (N : ℝ) + 8 - 2) (alphaF (4 * (N : ℝ) + 8)) (N + 2)
+      = (8 * (N : ℝ) + 11) / 6 := by
   rw [kappa2_F]; push_cast; ring
 
 lemma K2_F_cusp (N : ℕ) :
-    KanekoZagier.K2 (4 * (N : ℝ) + 12 - 2) (alphaF (4 * (N : ℝ) + 12)) (N + 3) (N + 2)
-      = -4 * (24 * (N : ℝ) ^ 2 + 73 * N + 53) := by
-  rw [K2_F, show N + 3 - (N + 2) = 1 by omega]
+    KanekoZagier.K2 (4 * (N : ℝ) + 8 - 2) (alphaF (4 * (N : ℝ) + 8)) (N + 2) (N + 1)
+      = -4 * (24 * (N : ℝ) ^ 2 + 25 * N + 4) := by
+  rw [K2_F, show N + 2 - (N + 1) = 1 by omega]
   norm_num
   ring
 
-/-- The second nonzero coefficient of `F_{4N+12}`, read off from the third-order equation.  This is
+/-- The second nonzero coefficient of `F_{4N+8}`, read off from the third-order equation.  This is
 the `b_{w/4}` of the paper. -/
-lemma coeff_fSeries_succ {N : ℕ} (h : coeff (N + 2) (fSeries N) = 1) :
-    coeff (N + 3) (fSeries N)
-      = 8 * ((N : ℝ) ^ 3 + 6 * N ^ 2 + 23 * N + 27) / (((N : ℝ) + 2) * ((N : ℝ) + 3)) := by
-  have key := congrArg (coeff (N + 3)) (mldeF N)
+lemma coeff_fSeries_succ {N : ℕ} (h : coeff (N + 1) (fSeries (N + 2)) = 1) :
+    coeff (N + 2) (fSeries (N + 2))
+      = 8 * ((N : ℝ) ^ 3 + 3 * N ^ 2 + 14 * N + 9) / (((N : ℝ) + 1) * ((N : ℝ) + 2)) := by
+  have key := congrArg (coeff (N + 2)) (mldeF N)
   rw [KanekoZagier.coeff_L3, map_zero, kappa3_F,
-    Finset.sum_eq_single (N + 2)
+    Finset.sum_eq_single (N + 1)
       (fun j hj hne ↦ by
-        rw [coeff_fSeries_eq_zero N j (by rw [Finset.mem_range] at hj; omega), mul_zero])
+        rw [coeff_fSeries_eq_zero (N + 2) j (by rw [Finset.mem_range] at hj; omega), mul_zero])
       (fun hj ↦ absurd (Finset.mem_range.2 (by omega)) hj),
     K3_F, h, mul_one] at key
   rw [eq_div_iff (by positivity)]
   linarith [key]
 
-/-- The recurrence turns the normalisation at index `N+2` into the normalisation at index `N+3`:
+/-- The recurrence turns the normalisation at index `N+1` into the normalisation at index `N+2`:
 this is where `b_{w/4}` cancels against the two coefficient functions of `𝒮_w`. -/
 private lemma cusp_normalization (N : ℕ) :
-    cF (4 * (N : ℝ) + 12) * -((8 * (N : ℝ) + 19) / 6
-        * (8 * ((N : ℝ) ^ 3 + 6 * N ^ 2 + 23 * N + 27) / (((N : ℝ) + 2) * ((N : ℝ) + 3)))
-      + -4 * (24 * (N : ℝ) ^ 2 + 73 * N + 53)) = 1 := by
+    cF (4 * (N : ℝ) + 8) * -((8 * (N : ℝ) + 11) / 6
+        * (8 * ((N : ℝ) ^ 3 + 3 * N ^ 2 + 14 * N + 9) / (((N : ℝ) + 1) * ((N : ℝ) + 2)))
+      + -4 * (24 * (N : ℝ) ^ 2 + 25 * N + 4)) = 1 := by
   have h0 : (0 : ℝ) ≤ N := N.cast_nonneg
+  have e1 : ((N : ℝ) + 1) ≠ 0 := by positivity
   have e2 : ((N : ℝ) + 2) ≠ 0 := by positivity
-  have e3 : ((N : ℝ) + 3) ≠ 0 := by positivity
-  have e4 : 4 * (N : ℝ) + 12 - 10 ≠ 0 := ne_of_gt (by linarith)
-  have e5 : 4 * (N : ℝ) + 12 - 5 ≠ 0 := ne_of_gt (by linarith)
-  have e6 : 4 * (N : ℝ) + 12 - 3 ≠ 0 := ne_of_gt (by linarith)
-  have e7 : 4 * (N : ℝ) + 12 + 2 ≠ 0 := ne_of_gt (by linarith)
+  have e4 : 4 * (N : ℝ) + 8 - 10 ≠ 0 := by
+    rcases Nat.eq_zero_or_pos N with rfl | hN
+    · norm_num
+    · have : (1 : ℝ) ≤ N := by exact_mod_cast hN
+      exact ne_of_gt (by linarith)
+  have e5 : 4 * (N : ℝ) + 8 - 5 ≠ 0 := ne_of_gt (by linarith)
+  have e6 : 4 * (N : ℝ) + 8 - 3 ≠ 0 := ne_of_gt (by linarith)
+  have e7 : 4 * (N : ℝ) + 8 + 2 ≠ 0 := ne_of_gt (by linarith)
   rw [cF]
   field_simp
   ring
 
 /-- **The normalisation of `F_w`**, proved rather than assumed: the leading coefficient of
-`F_{4N+12}` is `1`. -/
-theorem coeff_fSeries_eq_one (N : ℕ) : coeff (N + 2) (fSeries N) = 1 := by
+`F_{4N+8}`, at index `N+1`, is `1`. -/
+theorem coeff_fSeries_eq_one (N : ℕ) : coeff (N + 1) (fSeries (N + 2)) = 1 := by
   induction N with
-  | zero => rw [fSeries, Ffam, coeff_qexp_F₁₂]; norm_num [Finset.sum_range_succ]
+  | zero => simpa using coeff_qexp_F₈ (n := 1) le_rfl
   | succ N ih =>
-    have hz : ∀ j, j ≤ N + 1 → coeff j (qexp (Ffam N)) = 0 := coeff_fSeries_eq_zero N
-    have h2 : coeff (N + 2) (qexp (Ffam N)) = 1 := ih
-    have hb : coeff (N + 3) (qexp (Ffam N))
-        = 8 * ((N : ℝ) ^ 3 + 6 * N ^ 2 + 23 * N + 27) / (((N : ℝ) + 2) * ((N : ℝ) + 3)) :=
+    have hz : ∀ j, j + 2 ≤ N + 2 → coeff j (qexp (fFam (N + 2))) = 0 :=
+      fun j hj ↦ coeff_fSeries_eq_zero (N + 2) j hj
+    have h2 : coeff (N + 1) (qexp (fFam (N + 2))) = 1 := ih
+    have hb : coeff (N + 2) (qexp (fFam (N + 2)))
+        = 8 * ((N : ℝ) ^ 3 + 3 * N ^ 2 + 14 * N + 9) / (((N : ℝ) + 1) * ((N : ℝ) + 2)) :=
       coeff_fSeries_succ ih
-    change coeff (N + 3) (fSeries (N + 1)) = 1
-    rw [fSeries, Ffam, qexp_fStep, PowerSeries.coeff_smul, smul_eq_mul, coeff_SF,
-      Finset.sum_eq_single (N + 2)
+    change coeff (N + 2) (fSeries (N + 3)) = 1
+    rw [fSeries, fFam, qexp_fStep,
+      show (4 : ℝ) * ((N + 2 : ℕ) : ℝ) = 4 * (N : ℝ) + 8 by push_cast; ring,
+      PowerSeries.coeff_smul, smul_eq_mul, coeff_SF,
+      Finset.sum_eq_single (N + 1)
         (fun j hj hne ↦ by rw [hz j (by rw [Finset.mem_range] at hj; omega), mul_zero])
         (fun hj ↦ absurd (Finset.mem_range.2 (by omega)) hj),
       hb, h2, mul_one, kappa2_F_cusp, K2_F_cusp, cusp_normalization]
@@ -648,15 +705,27 @@ theorem coeff_fSeries_eq_one (N : ℕ) : coeff (N + 2) (fSeries N) = 1 := by
 
 /-- **Positivity of the Fourier coefficients of `F̃_{w-2}`**, with every hypothesis of `ftildePos`
 discharged: the recurrence, the base case, the vanishing order and the normalisation are all proved
-from the definition of the `F_w` family in the polynomial model. -/
+from the definition of the `F_w` family in the polynomial model.  The weight is `w = 4(N+3)`, that
+is `w ≥ 12`. -/
 theorem coeff_ftildeSeries_pos (N j : ℕ) (hj1 : 1 ≤ j) (hj : j ≤ N + 1) :
-    0 < coeff j (ftildeSeries N) :=
-  ftildePos ftildeSeries_zero ftildeSeries_succ coeff_fSeries_eq_zero coeff_fSeries_eq_one N j hj1
-    hj
+    0 < coeff j (ftildeSeries (N + 3)) :=
+  ftildePos (F := fun N ↦ fSeries (N + 3)) (Ft := fun N ↦ ftildeSeries (N + 3))
+    ftildeSeries_three
+    (fun N ↦ by
+      rw [show (4 : ℝ) * (N : ℝ) + 12 = 4 * ((N + 3 : ℕ) : ℝ) by push_cast; ring]
+      exact ftildeSeries_succ (by omega))
+    (fun N k hk ↦ coeff_fSeries_eq_zero (N + 3) k (by omega))
+    (fun N ↦ coeff_fSeries_eq_one (N + 1)) N j hj1 hj
 
 /-- The boundary estimate, likewise. -/
-theorem coeff_ftildeSeries_boundary (N : ℕ) : 1 / 360 ≤ coeff (N + 1) (ftildeSeries N) :=
-  ftildeBoundary ftildeSeries_zero ftildeSeries_succ coeff_fSeries_eq_zero coeff_fSeries_eq_one N
+theorem coeff_ftildeSeries_boundary (N : ℕ) : 1 / 360 ≤ coeff (N + 1) (ftildeSeries (N + 3)) :=
+  ftildeBoundary (F := fun N ↦ fSeries (N + 3)) (Ft := fun N ↦ ftildeSeries (N + 3))
+    ftildeSeries_three
+    (fun N ↦ by
+      rw [show (4 : ℝ) * (N : ℝ) + 12 = 4 * ((N + 3 : ℕ) : ℝ) by push_cast; ring]
+      exact ftildeSeries_succ (by omega))
+    (fun N k hk ↦ coeff_fSeries_eq_zero (N + 3) k (by omega))
+    (fun N ↦ coeff_fSeries_eq_one (N + 1)) N
 
 end PolynomialModel
 
