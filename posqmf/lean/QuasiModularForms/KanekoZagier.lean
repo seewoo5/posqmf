@@ -1,4 +1,4 @@
-import posqmf.lean.DifferentialOperators.Serre
+import posqmf.lean.QuasiModularForms.Serre
 
 /-!
 # The Kaneko--Zagier operators `L_{2,k}^α` and `L_{3,k}^{(α,β)}`
@@ -20,6 +20,8 @@ identities proved here, which are identities of formal power series.
 open PowerSeries
 
 namespace KanekoZagier
+
+open QExpansion
 
 noncomputable section
 

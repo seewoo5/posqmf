@@ -1,4 +1,4 @@
-import posqmf.lean.DifferentialOperators.Ramanujan
+import posqmf.lean.QuasiModularForms.Ramanujan
 
 /-!
 # The Serre derivative on formal `q`-expansions
@@ -9,16 +9,16 @@ number: all the identities below are polynomial in `k`.
 
 ## Main results
 
-* `KanekoZagier.serreD_mul`: the product rule `∂_{w₁+w₂}(FG) = (∂_{w₁}F)G + F(∂_{w₂}G)`.
-* `KanekoZagier.serreD_E₂`, `serreD_E₄`, `serreD_E₆`: Ramanujan's identities in Serre form.
-* `KanekoZagier.serreD_two_eq`, `serreD_three_eq`: the expansions of `∂_k²` and `∂_k³` in terms of
+* `QExpansion.serreD_mul`: the product rule `∂_{w₁+w₂}(FG) = (∂_{w₁}F)G + F(∂_{w₂}G)`.
+* `QExpansion.serreD_E₂`, `serreD_E₄`, `serreD_E₆`: Ramanujan's identities in Serre form.
+* `QExpansion.serreD_two_eq`, `serreD_three_eq`: the expansions of `∂_k²` and `∂_k³` in terms of
   `D`, `E₂`, `E₄`, `E₆`.  These are the computations behind the two Kaneko--Zagier operators.
 -/
 
 open ArithmeticFunction Finset PowerSeries
 open scoped sigma
 
-namespace KanekoZagier
+namespace QExpansion
 
 noncomputable section
 
@@ -146,4 +146,4 @@ theorem serreD_three_eq (k : ℝ) (f : ℝ⟦X⟧) :
 
 end
 
-end KanekoZagier
+end QExpansion

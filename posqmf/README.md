@@ -109,9 +109,11 @@ The first three files were initially written by AxiomProver and manually golfed 
 - `D_6_3.lean` verifies the positivity of the coefficients of $\mathcal{D}_{6, 3}$.
 - `SigmaBounds.lean` include basic inequalities for the divisor sum function, which are used in the above two files.
 
-### `DifferentialOperators`
+### `QuasiModularForms`
 
-The directory `lean/DifferentialOperators` formalizes the operator bookkeeping of "Positive quasimodular forms and the sign uncertainty principle", at the level of formal $q$-expansions: $\mathbb{R}[[q]]$ is the ring of $q$-series, $D = q \frac{d}{dq}$, and $E_2, E_4, E_6$ are the explicit divisor-sum series. (Mathlib's `D` and Serre derivative are differential operators on functions on the upper half plane, which carry analytic content that none of these identities need.)
+The directory `lean/QuasiModularForms` formalizes the operator bookkeeping of "Positive quasimodular forms and the sign uncertainty principle", at the level of formal $q$-expansions: $\mathbb{R}[[q]]$ is the ring of $q$-series, $D = q \frac{d}{dq}$, and $E_2, E_4, E_6$ are the explicit divisor-sum series. (Mathlib's `D` and Serre derivative are differential operators on functions on the upper half plane, which carry analytic content that none of these identities need.)
+
+The $q$-expansion layer (`Basic`, `Eisenstein`, `Ramanujan`, `Serre`) lives in namespace `QExpansion`, the polynomial model in `PolynomialModel`, and `KanekoZagier` is reserved for the operators that are actually Kaneko-Zagier's.
 
 - `Basic.lean` defines $D$ and proves the Leibniz rule and the convolution lemma used in all coefficient computations.
 - `Eisenstein.lean` defines $E_2, E_4, E_6$ and computes $[q^n](E \cdot G)$ for $E \in \\{E_2, E_4, E_6, E_2', E_2'', E_4'\\}$.
@@ -120,7 +122,7 @@ The directory `lean/DifferentialOperators` formalizes the operator bookkeeping o
 - `KanekoZagier.lean` defines the Kaneko-Zagier operators $L_{2,k}^{\alpha}$ and $L_{3,k}^{(\alpha,\beta)}$ by their $D$-forms and proves that these agree with their Serre-derivative forms.
 - `Coefficients.lean` proves the Fourier coefficient formulas `lem:KZ2_coeff` and `lem:KZ3_coeff` (Lemma 2.2 and Lemma 2.3). These do **not** depend on the Ramanujan axioms.
 - `Intertwine.lean` proves the intertwining relation between second- and third-order Kaneko-Zagier operators under the four constraints on parameters (Lemma 2.4).
-- `QuasiModular.lean` sets up the polynomial model $\mathbb{R}[E_2, E_4, E_6]$, which is needed because $\delta = \partial/\partial E_2$ is not an operator on $q$-series. It carries $D$, $\delta$, the Euler weight operator, and the Serre derivative, proves the commutator identities $[\delta, D] = \frac{1}{12}E$ and $\delta\partial_k F = \partial_k\delta F + \frac{w-k}{12}F$, and defines the algebra map to $q$-expansions that ties the two layers together.
+- `PolynomialModel.lean` sets up the polynomial model $\mathbb{R}[E_2, E_4, E_6]$, which is needed because $\delta = \partial/\partial E_2$ is not an operator on $q$-series. It carries $D$, $\delta$, the Euler weight operator, and the Serre derivative, proves the commutator identities $[\delta, D] = \frac{1}{12}E$ and $\delta\partial_k F = \partial_k\delta F + \frac{w-k}{12}F$, and defines the algebra map to $q$-expansions that ties the two layers together.
 
 ### `UncertaintyPrinciple`
 
@@ -130,6 +132,6 @@ The directory `lean/UncertaintyPrinciple` formalizes the coefficient-positivity 
 - `F.lean` proves positivity of the Fourier coefficients of $\widetilde{F}_{w-2}$ (Proposition 4.5), assuming nothing. Its `QExpansion` section runs the induction in $\mathbb{R}[[q]]$ from the recurrence (Lemma 4.4); its `PolynomialModel` section defines the family by that recurrence, indexed so that `fFam N` is the paper's $F_{4N}$ (with $F_8$ explicit and $F_0, F_4$ set to zero), sets $\widetilde{F}_{w-2} := \delta F_w$ (as `ftildeFam`, of weight $4N-2$, with `ftildeSeries` its $q$-expansion), and supplies the vanishing order and the normalization, the latter through the modular linear differential equation $L_{3,w-2}^{((w-4)/4,\,0)}F_w = 0$. The two sections open different namespaces, since `KanekoZagier` and `QuasiModular` both name $D$, $E_2, E_4, E_6$ and $\partial_k$.
 - `G.lean` proves nonnegativity of the Fourier coefficients of $\widetilde{G}_w$ (Propositions 4.21 and 4.22), also assuming nothing, plus strict positivity of the constant term. Its third-order equation is proved by the intertwining criterion from a check on the constant $\widetilde{G}_0$. The positivity argument needs no polynomial model, since no $\delta$ appears; the family is nevertheless defined there, as $\widetilde{G}_{4N}$ of weight $4N$ with $\delta\widetilde{G}_w = 0$ — the paper's level 1 modular form — which the $q$-expansion layer cannot state; `gtildeSeries` is its $q$-expansion and the recurrence becomes a theorem.
 
-Most results use the Ramanujan axioms of `DifferentialOperators/Ramanujan.lean`. The exceptions are `LogInequalities.lean` and the `QExpansion` sections of both files, which never meet the polynomial model — as do the polynomial facts themselves, since only the $q$-expansion map `qexp` needs those axioms.
+Most results use the Ramanujan axioms of `QuasiModularForms/Ramanujan.lean`. The exceptions are `LogInequalities.lean` and the `QExpansion` sections of both files, which never meet the polynomial model — as do the polynomial facts themselves, since only the $q$-expansion map `qexp` needs those axioms.
 
 Neither file identifies its family with the paper's $F_w$ and $\widetilde{G}_w$. For $F$ the vanishing order, normalization and differential equation are all proved, which is what characterizes the extremal quasimodular form. For $\widetilde{G}$ the recurrence is taken as the definition; deriving it from $G_w = \widetilde{G}_{w-12} \Delta \mathcal{L}_S + \Psi_w$ is an argument about modular functions for $\Gamma(2)$ and lies outside the development.

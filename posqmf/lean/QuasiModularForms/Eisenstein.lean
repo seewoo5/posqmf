@@ -1,5 +1,5 @@
 import Mathlib.NumberTheory.ArithmeticFunction.Misc
-import posqmf.lean.DifferentialOperators.Basic
+import posqmf.lean.QuasiModularForms.Basic
 
 /-!
 # The Eisenstein series `E₂`, `E₄`, `E₆` as formal `q`-expansions
@@ -23,7 +23,7 @@ strictly lower triangular convolution against `σ₁`, `σ₃` or `σ₅`.
 open ArithmeticFunction Finset PowerSeries
 open scoped sigma
 
-namespace KanekoZagier
+namespace QExpansion
 
 noncomputable section
 
@@ -107,4 +107,4 @@ lemma coeff_D_E₄_mul (G : ℝ⟦X⟧) (n : ℕ) :
 
 end
 
-end KanekoZagier
+end QExpansion

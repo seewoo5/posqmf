@@ -1,6 +1,6 @@
-import posqmf.lean.DifferentialOperators.Coefficients
-import posqmf.lean.DifferentialOperators.Intertwine
-import posqmf.lean.DifferentialOperators.QuasiModular
+import posqmf.lean.QuasiModularForms.Coefficients
+import posqmf.lean.QuasiModularForms.Intertwine
+import posqmf.lean.QuasiModularForms.PolynomialModel
 import posqmf.lean.SigmaBounds
 
 /-!
@@ -74,7 +74,7 @@ noncomputable section
 
 section QExpansion
 
-open ArithmeticFunction KanekoZagier
+open ArithmeticFunction QExpansion KanekoZagier
 open scoped sigma
 
 /-! ### The operators and the recurrence step -/
@@ -315,12 +315,12 @@ end QExpansion
 
 section PolynomialModel
 
-open QuasiModular
+open PolynomialModel
 
 /-! ### `G̃` in the polynomial model
 
 The paper's `G̃_w` is a *modular* form of weight `w`, hence a polynomial in `E₄` and `E₆` with no
-`E₂` at all.  The reason is visible in the `δ`-calculus: `QuasiModular.delta_serreD` carries a
+`E₂` at all.  The reason is visible in the `δ`-calculus: `PolynomialModel.delta_serreD` carries a
 correction `((w-k)/12)•G`, which vanishes exactly when the Serre derivative is taken at the form's
 own weight, and the `G̃` recurrence applies `∂_w` to `G̃_w`.  The `F` recurrence instead applies
 `∂_{w-2}` to `F_w`, off by its depth `2`, which is why `E₂` enters there and `F̃ := δF` is not zero.
@@ -334,7 +334,7 @@ def SGp (w : ℝ) (G : QM) : QM :=
 
 lemma qexp_SGp (w : ℝ) (G : QM) :
     qexp (SGp w G) = -KanekoZagier.L2 w (alphaG w) (qexp G) := by
-  rw [SGp, KanekoZagier.L2_eq_serre, KanekoZagier.serreDIter_two, alphaG, map_sub, map_smul,
+  rw [SGp, KanekoZagier.L2_eq_serre, QExpansion.serreDIter_two, alphaG, map_sub, map_smul,
     map_mul, qexp_E₄, qexp_serreD, qexp_serreD]
   module
 
@@ -395,7 +395,7 @@ end PolynomialModel
 
 section Conclusion
 
-open ArithmeticFunction KanekoZagier
+open ArithmeticFunction QExpansion KanekoZagier
 
 /-- The base case: `G̃₀` is a constant, and at `k = 0` with `β = 0` every coefficient of the
 undifferentiated term of `L_{3,k}^{(α,β)}` vanishes. -/

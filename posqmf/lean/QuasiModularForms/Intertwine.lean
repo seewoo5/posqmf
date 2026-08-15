@@ -1,4 +1,4 @@
-import posqmf.lean.DifferentialOperators.KanekoZagier
+import posqmf.lean.QuasiModularForms.KanekoZagier
 
 /-!
 # The intertwining criterion for the Kaneko--Zagier operators
@@ -29,6 +29,8 @@ operators.  That direction remains a Sage check.
 open PowerSeries
 
 namespace KanekoZagier
+
+open QExpansion
 
 noncomputable section
 

@@ -1,20 +1,27 @@
-import posqmf.lean.DifferentialOperators.Basic
-import posqmf.lean.DifferentialOperators.Coefficients
-import posqmf.lean.DifferentialOperators.Eisenstein
-import posqmf.lean.DifferentialOperators.Intertwine
-import posqmf.lean.DifferentialOperators.KanekoZagier
-import posqmf.lean.DifferentialOperators.Ramanujan
-import posqmf.lean.DifferentialOperators.Serre
+import posqmf.lean.QuasiModularForms.Basic
+import posqmf.lean.QuasiModularForms.Coefficients
+import posqmf.lean.QuasiModularForms.Eisenstein
+import posqmf.lean.QuasiModularForms.Intertwine
+import posqmf.lean.QuasiModularForms.KanekoZagier
+import posqmf.lean.QuasiModularForms.PolynomialModel
+import posqmf.lean.QuasiModularForms.Ramanujan
+import posqmf.lean.QuasiModularForms.Serre
 
 /-!
-# Kaneko--Zagier operators on formal `q`-expansions
+# Quasimodular forms, on `q`-expansions and as polynomials
 
 This directory formalises the operator bookkeeping of §2 of *Positive quasimodular forms and the
 sign uncertainty principle*, at the level of formal `q`-series rather than of functions on the
 complex upper half plane.  Concretely, `ℝ⟦X⟧` is the ring of `q`-expansions (`X` is `q`),
 `D = q d/dq`, and `E₂`, `E₄`, `E₆` are the explicit divisor-sum series.  Everything is then an
 identity of formal power series, which is exactly the level at which the paper's computations
-take place.
+take place.  A second model, `ℝ[E₂,E₄,E₆]`, is set up in `PolynomialModel`; it is needed because
+`δ = ∂/∂E₂` is not an operator on `q`-series.  The two are joined by the algebra map `qexp`.
+
+The `q`-expansion layer lives in namespace `QExpansion` and the polynomial one in
+`PolynomialModel`; `KanekoZagier` is reserved for what is actually Kaneko--Zagier's, namely the
+operators `L_{2,k}^α` and `L_{3,k}^{(α,β)}`, their Fourier coefficients, and the intertwining
+criterion.
 
 ## Contents
 
@@ -27,6 +34,7 @@ take place.
 | `KanekoZagier` | `L_{2,k}^α`, `L_{3,k}^{(α,β)}` and the `D`-form `=` Serre-form theorems |
 | `Coefficients` | Fourier coefficients of the two operators |
 | `Intertwine` | `∂_k⁵` normal forms of the composed operators, intertwining criterion (`⟸`) |
+| `PolynomialModel` | `ℝ[E₂,E₄,E₆]` with `D`, `δ`, the weight operator, `∂_k`, and `qexp` |
 
 ## Verification-plan items covered
 
@@ -42,7 +50,7 @@ take place.
 
 ## Axioms
 
-Ramanujan's identities are taken as axioms (`KanekoZagier.ramanujan_E₂`,
+Ramanujan's identities are taken as axioms (`QExpansion.ramanujan_E₂`,
 `ramanujan_E₄`, `ramanujan_E₆`); see `Ramanujan.lean`.  What each result actually uses:
 
 ```

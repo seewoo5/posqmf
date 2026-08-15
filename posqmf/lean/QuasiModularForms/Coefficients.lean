@@ -1,4 +1,4 @@
-import posqmf.lean.DifferentialOperators.KanekoZagier
+import posqmf.lean.QuasiModularForms.KanekoZagier
 
 /-!
 # Fourier coefficients of the Kaneko--Zagier operators
@@ -20,6 +20,8 @@ open ArithmeticFunction Finset PowerSeries
 open scoped sigma
 
 namespace KanekoZagier
+
+open QExpansion
 
 noncomputable section
 

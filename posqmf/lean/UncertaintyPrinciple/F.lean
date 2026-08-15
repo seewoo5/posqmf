@@ -1,6 +1,6 @@
-import posqmf.lean.DifferentialOperators.Coefficients
-import posqmf.lean.DifferentialOperators.Intertwine
-import posqmf.lean.DifferentialOperators.QuasiModular
+import posqmf.lean.QuasiModularForms.Coefficients
+import posqmf.lean.QuasiModularForms.Intertwine
+import posqmf.lean.QuasiModularForms.PolynomialModel
 import posqmf.lean.SigmaBounds
 
 /-!
@@ -58,7 +58,7 @@ paper.  `F₀` and `F₄` do not exist and are set to zero.
   with every hypothesis discharged.
 
 Only the first layer is axiom-free.  The second uses the Ramanujan axioms of
-`DifferentialOperators/Ramanujan.lean`, since `qexp` is what turns `DE₂, DE₄, DE₆` back into
+`QuasiModularForms/Ramanujan.lean`, since `qexp` is what turns `DE₂, DE₄, DE₆` back into
 polynomials in `E₂, E₄, E₆`.
 -/
 
@@ -70,7 +70,7 @@ noncomputable section
 
 section QExpansion
 
-open ArithmeticFunction KanekoZagier
+open ArithmeticFunction QExpansion KanekoZagier
 open scoped sigma
 
 /-! ### The operators and the recurrence step -/
@@ -305,7 +305,7 @@ end QExpansion
 
 section PolynomialModel
 
-open QuasiModular
+open PolynomialModel
 
 /-! ### The operators and the recurrence step, polynomially -/
 
@@ -314,7 +314,7 @@ def SFp (w : ℝ) (G : QM) : QM :=
   ((w - 6) * (w - 5) / 36 : ℝ) • (E₄ * G) - serreD w (serreD (w - 2) G)
 
 lemma qexp_SFp (w : ℝ) (G : QM) : qexp (SFp w G) = SF w (qexp G) := by
-  rw [SFp, SF, KanekoZagier.L2_eq_serre, KanekoZagier.serreDIter_two,
+  rw [SFp, SF, KanekoZagier.L2_eq_serre, QExpansion.serreDIter_two,
     show w - 2 + 2 = w by ring, alphaF, map_sub, map_smul, map_mul, qexp_E₄, qexp_serreD,
     qexp_serreD]
   module
@@ -370,7 +370,7 @@ lemma hasWeight_F₁₂ : HasWeight F₁₂ 12 :=
 Ramanujan's identity `E₂E₄-E₆ = 3E₄'` turns this into `(1/86400)E₄E₄' = (1/360)E₄X_{6,1}`, which is
 the `ftilde₁₀` of the `QExpansion` section. -/
 theorem qexp_delta_F₁₂ : qexp (delta F₁₂) = ftilde₁₀ := by
-  simp only [F₁₂, ftilde₁₀, KanekoZagier.ramanujan_E₄, pow_succ, pow_zero, one_mul,
+  simp only [F₁₂, ftilde₁₀, QExpansion.ramanujan_E₄, pow_succ, pow_zero, one_mul,
     Derivation.map_smul, map_add, map_sub, Derivation.leibniz, delta_E₂, delta_E₄, delta_E₆,
     smul_eq_mul, mul_zero, add_zero, zero_add, mul_one, mul_add, mul_sub, map_smul, map_mul,
     qexp_E₂, qexp_E₄, qexp_E₆, mul_smul_comm, smul_smul]
@@ -492,11 +492,11 @@ lemma F₈_eq : F₈ = (1 / 240 : ℝ) • D (D E₄) := by
 lemma coeff_qexp_F₈ {n : ℕ} (hn : 1 ≤ n) :
     coeff n (qexp F₈) = (n : ℝ) ^ 2 * (ArithmeticFunction.sigma 3 n : ℝ) := by
   rw [F₈_eq, map_smul, qexp_D, qexp_D, qexp_E₄, PowerSeries.coeff_smul, smul_eq_mul,
-    KanekoZagier.coeff_D, KanekoZagier.coeff_D, coeff_E₄_of_pos hn]
+    QExpansion.coeff_D, QExpansion.coeff_D, coeff_E₄_of_pos hn]
   ring
 
 @[simp] lemma coeff_qexp_F₈_zero : coeff 0 (qexp F₈) = 0 := by
-  rw [F₈_eq, map_smul, qexp_D, PowerSeries.coeff_smul, smul_eq_mul, KanekoZagier.coeff_D]
+  rw [F₈_eq, map_smul, qexp_D, PowerSeries.coeff_smul, smul_eq_mul, QExpansion.coeff_D]
   simp
 
 /-- **The vanishing order of `F_w`**, proved rather than assumed. -/
@@ -537,7 +537,7 @@ def L3p (k α β : ℝ) (G : QM) : QM :=
 
 lemma qexp_L3p (k α β : ℝ) (G : QM) :
     qexp (L3p k α β G) = KanekoZagier.L3 k α β (qexp G) := by
-  rw [L3p, KanekoZagier.L3_eq_serre, KanekoZagier.serreDIter_three, KanekoZagier.serreDIter_two,
+  rw [L3p, KanekoZagier.L3_eq_serre, QExpansion.serreDIter_three, QExpansion.serreDIter_two,
     map_add, map_add, map_smul, map_smul, map_mul, map_mul, qexp_E₄, qexp_E₆, qexp_serreD,
     qexp_serreD, qexp_serreD]
 

@@ -1,7 +1,7 @@
 import Mathlib.Algebra.MvPolynomial.Derivation
 import Mathlib.Algebra.MvPolynomial.PDeriv
 import Mathlib.RingTheory.Derivation.Lie
-import posqmf.lean.DifferentialOperators.Serre
+import posqmf.lean.QuasiModularForms.Serre
 
 /-!
 # The polynomial model `ℝ[E₂,E₄,E₆]` and the operator `δ = ∂/∂E₂`
@@ -24,16 +24,16 @@ by pure algebra, with no need for the weighted Euler identity.
 
 ## Main results
 
-* `QuasiModular.euler_D`: `⁅eulerOp, D⁆ = 2D`, i.e. `D` raises the weight by `2`.
-* `QuasiModular.delta_D`: `⁅δ, D⁆ = (1/12) eulerOp`, the `sl₂`-relation of Kaneko--Koike.
-* `QuasiModular.delta_serreD`: `δ(∂_k G) = ∂_k(δG) + ((w-k)/12) G` for `G` of weight `w`.
-* `QuasiModular.qexp_D`, `qexp_serreD`: the `q`-expansion map intertwines the polynomial `D` and
+* `PolynomialModel.euler_D`: `⁅eulerOp, D⁆ = 2D`, i.e. `D` raises the weight by `2`.
+* `PolynomialModel.delta_D`: `⁅δ, D⁆ = (1/12) eulerOp`, the `sl₂`-relation of Kaneko--Koike.
+* `PolynomialModel.delta_serreD`: `δ(∂_k G) = ∂_k(δG) + ((w-k)/12) G` for `G` of weight `w`.
+* `PolynomialModel.qexp_D`, `qexp_serreD`: the `q`-expansion map intertwines the polynomial `D` and
   `∂_k` with the ones on `ℝ⟦X⟧`.  This is where Ramanujan's identities enter.
 -/
 
 open MvPolynomial
 
-namespace QuasiModular
+namespace PolynomialModel
 
 /-- The ring of level-`1` quasimodular forms, modelled as `ℝ[E₂,E₄,E₆]`. -/
 abbrev QM := MvPolynomial (Fin 3) ℝ
@@ -269,8 +269,8 @@ theorem delta_serreD {G : QM} {w : ℝ} (k : ℝ) (h : HasWeight G w) :
 There are two families of objects called `E₂`, `E₄`, `E₆` in this development, and they are
 genuinely different:
 
-* `KanekoZagier.E₂ : ℝ⟦X⟧` is the concrete divisor-sum series `1 - 24∑σ₁(n)qⁿ`;
-* `QuasiModular.E₂ : QM` is an indeterminate of a polynomial ring, carrying no `q`-expansion.
+* `QExpansion.E₂ : ℝ⟦X⟧` is the concrete divisor-sum series `1 - 24∑σ₁(n)qⁿ`;
+* `PolynomialModel.E₂ : QM` is an indeterminate of a polynomial ring, carrying no `q`-expansion.
 
 They are related, but not equal, by the evaluation map `qexp` below.  Identifying them would
 require `qexp` to be injective, i.e. the algebraic independence of `E₂`, `E₄`, `E₆` over `ℝ`,
@@ -288,48 +288,48 @@ operator with no counterpart is `δ` itself: that is the whole point of the poly
 /-- The `q`-expansion homomorphism `ℝ[E₂,E₄,E₆] → ℝ⟦X⟧`, sending each generator to the
 corresponding divisor-sum series. -/
 def qexp : QM →ₐ[ℝ] PowerSeries ℝ :=
-  aeval ![KanekoZagier.E₂, KanekoZagier.E₄, KanekoZagier.E₆]
+  aeval ![QExpansion.E₂, QExpansion.E₄, QExpansion.E₆]
 
-@[simp] lemma qexp_E₂ : qexp E₂ = KanekoZagier.E₂ := by simp [qexp, E₂]
+@[simp] lemma qexp_E₂ : qexp E₂ = QExpansion.E₂ := by simp [qexp, E₂]
 
-@[simp] lemma qexp_E₄ : qexp E₄ = KanekoZagier.E₄ := by simp [qexp, E₄]
+@[simp] lemma qexp_E₄ : qexp E₄ = QExpansion.E₄ := by simp [qexp, E₄]
 
-@[simp] lemma qexp_E₆ : qexp E₆ = KanekoZagier.E₆ := by simp [qexp, E₆]
+@[simp] lemma qexp_E₆ : qexp E₆ = QExpansion.E₆ := by simp [qexp, E₆]
 
 /-- **Ramanujan's identities, packaged.**  The values of the polynomial `D` on the generators
 evaluate to the derivatives of the corresponding `q`-series.  This single statement is what the
 three axioms of `Ramanujan.lean` amount to, and it is the only place they are used here. -/
-theorem qexp_dGen (i : Fin 3) : qexp (dGen i) = KanekoZagier.D (qexp (X i)) := by
-  have h0 : qexp (dGen 0) = KanekoZagier.D (qexp E₂) := by
+theorem qexp_dGen (i : Fin 3) : qexp (dGen i) = QExpansion.D (qexp (X i)) := by
+  have h0 : qexp (dGen 0) = QExpansion.D (qexp E₂) := by
     rw [show dGen 0 = (1 / 12 : ℝ) • (E₂ * E₂ - E₄) from rfl, qexp_E₂,
-      KanekoZagier.ramanujan_E₂, map_smul, map_sub, map_mul, qexp_E₂, qexp_E₄]
-  have h1 : qexp (dGen 1) = KanekoZagier.D (qexp E₄) := by
+      QExpansion.ramanujan_E₂, map_smul, map_sub, map_mul, qexp_E₂, qexp_E₄]
+  have h1 : qexp (dGen 1) = QExpansion.D (qexp E₄) := by
     rw [show dGen 1 = (1 / 3 : ℝ) • (E₂ * E₄ - E₆) from rfl, qexp_E₄,
-      KanekoZagier.ramanujan_E₄, map_smul, map_sub, map_mul, qexp_E₂, qexp_E₄, qexp_E₆]
-  have h2 : qexp (dGen 2) = KanekoZagier.D (qexp E₆) := by
+      QExpansion.ramanujan_E₄, map_smul, map_sub, map_mul, qexp_E₂, qexp_E₄, qexp_E₆]
+  have h2 : qexp (dGen 2) = QExpansion.D (qexp E₆) := by
     rw [show dGen 2 = (1 / 2 : ℝ) • (E₂ * E₆ - E₄ * E₄) from rfl, qexp_E₆,
-      KanekoZagier.ramanujan_E₆, map_smul, map_sub, map_mul, map_mul, qexp_E₂, qexp_E₄, qexp_E₆]
+      QExpansion.ramanujan_E₆, map_smul, map_sub, map_mul, map_mul, qexp_E₂, qexp_E₄, qexp_E₆]
   fin_cases i
   · exact h0
   · exact h1
   · exact h2
 
 /-- The `q`-expansion map intertwines the two `D`'s. -/
-@[simp] theorem qexp_D (p : QM) : qexp (D p) = KanekoZagier.D (qexp p) := by
+@[simp] theorem qexp_D (p : QM) : qexp (D p) = QExpansion.D (qexp p) := by
   induction p using MvPolynomial.induction_on with
-  | C a => simp [KanekoZagier.D_C]
-  | add p q hp hq => simp [KanekoZagier.D_add, hp, hq]
+  | C a => simp [QExpansion.D_C]
+  | add p q hp hq => simp [QExpansion.D_add, hp, hq]
   | mul_X p i hp =>
     rw [Derivation.leibniz, smul_eq_mul, smul_eq_mul, map_add, map_mul, map_mul, hp,
       show D (X i) = dGen i from mkDerivation_X ℝ dGen i, qexp_dGen i, map_mul,
-      KanekoZagier.D_mul]
+      QExpansion.D_mul]
     ring
 
 /-- The `q`-expansion map intertwines the two Serre derivatives. -/
 @[simp] theorem qexp_serreD (k : ℝ) (p : QM) :
-    qexp (serreD k p) = KanekoZagier.serreD k (qexp p) := by
-  rw [serreD, KanekoZagier.serreD, map_sub, map_smul, map_mul, qexp_D, qexp_E₂]
+    qexp (serreD k p) = QExpansion.serreD k (qexp p) := by
+  rw [serreD, QExpansion.serreD, map_sub, map_smul, map_mul, qexp_D, qexp_E₂]
 
 end
 
-end QuasiModular
+end PolynomialModel

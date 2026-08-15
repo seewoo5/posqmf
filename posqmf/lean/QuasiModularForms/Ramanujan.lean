@@ -1,5 +1,5 @@
 import Mathlib.Tactic.Module
-import posqmf.lean.DifferentialOperators.Eisenstein
+import posqmf.lean.QuasiModularForms.Eisenstein
 
 /-!
 # Ramanujan's identities
@@ -15,12 +15,12 @@ concrete series defined in `Eisenstein.lean`, so no inconsistency is introduced;
 three `axiom`s by theorems is the only thing needed to make everything downstream unconditional.
 
 Every result that depends on them can be recognised by `#print axioms`, which will list
-`KanekoZagier.ramanujan_E₂`, `KanekoZagier.ramanujan_E₄` or `KanekoZagier.ramanujan_E₆`.
+`QExpansion.ramanujan_E₂`, `QExpansion.ramanujan_E₄` or `QExpansion.ramanujan_E₆`.
 Notably the coefficient formulas of `Coefficients.lean` do *not* depend on them.
 
 ## Main results
 
-* `KanekoZagier.E₂_mul_E₂`, `E₂_mul_E₄`, `E₂_mul_D_E₂`: the reduction rules in which Ramanujan's
+* `QExpansion.E₂_mul_E₂`, `E₂_mul_E₄`, `E₂_mul_D_E₂`: the reduction rules in which Ramanujan's
   identities are actually used, namely rewriting the products of `E₂` with `E₂`, `E₄` and `E₂'`
   that appear when an iterated Serre derivative is expanded in terms of `D`.  The `E₂E₆` reduction
   is not needed: `E₆` only ever enters through `∂₆E₆`, handled in Serre form by `serreD_E₆`.
@@ -28,7 +28,7 @@ Notably the coefficient formulas of `Coefficients.lean` do *not* depend on them.
 
 open PowerSeries
 
-namespace KanekoZagier
+namespace QExpansion
 
 /-- **Ramanujan's identity** `E₂' = (E₂² - E₄)/12`, taken as an axiom. -/
 axiom ramanujan_E₂ : D E₂ = (1 / 12 : ℝ) • (E₂ * E₂ - E₄)
@@ -58,4 +58,4 @@ lemma E₂_mul_D_E₂ : E₂ * D E₂ = (6 : ℝ) • D (D E₂) + (1 / 2 : ℝ)
   simp only [two_smul, h]
   module
 
-end KanekoZagier
+end QExpansion

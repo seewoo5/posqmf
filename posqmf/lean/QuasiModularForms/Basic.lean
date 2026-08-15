@@ -13,19 +13,19 @@ role of the ring of `q`-expansions (so the formal variable `X` is `q`).
 
 ## Main definitions
 
-* `KanekoZagier.D`: the operator `q d/dq`, that is `∑ₙ aₙ qⁿ ↦ ∑ₙ n aₙ qⁿ`.
+* `QExpansion.D`: the operator `q d/dq`, that is `∑ₙ aₙ qⁿ ↦ ∑ₙ n aₙ qⁿ`.
 
 ## Main results
 
-* `KanekoZagier.D_mul`: `D` satisfies the Leibniz rule.
-* `KanekoZagier.coeff_mk_mul`: for a series `f` with vanishing constant term,
+* `QExpansion.D_mul`: `D` satisfies the Leibniz rule.
+* `QExpansion.coeff_mk_mul`: for a series `f` with vanishing constant term,
   `[qⁿ](f * G) = ∑_{j < n} ([qⁿ⁻ʲ]f) · ([qʲ]G)`.  This is the shape in which every coefficient
   computation in this directory is carried out.
 -/
 
 open Finset PowerSeries
 
-namespace KanekoZagier
+namespace QExpansion
 
 noncomputable section
 
@@ -78,4 +78,4 @@ lemma coeff_mk_mul (c : ℕ → ℝ) (h0 : c 0 = 0) (G : ℝ⟦X⟧) (n : ℕ) :
 
 end
 
-end KanekoZagier
+end QExpansion
