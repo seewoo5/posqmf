@@ -356,8 +356,7 @@ lemma hasWeight_F₈ : HasWeight F₈ 8 :=
     (HasWeight.congr_weight (HasWeight.pow hasWeight_E₄ 2) (by norm_num))
 
 /-- `F₁₂ = (1/518400)(E₂²E₄² - 2E₂E₄E₆ + E₆²)`. -/
-def F₁₂ : QM :=
-  (1 / 518400 : ℝ) • (E₂ ^ 2 * E₄ ^ 2 - (2 : ℝ) • (E₂ * E₄ * E₆) + E₆ ^ 2)
+def F₁₂ : QM := (1 / 518400 : ℝ) • (E₂ ^ 2 * E₄ ^ 2 - (2 : ℝ) • (E₂ * E₄ * E₆) + E₆ ^ 2)
 
 lemma hasWeight_F₁₂ : HasWeight F₁₂ 12 :=
   have h1 : HasWeight (E₂ ^ 2 * E₄ ^ 2) 12 := HasWeight.congr_weight
@@ -605,8 +604,7 @@ lemma K3_F (N : ℕ) :
 
 lemma kappa2_F_cusp (N : ℕ) :
     KanekoZagier.kappa2 (4 * (N : ℝ) + 8 - 2) (alphaF (4 * (N : ℝ) + 8)) (N + 2)
-      = (8 * (N : ℝ) + 11) / 6 := by
-  rw [kappa2_F]; push_cast; ring
+      = (8 * (N : ℝ) + 11) / 6 := by rw [kappa2_F]; grind;
 
 lemma K2_F_cusp (N : ℕ) :
     KanekoZagier.K2 (4 * (N : ℝ) + 8 - 2) (alphaF (4 * (N : ℝ) + 8)) (N + 2) (N + 1)

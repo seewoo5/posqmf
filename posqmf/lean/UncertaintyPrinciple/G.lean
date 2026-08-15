@@ -1,5 +1,6 @@
 import posqmf.lean.DifferentialOperators.Coefficients
 import posqmf.lean.DifferentialOperators.Intertwine
+import posqmf.lean.DifferentialOperators.QuasiModular
 import posqmf.lean.SigmaBounds
 
 /-!
@@ -40,6 +41,9 @@ by the intertwining criterion.
 `KanekoZagier.L3_comp_L2_eq_L2_comp_L3` depends.  `coeff_gtildeSeries_zero_pos` never uses the
 third-order equation, so it stays free of them, riding only on `coeff_L2`.
 
+The `PolynomialModel` section at the end is additive: it exhibits `G̃_w` as a modular form but
+nothing in `QExpansion` depends on it, so those axiom counts are unaffected.
+
 What remains unformalized is the identification of `gtildeSeries` with the paper's `G̃_w`: the
 recurrence itself is a theorem about the latter, and its derivation needs the uniqueness of the
 decomposition `G_w = G̃_{w-12} Δ 𝓛_S + Ψ_w`, an argument about modular functions for `Γ(2)` rather
@@ -56,16 +60,23 @@ hypotheses, but does not discharge it.
   `w = 4N`, with every hypothesis discharged.
 * `UncertaintyPrinciple.coeff_gtildeSeries_zero_pos`: the constant term stays strictly positive,
   which is what makes the resulting bound strict.
+* `UncertaintyPrinciple.delta_gtildeFam` and `qexp_gtildeFam`: `G̃_w` exhibited in the polynomial
+  model as a modular form of weight `4N`, with `δG̃_w = 0`.  This is the paper's assertion that
+  `G̃_{w-12}` is a level 1 modular form; nothing above depends on it.
 
 Weights are indexed by `N : ℕ` with `w = 4N`, so `w/4 + 1 = N + 1` and `w/4 + 2 = N + 2`.
 -/
 
-open ArithmeticFunction Finset KanekoZagier PowerSeries
-open scoped sigma
+open Finset PowerSeries
 
 namespace UncertaintyPrinciple
 
 noncomputable section
+
+section QExpansion
+
+open ArithmeticFunction KanekoZagier
+open scoped sigma
 
 /-! ### The operators and the recurrence step -/
 
@@ -360,6 +371,80 @@ theorem coeff_gtildeSeries_zero_pos (N : ℕ) : 0 < coeff 0 (gtildeSeries N) := 
     refine mul_pos (cG_pos hw0) ?_
     have := kappa2_G_neg (w := 4 * (N : ℝ)) (n := 0) hw0 (by push_cast; linarith)
     nlinarith [ih]
+
+end QExpansion
+
+section PolynomialModel
+
+open QuasiModular
+
+/-! ### `G̃` in the polynomial model
+
+The paper's `G̃_w` is a *modular* form of weight `w`, hence a polynomial in `E₄` and `E₆` with no
+`E₂` at all.  The reason is visible in the `δ`-calculus: `QuasiModular.delta_serreD` carries a
+correction `((w-k)/12)•G`, which vanishes exactly when the Serre derivative is taken at the form's
+own weight, and the `G̃` recurrence applies `∂_w` to `G̃_w`.  The `F` recurrence instead applies
+`∂_{w-2}` to `F_w`, off by its depth `2`, which is why `E₂` enters there and `F̃ := δF` is not zero.
+
+None of this is needed for the coefficient positivity above; it records the modularity that the
+`q`-expansion layer cannot state. -/
+
+/-- `-L_{2,w}^{α_w} = ((w+8)(w+9)/36)E₄ - ∂_w²` on the polynomial model. -/
+def SGp (w : ℝ) (G : QM) : QM :=
+  ((w + 8) * (w + 9) / 36 : ℝ) • (E₄ * G) - serreD (w + 2) (serreD w G)
+
+/-- The right-hand side of the recurrence for `G̃`, polynomially. -/
+def gtildeStepP (w : ℝ) (G : QM) : QM := cG w • SGp w G
+
+lemma qexp_SGp (w : ℝ) (G : QM) :
+    qexp (SGp w G) = -KanekoZagier.L2 w (alphaG w) (qexp G) := by
+  rw [SGp, KanekoZagier.L2_eq_serre, KanekoZagier.serreDIter_two, alphaG, map_sub, map_smul,
+    map_mul, qexp_E₄, qexp_serreD, qexp_serreD]
+  module
+
+lemma qexp_gtildeStepP (w : ℝ) (G : QM) :
+    qexp (gtildeStepP w G) = gtildeStep w (qexp G) := by
+  rw [gtildeStepP, gtildeStep, map_smul, qexp_SGp]
+
+lemma hasWeight_gtildeStepP {w : ℝ} {G : QM} (h : HasWeight G w) :
+    HasWeight (gtildeStepP w G) (w + 4) :=
+  HasWeight.smul _ <| HasWeight.sub
+    (HasWeight.congr_weight ((hasWeight_E₄.mul h).smul _) (by ring))
+    (HasWeight.congr_weight (hasWeight_serreD (w + 2) (hasWeight_serreD w h)) (by ring))
+
+/-- The family `G̃_{4N}` in the polynomial model. -/
+def gtildeFam : ℕ → QM
+  | 0 => (3 / 14336 : ℝ) • 1
+  | N + 1 => gtildeStepP (4 * (N : ℝ)) (gtildeFam N)
+
+lemma hasWeight_gtildeFam : ∀ N : ℕ, HasWeight (gtildeFam N) (4 * N)
+  | 0 => by
+    rw [gtildeFam, show (4 : ℝ) * ((0 : ℕ) : ℝ) = 0 by norm_num]
+    exact HasWeight.smul _ hasWeight_one
+  | N + 1 => HasWeight.congr_weight (hasWeight_gtildeStepP (hasWeight_gtildeFam N))
+      (by push_cast; ring)
+
+/-- **`G̃_w` has depth `0`**: it is a modular form, a polynomial in `E₄` and `E₆` alone.  This is
+the paper's assertion that `G̃_{w-12}` is a level 1 modular form. -/
+lemma delta_gtildeFam : ∀ N : ℕ, delta (gtildeFam N) = 0
+  | 0 => by simp [gtildeFam]
+  | N + 1 => by
+    have hw := hasWeight_gtildeFam N
+    have h1 : delta (serreD (4 * (N : ℝ)) (gtildeFam N)) = 0 := by
+      rw [delta_serreD _ hw, delta_gtildeFam N]
+      simp [serreD]
+    rw [gtildeFam, gtildeStepP, SGp, Derivation.map_smul, map_sub, Derivation.map_smul,
+      Derivation.leibniz, delta_E₄, delta_gtildeFam N,
+      delta_serreD _ (hasWeight_serreD _ hw), h1]
+    simp [serreD]
+
+/-- The polynomial family and the `q`-series one agree, so `gtildeSeries N` is the `q`-expansion of
+a modular form of weight `4N`. -/
+theorem qexp_gtildeFam : ∀ N : ℕ, qexp (gtildeFam N) = gtildeSeries N
+  | 0 => by rw [gtildeFam, gtildeSeries, gtilde₀, map_smul, map_one]
+  | N + 1 => by rw [gtildeFam, gtildeSeries, qexp_gtildeStepP, qexp_gtildeFam N]
+
+end PolynomialModel
 
 end
 
