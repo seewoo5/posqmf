@@ -210,8 +210,13 @@ theorem euler_delta : ⁅eulerOp, delta⁆ = (-2 : ℝ) • delta := by
 
 `⁅h, e⁆ = 2e`,   `⁅h, f⁆ = -2f`,   `⁅e, f⁆ = h`,
 
-which are `euler_D`, `euler_delta` and `sl2_lie_e_f` below.  The last is `delta_D` rescaled: `D`
-raises the weight by two, `δ` lowers it by two, and their bracket is the weight itself. -/
+stated below as `sl2_lie_h_e`, `sl2_lie_h_f` and `sl2_lie_e_f`.  The first is `euler_D` verbatim,
+since `e = D` needs no rescaling; the other two are `euler_delta` and `delta_D` rescaled.  Read
+together: `D` raises the weight by two, `δ` lowers it by two, and their bracket is the weight. -/
+
+/-- `⁅h, e⁆ = 2e` for `e = D`.  This is `euler_D`: unlike `f`, the raising operator needs no
+rescaling, so the two statements coincide. -/
+theorem sl2_lie_h_e : ⁅eulerOp, D⁆ = (2 : ℝ) • D := euler_D
 
 /-- `⁅h, f⁆ = -2f` for `f = -12δ`, the weight-lowering half of the triple. -/
 theorem sl2_lie_h_f : ⁅eulerOp, (-12 : ℝ) • delta⁆ = (-2 : ℝ) • ((-12 : ℝ) • delta) := by
