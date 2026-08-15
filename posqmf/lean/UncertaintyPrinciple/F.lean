@@ -703,29 +703,37 @@ theorem coeff_fSeries_eq_one (N : ℕ) : coeff (N + 1) (fSeries (N + 2)) = 1 := 
 
 /-! ### The conclusion -/
 
+/-- The recurrence in the form `ftildePos` wants it, with the weight `4(N+3) = 4N+12`. -/
+private lemma ftildeSeries_succ' (N : ℕ) : ftildeSeries (N + 3 + 1)
+    = ftildeStep (4 * (N : ℝ) + 12) (fSeries (N + 3)) (ftildeSeries (N + 3)) := by
+  rw [show (4 : ℝ) * (N : ℝ) + 12 = 4 * ((N + 3 : ℕ) : ℝ) by push_cast; ring]
+  exact ftildeSeries_succ (by omega)
+
 /-- **Positivity of the Fourier coefficients of `F̃_{w-2}`**, with every hypothesis of `ftildePos`
 discharged: the recurrence, the base case, the vanishing order and the normalisation are all proved
-from the definition of the `F_w` family in the polynomial model.  The weight is `w = 4(N+3)`, that
-is `w ≥ 12`. -/
-theorem coeff_ftildeSeries_pos (N j : ℕ) (hj1 : 1 ≤ j) (hj : j ≤ N + 1) :
-    0 < coeff j (ftildeSeries (N + 3)) :=
-  ftildePos (F := fun N ↦ fSeries (N + 3)) (Ft := fun N ↦ ftildeSeries (N + 3))
-    ftildeSeries_three
-    (fun N ↦ by
-      rw [show (4 : ℝ) * (N : ℝ) + 12 = 4 * ((N + 3 : ℕ) : ℝ) by push_cast; ring]
-      exact ftildeSeries_succ (by omega))
-    (fun N k hk ↦ coeff_fSeries_eq_zero (N + 3) k (by omega))
-    (fun N ↦ coeff_fSeries_eq_one (N + 1)) N j hj1 hj
+from the definition of the `F_w` family in the polynomial model.
 
-/-- The boundary estimate, likewise. -/
-theorem coeff_ftildeSeries_boundary (N : ℕ) : 1 / 360 ≤ coeff (N + 1) (ftildeSeries (N + 3)) :=
-  ftildeBoundary (F := fun N ↦ fSeries (N + 3)) (Ft := fun N ↦ ftildeSeries (N + 3))
-    ftildeSeries_three
-    (fun N ↦ by
-      rw [show (4 : ℝ) * (N : ℝ) + 12 = 4 * ((N + 3 : ℕ) : ℝ) by push_cast; ring]
-      exact ftildeSeries_succ (by omega))
+`ftildeSeries N` is `F̃_{4N-2}`, and the range `1 ≤ j ≤ N - 2` is the paper's `1 ≤ j ≤ w/4 - 3`. -/
+theorem coeff_ftildeSeries_pos (N j : ℕ) (hN : 2 ≤ N) (hj1 : 1 ≤ j) (hj : j ≤ N - 2) :
+    0 < coeff j (ftildeSeries N) := by
+  obtain ⟨M, rfl⟩ : ∃ M, N = M + 3 := ⟨N - 3, by omega⟩
+  exact ftildePos (F := fun N ↦ fSeries (N + 3)) (Ft := fun N ↦ ftildeSeries (N + 3))
+    ftildeSeries_three ftildeSeries_succ'
     (fun N k hk ↦ coeff_fSeries_eq_zero (N + 3) k (by omega))
-    (fun N ↦ coeff_fSeries_eq_one (N + 1)) N
+    (fun N ↦ coeff_fSeries_eq_one (N + 1)) M j hj1 (by omega)
+
+/-- **The boundary coefficient.**  `ã_{w/4-2} ≥ 1/360`, at the index `N - 2` of `F̃_{4N-2}`.
+
+Unlike the positivity range this one is not vacuous at small `N`, so `3 ≤ N` is needed: `F̃` is a
+cusp form, and at `N = 2` the statement would read `1/360 ≤ 0`. -/
+theorem coeff_ftildeSeries_boundary (N : ℕ) (hN : 3 ≤ N) :
+    1 / 360 ≤ coeff (N - 2) (ftildeSeries N) := by
+  obtain ⟨M, rfl⟩ : ∃ M, N = M + 3 := ⟨N - 3, by omega⟩
+  rw [show M + 3 - 2 = M + 1 by omega]
+  exact ftildeBoundary (F := fun N ↦ fSeries (N + 3)) (Ft := fun N ↦ ftildeSeries (N + 3))
+    ftildeSeries_three ftildeSeries_succ'
+    (fun N k hk ↦ coeff_fSeries_eq_zero (N + 3) k (by omega))
+    (fun N ↦ coeff_fSeries_eq_one (N + 1)) M
 
 end PolynomialModel
 
