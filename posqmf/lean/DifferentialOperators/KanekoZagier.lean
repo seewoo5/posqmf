@@ -27,16 +27,16 @@ noncomputable section
 `L_{2,k}^α = D² - ((k+1)/6)E₂D + (k(k+1)/12)E₂' + αE₄`.
 Taking `α = 0` recovers the classical operator `L_{2,k}` of Kaneko--Zagier. -/
 def L2 (k α : ℝ) (f : ℝ⟦X⟧) : ℝ⟦X⟧ :=
-  D (D f) - ((k + 1) / 6) • (E2 * D f) + (k * (k + 1) / 12) • (D E2 * f) + α • (E4 * f)
+  D (D f) - ((k + 1) / 6) • (E₂ * D f) + (k * (k + 1) / 12) • (D E₂ * f) + α • (E₄ * f)
 
 /-- The third-order Kaneko--Zagier operator in `D`-form:
 `L_{3,k}^{(α,β)} = D³ - ((k+2)/4)E₂D² + ((((k+1)(k+2))/4)E₂' + αE₄)D`
 `- ((k(k+1)(k+2)/24)E₂'' + (kα/4)E₄' - βE₆)`.
 Taking `α = β = 0` recovers `L_{3,k}` of Kaneko--Nagatomo--Sakai. -/
 def L3 (k α β : ℝ) (f : ℝ⟦X⟧) : ℝ⟦X⟧ :=
-  D (D (D f)) - ((k + 2) / 4) • (E2 * D (D f))
-    + (((k + 1) * (k + 2) / 4) • D E2 + α • E4) * D f
-    - ((k * (k + 1) * (k + 2) / 24) • D (D E2) + (k * α / 4) • D E4 - β • E6) * f
+  D (D (D f)) - ((k + 2) / 4) • (E₂ * D (D f))
+    + (((k + 1) * (k + 2) / 4) • D E₂ + α • E₄) * D f
+    - ((k * (k + 1) * (k + 2) / 24) • D (D E₂) + (k * α / 4) • D E₄ - β • E₆) * f
 
 @[simp] lemma L2_zero (k α : ℝ) : L2 k α 0 = 0 := by simp [L2]
 
@@ -48,18 +48,18 @@ lemma L3_smul (k α β c : ℝ) (f : ℝ⟦X⟧) : L3 k α β (c • f) = c • 
 
 /-- **Serre form of the second-order operator**: `L_{2,k}^α = ∂_k² - (k(k+2)/144 - α)E₄`. -/
 theorem L2_eq_serre (k α : ℝ) (f : ℝ⟦X⟧) :
-    L2 k α f = serreDIter k 2 f - (k * (k + 2) / 144 - α) • (E4 * f) := by
+    L2 k α f = serreDIter k 2 f - (k * (k + 2) / 144 - α) • (E₄ * f) := by
   rw [L2, serreD_two_eq]; module
 
 /-- **Serre form of the third-order operator** (item 1.1 of the verification plan):
 `L_{3,k}^{(α,β)} = ∂_k³ + (α - (3k²+12k+8)/144)E₄∂_k + (β + kα/12 - k²(k+3)/864)E₆`. -/
 theorem L3_eq_serre (k α β : ℝ) (f : ℝ⟦X⟧) :
-    L3 k α β f = serreDIter k 3 f + (α - (3 * k ^ 2 + 12 * k + 8) / 144) • (E4 * serreD k f)
-      + (β + k * α / 12 - k ^ 2 * (k + 3) / 864) • (E6 * f) := by
+    L3 k α β f = serreDIter k 3 f + (α - (3 * k ^ 2 + 12 * k + 8) / 144) • (E₄ * serreD k f)
+      + (β + k * α / 12 - k ^ 2 * (k + 3) / 864) • (E₆ * f) := by
   rw [L3, serreD_three_eq, serreD]
   simp only [smul_sub, smul_smul, smul_mul_assoc, mul_smul_comm, mul_sub, mul_add,
     add_mul, sub_mul]
-  rw [show E4 * (E2 * f) = E2 * E4 * f by ring, E2_mul_E4]
+  rw [show E₄ * (E₂ * f) = E₂ * E₄ * f by ring, E₂_mul_E₄]
   simp only [smul_add, add_mul, smul_mul_assoc, smul_smul]
   ring_nf
   module

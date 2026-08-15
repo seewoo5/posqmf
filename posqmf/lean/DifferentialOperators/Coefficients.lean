@@ -58,8 +58,8 @@ theorem coeff_L2 (k α : ℝ) (G : ℝ⟦X⟧) (n : ℕ) :
     rw [K2, Nat.cast_sub hj.le]
     ring
   rw [L2, kappa2, hsum]
-  simp only [map_add, map_sub, PowerSeries.coeff_smul, smul_eq_mul, coeff_D, coeff_E2_mul,
-    coeff_D_E2_mul, coeff_E4_mul]
+  simp only [map_add, map_sub, PowerSeries.coeff_smul, smul_eq_mul, coeff_D, coeff_E₂_mul,
+    coeff_D_E₂_mul, coeff_E₄_mul]
   ring
 
 /-- **Coefficients of the third-order operator** (item 1.3 of the verification plan).
@@ -86,8 +86,8 @@ theorem coeff_L3 (k α β : ℝ) (G : ℝ⟦X⟧) (n : ℕ) :
     ring
   rw [L3, kappa3, hsum]
   simp only [add_mul, sub_mul, smul_mul_assoc, map_add, map_sub, PowerSeries.coeff_smul,
-    smul_eq_mul, coeff_D, coeff_E2_mul, coeff_E4_mul, coeff_E6_mul, coeff_D_E2_mul,
-    coeff_D_D_E2_mul, coeff_D_E4_mul]
+    smul_eq_mul, coeff_D, coeff_E₂_mul, coeff_E₄_mul, coeff_E₆_mul, coeff_D_E₂_mul,
+    coeff_D_D_E₂_mul, coeff_D_E₄_mul]
   ring
 
 end

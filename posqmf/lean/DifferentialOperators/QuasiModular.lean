@@ -41,51 +41,51 @@ abbrev QM := MvPolynomial (Fin 3) ℝ
 noncomputable section
 
 /-- The generator `E₂`. -/
-def E2 : QM := X 0
+def E₂ : QM := X 0
 
 /-- The generator `E₄`. -/
-def E4 : QM := X 1
+def E₄ : QM := X 1
 
 /-- The generator `E₆`. -/
-def E6 : QM := X 2
+def E₆ : QM := X 2
 
 /-! ### The derivation `D` -/
 
 /-- Ramanujan's identities, read as the values of `D` on the three generators. -/
 def dGen : Fin 3 → QM
-  | 0 => (1 / 12 : ℝ) • (E2 * E2 - E4)
-  | 1 => (1 / 3 : ℝ) • (E2 * E4 - E6)
-  | 2 => (1 / 2 : ℝ) • (E2 * E6 - E4 * E4)
+  | 0 => (1 / 12 : ℝ) • (E₂ * E₂ - E₄)
+  | 1 => (1 / 3 : ℝ) • (E₂ * E₄ - E₆)
+  | 2 => (1 / 2 : ℝ) • (E₂ * E₆ - E₄ * E₄)
 
 /-- `D = q d/dq` on the polynomial model: the derivation determined by Ramanujan's identities. -/
 def D : Derivation ℝ QM QM := mkDerivation ℝ dGen
 
-@[simp] lemma D_E2 : D E2 = (1 / 12 : ℝ) • (E2 * E2 - E4) := mkDerivation_X ℝ dGen 0
+@[simp] lemma D_E₂ : D E₂ = (1 / 12 : ℝ) • (E₂ * E₂ - E₄) := mkDerivation_X ℝ dGen 0
 
-@[simp] lemma D_E4 : D E4 = (1 / 3 : ℝ) • (E2 * E4 - E6) := mkDerivation_X ℝ dGen 1
+@[simp] lemma D_E₄ : D E₄ = (1 / 3 : ℝ) • (E₂ * E₄ - E₆) := mkDerivation_X ℝ dGen 1
 
-@[simp] lemma D_E6 : D E6 = (1 / 2 : ℝ) • (E2 * E6 - E4 * E4) := mkDerivation_X ℝ dGen 2
+@[simp] lemma D_E₆ : D E₆ = (1 / 2 : ℝ) • (E₂ * E₆ - E₄ * E₄) := mkDerivation_X ℝ dGen 2
 
 /-! ### `δ`, the Euler operator, and weights -/
 
 /-- `δ = ∂/∂E₂`, the operator extracting the depth filtration. -/
 def delta : Derivation ℝ QM QM := pderiv 0
 
-@[simp] lemma delta_E2 : delta E2 = 1 := by simp [delta, E2]
+@[simp] lemma delta_E₂ : delta E₂ = 1 := by simp [delta, E₂]
 
-@[simp] lemma delta_E4 : delta E4 = 0 := by simp [delta, E4]
+@[simp] lemma delta_E₄ : delta E₄ = 0 := by simp [delta, E₄]
 
-@[simp] lemma delta_E6 : delta E6 = 0 := by simp [delta, E6]
+@[simp] lemma delta_E₆ : delta E₆ = 0 := by simp [delta, E₆]
 
 /-- The weighted Euler operator `2E₂∂/∂E₂ + 4E₄∂/∂E₄ + 6E₆∂/∂E₆`. -/
 def eulerOp : Derivation ℝ QM QM :=
-  ((2 : ℝ) • E2) • pderiv 0 + ((4 : ℝ) • E4) • pderiv 1 + ((6 : ℝ) • E6) • pderiv 2
+  ((2 : ℝ) • E₂) • pderiv 0 + ((4 : ℝ) • E₄) • pderiv 1 + ((6 : ℝ) • E₆) • pderiv 2
 
-@[simp] lemma eulerOp_E2 : eulerOp E2 = (2 : ℝ) • E2 := by simp [eulerOp, E2, E4, E6]
+@[simp] lemma eulerOp_E₂ : eulerOp E₂ = (2 : ℝ) • E₂ := by simp [eulerOp, E₂, E₄, E₆]
 
-@[simp] lemma eulerOp_E4 : eulerOp E4 = (4 : ℝ) • E4 := by simp [eulerOp, E2, E4, E6]
+@[simp] lemma eulerOp_E₄ : eulerOp E₄ = (4 : ℝ) • E₄ := by simp [eulerOp, E₂, E₄, E₆]
 
-@[simp] lemma eulerOp_E6 : eulerOp E6 = (6 : ℝ) • E6 := by simp [eulerOp, E2, E4, E6]
+@[simp] lemma eulerOp_E₆ : eulerOp E₆ = (6 : ℝ) • E₆ := by simp [eulerOp, E₂, E₄, E₆]
 
 /-- `G` is weighted homogeneous of weight `w`, expressed through the Euler operator. -/
 def HasWeight (G : QM) (w : ℝ) : Prop := eulerOp G = w • G
@@ -116,31 +116,41 @@ accumulates when weights are added up. -/
 lemma HasWeight.congr_weight {G : QM} {a b : ℝ} (h : HasWeight G a) (hab : a = b) : HasWeight G b :=
   hab ▸ h
 
-lemma hasWeight_E2 : HasWeight E2 2 := eulerOp_E2
+lemma hasWeight_one : HasWeight (1 : QM) 0 := by simp [HasWeight]
 
-lemma hasWeight_E4 : HasWeight E4 4 := eulerOp_E4
+lemma HasWeight.pow {G : QM} {a : ℝ} (hG : HasWeight G a) (n : ℕ) :
+    HasWeight (G ^ n) (n * a) := by
+  induction n with
+  | zero => simpa using hasWeight_one
+  | succ n ih =>
+    rw [pow_succ]
+    exact HasWeight.congr_weight (ih.mul hG) (by push_cast; ring)
 
-lemma hasWeight_E6 : HasWeight E6 6 := eulerOp_E6
+lemma hasWeight_E₂ : HasWeight E₂ 2 := eulerOp_E₂
+
+lemma hasWeight_E₄ : HasWeight E₄ 4 := eulerOp_E₄
+
+lemma hasWeight_E₆ : HasWeight E₆ 6 := eulerOp_E₆
 
 /-! ### The two commutator identities -/
 
 /-- `⁅eulerOp, D⁆ = 2D`: the operator `D` raises the weight by `2`. -/
 theorem euler_D : ⁅eulerOp, D⁆ = (2 : ℝ) • D := by
   refine derivation_ext fun i ↦ ?_
-  have h0 : ⁅eulerOp, D⁆ E2 = ((2 : ℝ) • D) E2 := by
-    rw [Derivation.commutator_apply, Derivation.smul_apply, D_E2, eulerOp_E2]
-    simp only [Derivation.map_smul, map_sub, Derivation.leibniz, D_E2, eulerOp_E2, eulerOp_E4,
+  have h0 : ⁅eulerOp, D⁆ E₂ = ((2 : ℝ) • D) E₂ := by
+    rw [Derivation.commutator_apply, Derivation.smul_apply, D_E₂, eulerOp_E₂]
+    simp only [Derivation.map_smul, map_sub, Derivation.leibniz, D_E₂, eulerOp_E₂, eulerOp_E₄,
       smul_eq_mul, mul_smul_comm]
     module
-  have h1 : ⁅eulerOp, D⁆ E4 = ((2 : ℝ) • D) E4 := by
-    rw [Derivation.commutator_apply, Derivation.smul_apply, D_E4, eulerOp_E4]
-    simp only [Derivation.map_smul, map_sub, Derivation.leibniz, D_E4, eulerOp_E2, eulerOp_E4,
-      eulerOp_E6, smul_eq_mul, mul_smul_comm, mul_comm E4 E2]
+  have h1 : ⁅eulerOp, D⁆ E₄ = ((2 : ℝ) • D) E₄ := by
+    rw [Derivation.commutator_apply, Derivation.smul_apply, D_E₄, eulerOp_E₄]
+    simp only [Derivation.map_smul, map_sub, Derivation.leibniz, D_E₄, eulerOp_E₂, eulerOp_E₄,
+      eulerOp_E₆, smul_eq_mul, mul_smul_comm, mul_comm E₄ E₂]
     module
-  have h2 : ⁅eulerOp, D⁆ E6 = ((2 : ℝ) • D) E6 := by
-    rw [Derivation.commutator_apply, Derivation.smul_apply, D_E6, eulerOp_E6]
-    simp only [Derivation.map_smul, map_sub, Derivation.leibniz, D_E6, eulerOp_E2, eulerOp_E4,
-      eulerOp_E6, smul_eq_mul, mul_smul_comm, mul_comm E6 E2]
+  have h2 : ⁅eulerOp, D⁆ E₆ = ((2 : ℝ) • D) E₆ := by
+    rw [Derivation.commutator_apply, Derivation.smul_apply, D_E₆, eulerOp_E₆]
+    simp only [Derivation.map_smul, map_sub, Derivation.leibniz, D_E₆, eulerOp_E₂, eulerOp_E₄,
+      eulerOp_E₆, smul_eq_mul, mul_smul_comm, mul_comm E₆ E₂]
     module
   fin_cases i
   · exact h0
@@ -150,19 +160,19 @@ theorem euler_D : ⁅eulerOp, D⁆ = (2 : ℝ) • D := by
 /-- `⁅δ, D⁆ = (1/12) eulerOp`, the `sl₂`-relation of Kaneko--Koike. -/
 theorem delta_D : ⁅delta, D⁆ = (1 / 12 : ℝ) • eulerOp := by
   refine derivation_ext fun i ↦ ?_
-  have h0 : ⁅delta, D⁆ E2 = ((1 / 12 : ℝ) • eulerOp) E2 := by
-    rw [Derivation.commutator_apply, Derivation.smul_apply, D_E2, delta_E2, eulerOp_E2]
-    simp only [Derivation.map_smul, map_sub, Derivation.leibniz, delta_E2, delta_E4,
+  have h0 : ⁅delta, D⁆ E₂ = ((1 / 12 : ℝ) • eulerOp) E₂ := by
+    rw [Derivation.commutator_apply, Derivation.smul_apply, D_E₂, delta_E₂, eulerOp_E₂]
+    simp only [Derivation.map_smul, map_sub, Derivation.leibniz, delta_E₂, delta_E₄,
       Derivation.map_one_eq_zero, smul_eq_mul, mul_one]
     module
-  have h1 : ⁅delta, D⁆ E4 = ((1 / 12 : ℝ) • eulerOp) E4 := by
-    rw [Derivation.commutator_apply, Derivation.smul_apply, D_E4, delta_E4, eulerOp_E4]
-    simp only [Derivation.map_smul, map_sub, Derivation.leibniz, delta_E2, delta_E4, delta_E6,
+  have h1 : ⁅delta, D⁆ E₄ = ((1 / 12 : ℝ) • eulerOp) E₄ := by
+    rw [Derivation.commutator_apply, Derivation.smul_apply, D_E₄, delta_E₄, eulerOp_E₄]
+    simp only [Derivation.map_smul, map_sub, Derivation.leibniz, delta_E₂, delta_E₄, delta_E₆,
       map_zero, smul_eq_mul, mul_one, mul_zero]
     module
-  have h2 : ⁅delta, D⁆ E6 = ((1 / 12 : ℝ) • eulerOp) E6 := by
-    rw [Derivation.commutator_apply, Derivation.smul_apply, D_E6, delta_E6, eulerOp_E6]
-    simp only [Derivation.map_smul, map_sub, Derivation.leibniz, delta_E2, delta_E4, delta_E6,
+  have h2 : ⁅delta, D⁆ E₆ = ((1 / 12 : ℝ) • eulerOp) E₆ := by
+    rw [Derivation.commutator_apply, Derivation.smul_apply, D_E₆, delta_E₆, eulerOp_E₆]
+    simp only [Derivation.map_smul, map_sub, Derivation.leibniz, delta_E₂, delta_E₄, delta_E₆,
       map_zero, smul_eq_mul, mul_one, mul_zero]
     module
   fin_cases i
@@ -192,7 +202,7 @@ theorem D_delta {G : QM} {w : ℝ} (h : HasWeight G w) :
 /-! ### The Serre derivative on the polynomial model -/
 
 /-- The Serre derivative `∂_k G = DG - (k/12)E₂G` on the polynomial model. -/
-def serreD (k : ℝ) (G : QM) : QM := D G - (k / 12 : ℝ) • (E2 * G)
+def serreD (k : ℝ) (G : QM) : QM := D G - (k / 12 : ℝ) • (E₂ * G)
 
 lemma serreD_add (k : ℝ) (G H : QM) : serreD k (G + H) = serreD k G + serreD k H := by
   simp only [serreD, map_add, mul_add, smul_add]; abel
@@ -211,7 +221,7 @@ lemma serreD_collapse (w : ℝ) (G : QM) :
 
 lemma hasWeight_serreD {G : QM} {w : ℝ} (k : ℝ) (h : HasWeight G w) :
     HasWeight (serreD k G) (w + 2) :=
-  (hasWeight_D h).sub (HasWeight.congr_weight ((hasWeight_E2.mul h).smul (k / 12)) (by ring))
+  (hasWeight_D h).sub (HasWeight.congr_weight ((hasWeight_E₂.mul h).smul (k / 12)) (by ring))
 
 /-- **`lem:delta_serre`**: `δ(∂_k G) = ∂_k(δG) + ((w-k)/12)G` for `G` of weight `w`. -/
 theorem delta_serreD {G : QM} {w : ℝ} (k : ℝ) (h : HasWeight G w) :
@@ -221,7 +231,7 @@ theorem delta_serreD {G : QM} {w : ℝ} (k : ℝ) (h : HasWeight G w) :
     rw [sub_eq_iff_eq_add] at h1
     rw [h1]
     module
-  simp only [serreD, map_sub, Derivation.map_smul, Derivation.leibniz, delta_E2, smul_eq_mul,
+  simp only [serreD, map_sub, Derivation.map_smul, Derivation.leibniz, delta_E₂, smul_eq_mul,
     mul_one]
   rw [hD]
   module
@@ -231,8 +241,8 @@ theorem delta_serreD {G : QM} {w : ℝ} (k : ℝ) (h : HasWeight G w) :
 There are two families of objects called `E₂`, `E₄`, `E₆` in this development, and they are
 genuinely different:
 
-* `KanekoZagier.E2 : ℝ⟦X⟧` is the concrete divisor-sum series `1 - 24∑σ₁(n)qⁿ`;
-* `QuasiModular.E2 : QM` is an indeterminate of a polynomial ring, carrying no `q`-expansion.
+* `KanekoZagier.E₂ : ℝ⟦X⟧` is the concrete divisor-sum series `1 - 24∑σ₁(n)qⁿ`;
+* `QuasiModular.E₂ : QM` is an indeterminate of a polynomial ring, carrying no `q`-expansion.
 
 They are related, but not equal, by the evaluation map `qexp` below.  Identifying them would
 require `qexp` to be injective, i.e. the algebraic independence of `E₂`, `E₄`, `E₆` over `ℝ`,
@@ -250,27 +260,27 @@ operator with no counterpart is `δ` itself: that is the whole point of the poly
 /-- The `q`-expansion homomorphism `ℝ[E₂,E₄,E₆] → ℝ⟦X⟧`, sending each generator to the
 corresponding divisor-sum series. -/
 def qexp : QM →ₐ[ℝ] PowerSeries ℝ :=
-  aeval ![KanekoZagier.E2, KanekoZagier.E4, KanekoZagier.E6]
+  aeval ![KanekoZagier.E₂, KanekoZagier.E₄, KanekoZagier.E₆]
 
-@[simp] lemma qexp_E2 : qexp E2 = KanekoZagier.E2 := by simp [qexp, E2]
+@[simp] lemma qexp_E₂ : qexp E₂ = KanekoZagier.E₂ := by simp [qexp, E₂]
 
-@[simp] lemma qexp_E4 : qexp E4 = KanekoZagier.E4 := by simp [qexp, E4]
+@[simp] lemma qexp_E₄ : qexp E₄ = KanekoZagier.E₄ := by simp [qexp, E₄]
 
-@[simp] lemma qexp_E6 : qexp E6 = KanekoZagier.E6 := by simp [qexp, E6]
+@[simp] lemma qexp_E₆ : qexp E₆ = KanekoZagier.E₆ := by simp [qexp, E₆]
 
 /-- **Ramanujan's identities, packaged.**  The values of the polynomial `D` on the generators
 evaluate to the derivatives of the corresponding `q`-series.  This single statement is what the
 three axioms of `Ramanujan.lean` amount to, and it is the only place they are used here. -/
 theorem qexp_dGen (i : Fin 3) : qexp (dGen i) = KanekoZagier.D (qexp (X i)) := by
-  have h0 : qexp (dGen 0) = KanekoZagier.D (qexp E2) := by
-    rw [show dGen 0 = (1 / 12 : ℝ) • (E2 * E2 - E4) from rfl, qexp_E2,
-      KanekoZagier.ramanujan_E2, map_smul, map_sub, map_mul, qexp_E2, qexp_E4]
-  have h1 : qexp (dGen 1) = KanekoZagier.D (qexp E4) := by
-    rw [show dGen 1 = (1 / 3 : ℝ) • (E2 * E4 - E6) from rfl, qexp_E4,
-      KanekoZagier.ramanujan_E4, map_smul, map_sub, map_mul, qexp_E2, qexp_E4, qexp_E6]
-  have h2 : qexp (dGen 2) = KanekoZagier.D (qexp E6) := by
-    rw [show dGen 2 = (1 / 2 : ℝ) • (E2 * E6 - E4 * E4) from rfl, qexp_E6,
-      KanekoZagier.ramanujan_E6, map_smul, map_sub, map_mul, map_mul, qexp_E2, qexp_E4, qexp_E6]
+  have h0 : qexp (dGen 0) = KanekoZagier.D (qexp E₂) := by
+    rw [show dGen 0 = (1 / 12 : ℝ) • (E₂ * E₂ - E₄) from rfl, qexp_E₂,
+      KanekoZagier.ramanujan_E₂, map_smul, map_sub, map_mul, qexp_E₂, qexp_E₄]
+  have h1 : qexp (dGen 1) = KanekoZagier.D (qexp E₄) := by
+    rw [show dGen 1 = (1 / 3 : ℝ) • (E₂ * E₄ - E₆) from rfl, qexp_E₄,
+      KanekoZagier.ramanujan_E₄, map_smul, map_sub, map_mul, qexp_E₂, qexp_E₄, qexp_E₆]
+  have h2 : qexp (dGen 2) = KanekoZagier.D (qexp E₆) := by
+    rw [show dGen 2 = (1 / 2 : ℝ) • (E₂ * E₆ - E₄ * E₄) from rfl, qexp_E₆,
+      KanekoZagier.ramanujan_E₆, map_smul, map_sub, map_mul, map_mul, qexp_E₂, qexp_E₄, qexp_E₆]
   fin_cases i
   · exact h0
   · exact h1
@@ -290,7 +300,7 @@ theorem qexp_dGen (i : Fin 3) : qexp (dGen i) = KanekoZagier.D (qexp (X i)) := b
 /-- The `q`-expansion map intertwines the two Serre derivatives. -/
 @[simp] theorem qexp_serreD (k : ℝ) (p : QM) :
     qexp (serreD k p) = KanekoZagier.serreD k (qexp p) := by
-  rw [serreD, KanekoZagier.serreD, map_sub, map_smul, map_mul, qexp_D, qexp_E2]
+  rw [serreD, KanekoZagier.serreD, map_sub, map_smul, map_mul, qexp_D, qexp_E₂]
 
 end
 

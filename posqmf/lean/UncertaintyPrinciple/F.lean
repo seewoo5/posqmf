@@ -46,7 +46,7 @@ Weights are indexed by `N : ℕ` with `w = 4N + 12`, so that `w/4 - 3 = N`, `w/4
   the inequality controlling the boundary coefficient.
 * `UncertaintyPrinciple.delta_fStep` and `qexp_delta_fStep`: the recurrence for `F̃`, in the
   polynomial model and on `q`-expansions.
-* `UncertaintyPrinciple.mlde`: the third-order equation `L_{3,w-2}^{((w-4)/4,0)}F_w = 0`, proved by
+* `UncertaintyPrinciple.mldeF`: the third-order equation `L_{3,w-2}^{((w-4)/4,0)}F_w = 0`, proved by
   the intertwining criterion from an explicit check on `F₁₂`.
 * `UncertaintyPrinciple.coeff_fSeries_eq_zero` and `coeff_fSeries_eq_one`: the vanishing order and
   the normalisation of `F_w`.
@@ -69,7 +69,7 @@ section QExpansion
 open ArithmeticFunction KanekoZagier
 open scoped sigma
 
-/-! ### The operator `𝒮_w` and the recurrence step -/
+/-! ### The operators and the recurrence step -/
 
 /-- `α_w = -(w-10)(w-4)/48`, the parameter for which `𝒮_w = -L_{2,w-2}^{α_w}`. -/
 def alphaF (w : ℝ) : ℝ := -((w - 10) * (w - 4)) / 48
@@ -98,13 +98,15 @@ lemma K2_F (w : ℝ) (n j : ℕ) :
         - 5 * (w - 10) * (w - 4) * (σ 3 (n - j) : ℝ) := by
   rw [K2, alphaF]; ring
 
-private lemma denom_pos {w : ℝ} (hw : 12 ≤ w) :
+private lemma denomF_pos {w : ℝ} (hw : 12 ≤ w) :
     0 < 16 * (w - 10) * (w - 5) * (w - 3) * (w + 2) :=
   mul_pos (mul_pos (mul_pos (mul_pos (by norm_num) (by linarith)) (by linarith))
     (by linarith)) (by linarith)
 
 lemma cF_pos {w : ℝ} (hw : 12 ≤ w) : 0 < cF w :=
-  div_pos (mul_pos (mul_pos (by norm_num) (by linarith)) (by linarith)) (denom_pos hw)
+  div_pos (mul_pos (mul_pos (by norm_num) (by linarith)) (by linarith)) (denomF_pos hw)
+
+/-! ### Signs on the interior range -/
 
 /-- On the range `1 ≤ n ≤ w/4 - 2` the diagonal coefficient is negative. -/
 lemma kappa2_F_neg {w : ℝ} {n : ℕ} (hw : 12 ≤ w) (hn1 : 1 ≤ n) (hn : 4 * (n : ℝ) ≤ w - 8) :
@@ -153,7 +155,7 @@ lemma K2_F_boundary {N : ℕ} {w : ℝ} (hw : w = 4 * N + 12) :
 `(w-6)(w-4)w(2w-17) / (640(w-10)(w-5)(w-3)(w+2))`, which is again at least `1/360`. -/
 theorem boundary_bound {w : ℝ} (hw : 12 ≤ w) :
     1 / 360 ≤ cF w * ((6 * w ^ 2 - 67 * w + 196) / 360 - (2 * w - 11) / 36) := by
-  rw [cF, div_mul_eq_mul_div, le_div_iff₀ (denom_pos hw)]
+  rw [cF, div_mul_eq_mul_div, le_div_iff₀ (denomF_pos hw)]
   nlinarith [quartic_nonneg hw]
 
 /-! ### Coefficients of the recurrence step -/
@@ -168,7 +170,7 @@ lemma coeff_ftildeStep (w : ℝ) (F Ft : ℝ⟦X⟧) (n : ℕ) :
   rw [ftildeStep, PowerSeries.coeff_smul, smul_eq_mul, map_sub, PowerSeries.coeff_smul,
     smul_eq_mul, SF, map_neg, coeff_L2, coeff_serreD]
 
-/-! ### One induction step -/
+/-! ### One induction step, interior range -/
 
 private lemma weight_ge {N : ℕ} {w : ℝ} (hw : w = 4 * N + 12) : 12 ≤ w := by
   rw [hw]; have : 0 ≤ (N : ℝ) := Nat.cast_nonneg N; linarith
@@ -209,6 +211,8 @@ theorem ftildeStep_pos {N : ℕ} {w : ℝ} (hw : w = 4 * N + 12) {F Ft : ℝ⟦X
   exact mul_pos (cF_pos (weight_ge hw))
     (by linarith [K_sum_nonpos hw hFt0 hpos (n := n) (m := n) (by omega) le_rfl])
 
+/-! ### One induction step, boundary index -/
+
 /-- **One induction step, boundary index.**  At `n = w/4 - 1` the diagonal coefficient vanishes,
 `F_w` contributes `-(2w-11)/36`, and the single surviving `K`-term carries the `1/360` forward. -/
 theorem ftildeStep_boundary {N : ℕ} {w : ℝ} (hw : w = 4 * N + 12) {F Ft : ℝ⟦X⟧}
@@ -241,49 +245,49 @@ theorem ftildeStep_boundary {N : ℕ} {w : ℝ} (hw : w = 4 * N + 12) {F Ft : �
 
 /-! ### The base case `F̃₁₀ = (1/360) E₄ X_{6,1}` -/
 
-private lemma coeff_E4_of_pos {m : ℕ} (hm : 1 ≤ m) : coeff m E4 = 240 * (σ 3 m : ℝ) := by
-  rw [E4, map_add, PowerSeries.coeff_smul, smul_eq_mul, coeff_qSigma, PowerSeries.coeff_one,
+private lemma coeff_E₄_of_pos {m : ℕ} (hm : 1 ≤ m) : coeff m E₄ = 240 * (σ 3 m : ℝ) := by
+  rw [E₄, map_add, PowerSeries.coeff_smul, smul_eq_mul, coeff_qSigma, PowerSeries.coeff_one,
     if_neg (by omega), zero_add]
 
-private lemma coeff_E4_nonneg (m : ℕ) : 0 ≤ coeff m E4 := by
-  rw [E4, map_add, PowerSeries.coeff_smul, smul_eq_mul, coeff_qSigma, PowerSeries.coeff_one]
+private lemma coeff_E₄_nonneg (m : ℕ) : 0 ≤ coeff m E₄ := by
+  rw [E₄, map_add, PowerSeries.coeff_smul, smul_eq_mul, coeff_qSigma, PowerSeries.coeff_one]
   split_ifs <;> positivity
 
 /-- `F̃₁₀ = (1/360)E₄X_{6,1}`, where `X_{6,1} = ∑_{n ≥ 1} nσ₃(n)qⁿ = E₄'/240`. -/
-def ftilde10 : ℝ⟦X⟧ := (1 / 86400 : ℝ) • (E4 * D E4)
+def ftilde₁₀ : ℝ⟦X⟧ := (1 / 86400 : ℝ) • (E₄ * D E₄)
 
 @[simp]
-lemma coeff_ftilde10_zero : coeff 0 ftilde10 = 0 := by
-  rw [ftilde10, PowerSeries.coeff_smul, smul_eq_mul, coeff_E4_mul]
+lemma coeff_ftilde₁₀_zero : coeff 0 ftilde₁₀ = 0 := by
+  rw [ftilde₁₀, PowerSeries.coeff_smul, smul_eq_mul, coeff_E₄_mul]
   simp
 
-lemma coeff_ftilde10_one : coeff 1 ftilde10 = 1 / 360 := by
-  rw [ftilde10, PowerSeries.coeff_smul, smul_eq_mul, coeff_E4_mul, coeff_D,
-    coeff_E4_of_pos le_rfl]
+lemma coeff_ftilde₁₀_one : coeff 1 ftilde₁₀ = 1 / 360 := by
+  rw [ftilde₁₀, PowerSeries.coeff_smul, smul_eq_mul, coeff_E₄_mul, coeff_D,
+    coeff_E₄_of_pos le_rfl]
   norm_num
 
 /-- `F̃₁₀` is completely positive: every Fourier coefficient of index `≥ 1` is positive. -/
-theorem ftilde10_pos {n : ℕ} (hn : 1 ≤ n) : 0 < coeff n ftilde10 := by
-  rw [ftilde10, PowerSeries.coeff_smul, smul_eq_mul, coeff_E4_mul, coeff_D, coeff_E4_of_pos hn]
-  have hsum : 0 ≤ ∑ j ∈ range n, (σ 3 (n - j) : ℝ) * coeff j (D E4) :=
+theorem ftilde₁₀_pos {n : ℕ} (hn : 1 ≤ n) : 0 < coeff n ftilde₁₀ := by
+  rw [ftilde₁₀, PowerSeries.coeff_smul, smul_eq_mul, coeff_E₄_mul, coeff_D, coeff_E₄_of_pos hn]
+  have hsum : 0 ≤ ∑ j ∈ range n, (σ 3 (n - j) : ℝ) * coeff j (D E₄) :=
     Finset.sum_nonneg fun j _ ↦ by
       rw [coeff_D]
-      have := coeff_E4_nonneg j
+      have := coeff_E₄_nonneg j
       positivity
   have hn' : 1 ≤ (n : ℝ) := by exact_mod_cast hn
   nlinarith [one_le_sigma (k := 3) hn]
 
 /-! ### The induction -/
 
-private lemma ftilde_induction {F Ft : ℕ → ℝ⟦X⟧} (hbase : Ft 0 = ftilde10)
+private lemma ftilde_induction {F Ft : ℕ → ℝ⟦X⟧} (hbase : Ft 0 = ftilde₁₀)
     (hrec : ∀ N, Ft (N + 1) = ftildeStep (4 * (N : ℝ) + 12) (F N) (Ft N))
     (hF0 : ∀ N k, k ≤ N + 1 → coeff k (F N) = 0) (hF1 : ∀ N, coeff (N + 2) (F N) = 1) (N : ℕ) :
     coeff 0 (Ft N) = 0 ∧ (∀ j, 1 ≤ j → j ≤ N + 1 → 0 < coeff j (Ft N))
       ∧ 1 / 360 ≤ coeff (N + 1) (Ft N) := by
   induction N with
   | zero =>
-    exact ⟨by simp [hbase], fun j hj1 _ ↦ hbase ▸ ftilde10_pos hj1,
-      by rw [hbase, coeff_ftilde10_one]⟩
+    exact ⟨by simp [hbase], fun j hj1 _ ↦ hbase ▸ ftilde₁₀_pos hj1,
+      by rw [hbase, coeff_ftilde₁₀_one]⟩
   | succ N ih =>
     obtain ⟨hcusp, hpos, hbdry⟩ := ih
     have hstepPos : ∀ j, 1 ≤ j → j ≤ N + 1 → 0 < coeff j (Ft (N + 1)) := fun j hj1 hj ↦ by
@@ -298,7 +302,7 @@ private lemma ftilde_induction {F Ft : ℕ → ℝ⟦X⟧} (hbase : Ft 0 = ftild
 
 /-- **Positivity of the interior coefficients.**  For `w = 4N + 12`, every Fourier coefficient
 `ã_j` of `F̃_{w-2}` with `1 ≤ j ≤ w/4 - 3 = N` is positive. -/
-theorem ftildePos {F Ft : ℕ → ℝ⟦X⟧} (hbase : Ft 0 = ftilde10)
+theorem ftildePos {F Ft : ℕ → ℝ⟦X⟧} (hbase : Ft 0 = ftilde₁₀)
     (hrec : ∀ N, Ft (N + 1) = ftildeStep (4 * (N : ℝ) + 12) (F N) (Ft N))
     (hF0 : ∀ N k, k ≤ N + 1 → coeff k (F N) = 0) (hF1 : ∀ N, coeff (N + 2) (F N) = 1)
     (N j : ℕ) (hj1 : 1 ≤ j) (hj : j ≤ N + 1) : 0 < coeff j (Ft N) :=
@@ -306,7 +310,7 @@ theorem ftildePos {F Ft : ℕ → ℝ⟦X⟧} (hbase : Ft 0 = ftilde10)
 
 /-- **The boundary coefficient.**  For `w = 4N + 12`, the coefficient `ã_{w/4-2} = ã_{N+1}` of
 `F̃_{w-2}` is at least `1/360`. -/
-theorem ftildeBoundary {F Ft : ℕ → ℝ⟦X⟧} (hbase : Ft 0 = ftilde10)
+theorem ftildeBoundary {F Ft : ℕ → ℝ⟦X⟧} (hbase : Ft 0 = ftilde₁₀)
     (hrec : ∀ N, Ft (N + 1) = ftildeStep (4 * (N : ℝ) + 12) (F N) (Ft N))
     (hF0 : ∀ N k, k ≤ N + 1 → coeff k (F N) = 0) (hF1 : ∀ N, coeff (N + 2) (F N) = 1)
     (N : ℕ) : 1 / 360 ≤ coeff (N + 1) (Ft N) :=
@@ -315,11 +319,11 @@ theorem ftildeBoundary {F Ft : ℕ → ℝ⟦X⟧} (hbase : Ft 0 = ftilde10)
 /-- The hypotheses of `ftildePos` and `ftildeBoundary` are satisfiable, so neither statement is
 vacuous: any family of `F`'s with the right vanishing order will do, and `Ft` is then determined
 by the recurrence. -/
-example : ∃ F Ft : ℕ → ℝ⟦X⟧, Ft 0 = ftilde10 ∧
+example : ∃ F Ft : ℕ → ℝ⟦X⟧, Ft 0 = ftilde₁₀ ∧
     (∀ N, Ft (N + 1) = ftildeStep (4 * (N : ℝ) + 12) (F N) (Ft N)) ∧
     (∀ N k, k ≤ N + 1 → coeff k (F N) = 0) ∧ (∀ N, coeff (N + 2) (F N) = 1) :=
   ⟨fun N ↦ X ^ (N + 2),
-   fun N ↦ Nat.rec ftilde10 (fun n ih ↦ ftildeStep (4 * (n : ℝ) + 12) (X ^ (n + 2)) ih) N,
+   fun N ↦ Nat.rec ftilde₁₀ (fun n ih ↦ ftildeStep (4 * (n : ℝ) + 12) (X ^ (n + 2)) ih) N,
    rfl, fun _ ↦ rfl,
    fun _ _ hk ↦ by rw [PowerSeries.coeff_X_pow]; exact if_neg (by omega),
    fun _ ↦ by rw [PowerSeries.coeff_X_pow]; exact if_pos rfl⟩
@@ -330,23 +334,23 @@ section PolynomialModel
 
 open QuasiModular
 
-/-! ### The operator `𝒮_w` and the recurrence step, polynomially -/
+/-! ### The operators and the recurrence step, polynomially -/
 
 /-- `𝒮_w = ((w-6)(w-5)/36)E₄ - ∂_w∂_{w-2}` on the polynomial model. -/
 def SFp (w : ℝ) (G : QM) : QM :=
-  ((w - 6) * (w - 5) / 36 : ℝ) • (E4 * G) - serreD w (serreD (w - 2) G)
+  ((w - 6) * (w - 5) / 36 : ℝ) • (E₄ * G) - serreD w (serreD (w - 2) G)
 
 /-- The right-hand side of the recurrence defining `F_{w+4}` from `F_w`. -/
 def fStep (w : ℝ) (Fw : QM) : QM := cF w • SFp w Fw
 
 lemma qexp_SFp (w : ℝ) (G : QM) : qexp (SFp w G) = SF w (qexp G) := by
   rw [SFp, SF, KanekoZagier.L2_eq_serre, KanekoZagier.serreDIter_two,
-    show w - 2 + 2 = w by ring, alphaF, map_sub, map_smul, map_mul, qexp_E4, qexp_serreD,
+    show w - 2 + 2 = w by ring, alphaF, map_sub, map_smul, map_mul, qexp_E₄, qexp_serreD,
     qexp_serreD]
   module
 
 lemma hasWeight_SFp {w : ℝ} {G : QM} (h : HasWeight G w) : HasWeight (SFp w G) (w + 4) :=
-  HasWeight.sub (HasWeight.congr_weight ((hasWeight_E4.mul h).smul _) (by ring))
+  HasWeight.sub (HasWeight.congr_weight ((hasWeight_E₄.mul h).smul _) (by ring))
     (HasWeight.congr_weight (hasWeight_serreD w (hasWeight_serreD (w - 2) h)) (by ring))
 
 lemma hasWeight_fStep {w : ℝ} {G : QM} (h : HasWeight G w) : HasWeight (fStep w G) (w + 4) :=
@@ -359,7 +363,7 @@ for `F̃`.  The two uses of `delta_serreD` contribute `(1/6)∂_wF_w` and `(1/6)
 combine into `(1/3)∂_{w-1}F_w`. -/
 theorem delta_fStep {w : ℝ} {Fw : QM} (h : HasWeight Fw w) :
     delta (fStep w Fw) = cF w • (SFp w (delta Fw) - (1 / 3 : ℝ) • serreD (w - 1) Fw) := by
-  rw [fStep, Derivation.map_smul, SFp, map_sub, Derivation.map_smul, Derivation.leibniz, delta_E4,
+  rw [fStep, Derivation.map_smul, SFp, map_sub, Derivation.map_smul, Derivation.leibniz, delta_E₄,
     delta_serreD w (hasWeight_serreD (w - 2) h), delta_serreD (w - 2) h, serreD_add, serreD_smul,
     SFp, ← serreD_collapse w Fw, smul_zero, add_zero, smul_eq_mul]
   module
@@ -372,35 +376,36 @@ theorem qexp_delta_fStep {w : ℝ} {Fw : QM} (h : HasWeight Fw w) :
 /-! ### The family and its base case -/
 
 /-- `F₁₂ = (1/518400)(E₂²E₄² - 2E₂E₄E₆ + E₆²)`. -/
-def F12 : QM :=
-  (1 / 518400 : ℝ) • (E2 * E2 * E4 * E4 - (E2 * E4 * E6 + E2 * E4 * E6) + E6 * E6)
+def F₁₂ : QM :=
+  (1 / 518400 : ℝ) • (E₂ ^ 2 * E₄ ^ 2 - (2 : ℝ) • (E₂ * E₄ * E₆) + E₆ ^ 2)
 
-lemma hasWeight_F12 : HasWeight F12 12 :=
-  have h1 : HasWeight (E2 * E2 * E4 * E4) 12 := HasWeight.congr_weight
-    (((hasWeight_E2.mul hasWeight_E2).mul hasWeight_E4).mul hasWeight_E4) (by norm_num)
-  have h2 : HasWeight (E2 * E4 * E6) 12 :=
-    HasWeight.congr_weight ((hasWeight_E2.mul hasWeight_E4).mul hasWeight_E6) (by norm_num)
-  HasWeight.smul _ <| (h1.sub (h2.add h2)).add
-    (HasWeight.congr_weight (hasWeight_E6.mul hasWeight_E6) (by norm_num))
+lemma hasWeight_F₁₂ : HasWeight F₁₂ 12 :=
+  have h1 : HasWeight (E₂ ^ 2 * E₄ ^ 2) 12 := HasWeight.congr_weight
+    ((HasWeight.pow hasWeight_E₂ 2).mul (HasWeight.pow hasWeight_E₄ 2)) (by norm_num)
+  have h2 : HasWeight ((2 : ℝ) • (E₂ * E₄ * E₆)) 12 := HasWeight.smul _
+    (HasWeight.congr_weight ((hasWeight_E₂.mul hasWeight_E₄).mul hasWeight_E₆) (by norm_num))
+  HasWeight.smul _ <| (h1.sub h2).add
+    (HasWeight.congr_weight (HasWeight.pow hasWeight_E₆ 2) (by norm_num))
 
 /-- **The base case, computed rather than assumed.**  `δF₁₂ = (1/259200)E₄(E₂E₄-E₆)`, and
 Ramanujan's identity `E₂E₄-E₆ = 3E₄'` turns this into `(1/86400)E₄E₄' = (1/360)E₄X_{6,1}`, which is
-the `ftilde10` of the `QExpansion` section. -/
-theorem qexp_delta_F12 : qexp (delta F12) = ftilde10 := by
-  simp only [F12, ftilde10, KanekoZagier.ramanujan_E4, Derivation.map_smul, map_add, map_sub,
-    Derivation.leibniz, delta_E2, delta_E4, delta_E6, smul_eq_mul, mul_zero, add_zero, zero_add,
-    mul_one, mul_add, mul_sub, map_smul, map_mul, qexp_E2, qexp_E4, qexp_E6, mul_smul_comm]
+the `ftilde₁₀` of the `QExpansion` section. -/
+theorem qexp_delta_F₁₂ : qexp (delta F₁₂) = ftilde₁₀ := by
+  simp only [F₁₂, ftilde₁₀, KanekoZagier.ramanujan_E₄, pow_succ, pow_zero, one_mul,
+    Derivation.map_smul, map_add, map_sub, Derivation.leibniz, delta_E₂, delta_E₄, delta_E₆,
+    smul_eq_mul, mul_zero, add_zero, zero_add, mul_one, mul_add, mul_sub, map_smul, map_mul,
+    qexp_E₂, qexp_E₄, qexp_E₆, mul_smul_comm, smul_smul]
   simp only [mul_comm, mul_left_comm]
   module
 
 /-- The family `F_{4N+12}`, generated from `F₁₂` by the recurrence. -/
 def Ffam : ℕ → QM
-  | 0 => F12
+  | 0 => F₁₂
   | N + 1 => fStep (4 * (N : ℝ) + 12) (Ffam N)
 
 lemma hasWeight_Ffam (N : ℕ) : HasWeight (Ffam N) (4 * (N : ℝ) + 12) := by
   induction N with
-  | zero => simpa using hasWeight_F12
+  | zero => simpa using hasWeight_F₁₂
   | succ N ih => exact HasWeight.congr_weight (hasWeight_fStep ih) (by push_cast; ring)
 
 /-- The `q`-expansion of `F̃`, i.e. of `δF_w`. -/
@@ -415,7 +420,7 @@ theorem ftildeSeries_succ (N : ℕ) :
   rw [ftildeSeries, ftildeSeries, fSeries, Ffam, qexp_delta_fStep (hasWeight_Ffam N)]
 
 /-- **The base case of `ftildePos`, discharged.** -/
-theorem ftildeSeries_zero : ftildeSeries 0 = ftilde10 := qexp_delta_F12
+theorem ftildeSeries_zero : ftildeSeries 0 = ftilde₁₀ := qexp_delta_F₁₂
 
 /-! ### Vanishing order of `F_w` -/
 
@@ -435,25 +440,25 @@ lemma kappa2_F_zero {N : ℕ} {w : ℝ} (hw : w = 4 * N + 12) :
 
 /-- `F₁₂ = (1/57600)(E₄')²`: the quadratic `E₂²E₄² - 2E₂E₄E₆ + E₆²` is `(E₂E₄-E₆)²`, and
 Ramanujan turns `E₂E₄-E₆` into `3E₄'`. -/
-lemma qexp_F12 : qexp F12
+lemma qexp_F₁₂ : qexp F₁₂
     = (PowerSeries.mk fun m ↦ (m : ℝ) * (ArithmeticFunction.sigma 3 m : ℝ))
       * (PowerSeries.mk fun m ↦ (m : ℝ) * (ArithmeticFunction.sigma 3 m : ℝ)) := by
-  simp only [F12, map_smul, map_sub, map_add, map_mul, qexp_E2, qexp_E4, qexp_E6,
-    (eq_inv_smul_iff₀ (by norm_num : (240 : ℝ) ≠ 0)).2 KanekoZagier.D_E4.symm,
-    KanekoZagier.ramanujan_E4, smul_mul_assoc, mul_smul_comm, smul_smul]
+  simp only [F₁₂, map_smul, map_sub, map_add, map_mul, map_pow, qexp_E₂, qexp_E₄, qexp_E₆,
+    (eq_inv_smul_iff₀ (by norm_num : (240 : ℝ) ≠ 0)).2 KanekoZagier.D_E₄.symm,
+    KanekoZagier.ramanujan_E₄, two_smul, smul_mul_assoc, mul_smul_comm, smul_smul]
   ring_nf
 
-lemma coeff_qexp_F12 (n : ℕ) : coeff n (qexp F12)
+lemma coeff_qexp_F₁₂ (n : ℕ) : coeff n (qexp F₁₂)
     = ∑ j ∈ range n, (((n - j : ℕ) : ℝ) * (ArithmeticFunction.sigma 3 (n - j) : ℝ))
         * ((j : ℝ) * (ArithmeticFunction.sigma 3 j : ℝ)) := by
-  rw [qexp_F12, KanekoZagier.coeff_mk_mul _ (by simp) _ n]
+  rw [qexp_F₁₂, KanekoZagier.coeff_mk_mul _ (by simp) _ n]
   exact Finset.sum_congr rfl fun j _ ↦ by rw [coeff_mk]
 
 /-- **The vanishing order of `F_w`**, proved rather than assumed: `F_{4N+12}` vanishes to order
 `N+2` at the cusp. -/
 theorem coeff_fSeries_eq_zero (N : ℕ) : ∀ k, k ≤ N + 1 → coeff k (fSeries N) = 0 := by
   induction N with
-  | zero => intro k hk; interval_cases k <;> simp [fSeries, Ffam, coeff_qexp_F12]
+  | zero => intro k hk; interval_cases k <;> simp [fSeries, Ffam, coeff_qexp_F₁₂]
   | succ N ih =>
     intro k hk
     have ih' : ∀ j, j ≤ N + 1 → coeff j (qexp (Ffam N)) = 0 := ih
@@ -478,62 +483,62 @@ composed with `L_{3,w-2}`, and an operator annihilating `F_w` annihilates `F_{w+
 /-- The third-order Kaneko--Zagier operator on the polynomial model, in Serre form. -/
 def L3p (k α β : ℝ) (G : QM) : QM :=
   serreD (k + 4) (serreD (k + 2) (serreD k G))
-    + (α - (3 * k ^ 2 + 12 * k + 8) / 144) • (E4 * serreD k G)
-    + (β + k * α / 12 - k ^ 2 * (k + 3) / 864) • (E6 * G)
+    + (α - (3 * k ^ 2 + 12 * k + 8) / 144) • (E₄ * serreD k G)
+    + (β + k * α / 12 - k ^ 2 * (k + 3) / 864) • (E₆ * G)
 
 lemma qexp_L3p (k α β : ℝ) (G : QM) :
     qexp (L3p k α β G) = KanekoZagier.L3 k α β (qexp G) := by
   rw [L3p, KanekoZagier.L3_eq_serre, KanekoZagier.serreDIter_three, KanekoZagier.serreDIter_two,
-    map_add, map_add, map_smul, map_smul, map_mul, map_mul, qexp_E4, qexp_E6, qexp_serreD,
+    map_add, map_add, map_smul, map_smul, map_mul, map_mul, qexp_E₄, qexp_E₆, qexp_serreD,
     qexp_serreD, qexp_serreD]
 
--- `L3p_F12` needs the triple Serre derivative of `F₁₂`; it is expanded one derivative at a time
+-- `L3p_F₁₂` needs the triple Serre derivative of `F₁₂`; it is expanded one derivative at a time
 -- because expanding all three in a single `simp` call exceeds the default heartbeat budget.
-private lemma serreD_F12 : serreD 10 F12 =
-    -(1 / 622080 : ℝ) • (E2 ^ 2 * E4 * E6) + (1 / 622080 : ℝ) • (E2 * E4 ^ 3)
-      + (1 / 622080 : ℝ) • (E2 * E6 ^ 2) - (1 / 622080 : ℝ) • (E4 ^ 2 * E6) := by
-  simp only [F12, pow_succ, pow_zero, one_mul, serreD, Derivation.map_smul, map_sub, map_add,
-    Derivation.leibniz, smul_eq_mul, D_E2, D_E4, D_E6, smul_smul, smul_sub, smul_add,
+private lemma serreD_F₁₂ : serreD 10 F₁₂ =
+    -(1 / 622080 : ℝ) • (E₂ ^ 2 * E₄ * E₆) + (1 / 622080 : ℝ) • (E₂ * E₄ ^ 3)
+      + (1 / 622080 : ℝ) • (E₂ * E₆ ^ 2) - (1 / 622080 : ℝ) • (E₄ ^ 2 * E₆) := by
+  simp only [F₁₂, pow_succ, pow_zero, one_mul, serreD, Derivation.map_smul, map_sub, map_add,
+    Derivation.leibniz, smul_eq_mul, D_E₂, D_E₄, D_E₆, smul_smul, smul_sub, smul_add,
     mul_smul_comm, mul_sub, mul_add]
   simp only [mul_comm, mul_left_comm]
   module
 
-private lemma serreD_serreD_F12 : serreD 12 (serreD 10 F12) =
-    (7 / 7464960 : ℝ) • (E2 ^ 2 * E4 ^ 3) + (5 / 7464960 : ℝ) • (E2 ^ 2 * E6 ^ 2)
-      - (24 / 7464960 : ℝ) • (E2 * E4 ^ 2 * E6) + (5 / 7464960 : ℝ) • E4 ^ 4
-      + (7 / 7464960 : ℝ) • (E4 * E6 ^ 2) := by
-  rw [serreD_F12]
+private lemma serreD_serreD_F₁₂ : serreD 12 (serreD 10 F₁₂) =
+    (7 / 7464960 : ℝ) • (E₂ ^ 2 * E₄ ^ 3) + (5 / 7464960 : ℝ) • (E₂ ^ 2 * E₆ ^ 2)
+      - (24 / 7464960 : ℝ) • (E₂ * E₄ ^ 2 * E₆) + (5 / 7464960 : ℝ) • E₄ ^ 4
+      + (7 / 7464960 : ℝ) • (E₄ * E₆ ^ 2) := by
+  rw [serreD_F₁₂]
   simp only [pow_succ, pow_zero, one_mul, serreD, Derivation.map_smul, map_sub, map_add,
-    Derivation.leibniz, smul_eq_mul, D_E2, D_E4, D_E6, smul_smul, smul_sub, smul_add,
+    Derivation.leibniz, smul_eq_mul, D_E₂, D_E₄, D_E₆, smul_smul, smul_sub, smul_add,
     mul_smul_comm, mul_sub, mul_add]
   simp only [mul_comm, mul_left_comm]
   module
 
-private lemma serreD_serreD_serreD_F12 : serreD 14 (serreD 12 (serreD 10 F12)) =
-    (35 / 22394880 : ℝ) • (E2 * E4 ^ 4) + (49 / 22394880 : ℝ) • (E2 * E4 * E6 ^ 2)
-      - (42 / 22394880 : ℝ) • (E2 ^ 2 * E4 ^ 2 * E6) - (35 / 22394880 : ℝ) • (E4 ^ 3 * E6)
-      - (7 / 22394880 : ℝ) • E6 ^ 3 := by
-  rw [serreD_serreD_F12]
+private lemma serreD_serreD_serreD_F₁₂ : serreD 14 (serreD 12 (serreD 10 F₁₂)) =
+    (35 / 22394880 : ℝ) • (E₂ * E₄ ^ 4) + (49 / 22394880 : ℝ) • (E₂ * E₄ * E₆ ^ 2)
+      - (42 / 22394880 : ℝ) • (E₂ ^ 2 * E₄ ^ 2 * E₆) - (35 / 22394880 : ℝ) • (E₄ ^ 3 * E₆)
+      - (7 / 22394880 : ℝ) • E₆ ^ 3 := by
+  rw [serreD_serreD_F₁₂]
   simp only [pow_succ, pow_zero, one_mul, serreD, Derivation.map_smul, map_sub, map_add,
-    Derivation.leibniz, smul_eq_mul, D_E2, D_E4, D_E6, smul_smul, smul_sub, smul_add,
+    Derivation.leibniz, smul_eq_mul, D_E₂, D_E₄, D_E₆, smul_smul, smul_sub, smul_add,
     mul_smul_comm, mul_sub, mul_add]
   simp only [mul_comm, mul_left_comm]
   module
 
 /-- The base case of the differential equation, checked on the explicit `F₁₂`. -/
-lemma L3p_F12 : L3p 10 2 0 F12 = 0 := by
+lemma L3p_F₁₂ : L3p 10 2 0 F₁₂ = 0 := by
   rw [L3p, show (10 : ℝ) + 4 = 14 by norm_num, show (10 : ℝ) + 2 = 12 by norm_num,
-    serreD_serreD_serreD_F12, serreD_F12, F12]
+    serreD_serreD_serreD_F₁₂, serreD_F₁₂, F₁₂]
   simp only [pow_succ, pow_zero, one_mul, smul_smul, smul_sub, smul_add, smul_neg, neg_smul,
     mul_neg, mul_smul_comm, mul_sub, mul_add, sub_mul, add_mul]
   simp only [mul_comm, mul_left_comm]
   module
 
-lemma mlde_zero : KanekoZagier.L3 10 2 0 (fSeries 0) = 0 := by
-  rw [fSeries, Ffam, ← qexp_L3p, L3p_F12, map_zero]
+lemma mldeF_zero : KanekoZagier.L3 10 2 0 (fSeries 0) = 0 := by
+  rw [fSeries, Ffam, ← qexp_L3p, L3p_F₁₂, map_zero]
 
 /-- The differential equation propagates along the recurrence, by the intertwining criterion. -/
-lemma mlde_step {w : ℝ} {f : ℝ⟦X⟧} (h : KanekoZagier.L3 (w - 2) ((w - 4) / 4) 0 f = 0) :
+lemma mldeF_step {w : ℝ} {f : ℝ⟦X⟧} (h : KanekoZagier.L3 (w - 2) ((w - 4) / 4) 0 f = 0) :
     KanekoZagier.L3 (w + 2) (w / 4) 0 (cF w • SF w f) = 0 := by
   rw [SF, smul_neg, ← neg_smul, KanekoZagier.L3_smul, show w + 2 = w - 2 + 4 by ring,
     KanekoZagier.L3_comp_L2_eq_L2_comp_L3 (w - 2) (w / 4) 0 (alphaF w) ((w - 4) / 4) 0
@@ -544,12 +549,12 @@ lemma mlde_step {w : ℝ} {f : ℝ⟦X⟧} (h : KanekoZagier.L3 (w - 2) ((w - 4)
     ring
 
 /-- **The differential equation for `F_w`**, for every `w = 4N + 12`. -/
-theorem mlde (N : ℕ) :
+theorem mldeF (N : ℕ) :
     KanekoZagier.L3 (4 * (N : ℝ) + 10) ((4 * (N : ℝ) + 8) / 4) 0 (fSeries N) = 0 := by
   induction N with
-  | zero => norm_num; exact mlde_zero
+  | zero => norm_num; exact mldeF_zero
   | succ N ih =>
-    have := mlde_step (w := 4 * (N : ℝ) + 12) (by
+    have := mldeF_step (w := 4 * (N : ℝ) + 12) (by
       rw [show 4 * (N : ℝ) + 12 - 2 = 4 * (N : ℝ) + 10 by ring,
         show (4 * (N : ℝ) + 12 - 4) / 4 = (4 * (N : ℝ) + 8) / 4 by ring]
       exact ih)
@@ -594,7 +599,7 @@ the `b_{w/4}` of the paper. -/
 lemma coeff_fSeries_succ {N : ℕ} (h : coeff (N + 2) (fSeries N) = 1) :
     coeff (N + 3) (fSeries N)
       = 8 * ((N : ℝ) ^ 3 + 6 * N ^ 2 + 23 * N + 27) / (((N : ℝ) + 2) * ((N : ℝ) + 3)) := by
-  have key := congrArg (coeff (N + 3)) (mlde N)
+  have key := congrArg (coeff (N + 3)) (mldeF N)
   rw [KanekoZagier.coeff_L3, map_zero, kappa3_F,
     Finset.sum_eq_single (N + 2)
       (fun j hj hne ↦ by
@@ -625,7 +630,7 @@ private lemma cusp_normalization (N : ℕ) :
 `F_{4N+12}` is `1`. -/
 theorem coeff_fSeries_eq_one (N : ℕ) : coeff (N + 2) (fSeries N) = 1 := by
   induction N with
-  | zero => rw [fSeries, Ffam, coeff_qexp_F12]; norm_num [Finset.sum_range_succ]
+  | zero => rw [fSeries, Ffam, coeff_qexp_F₁₂]; norm_num [Finset.sum_range_succ]
   | succ N ih =>
     have hz : ∀ j, j ≤ N + 1 → coeff j (qexp (Ffam N)) = 0 := coeff_fSeries_eq_zero N
     have h2 : coeff (N + 2) (qexp (Ffam N)) = 1 := ih

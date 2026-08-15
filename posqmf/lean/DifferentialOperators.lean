@@ -42,16 +42,16 @@ take place.
 
 ## Axioms
 
-Ramanujan's identities are taken as axioms (`KanekoZagier.ramanujan_E2`,
-`ramanujan_E4`, `ramanujan_E6`); see `Ramanujan.lean`.  What each result actually uses:
+Ramanujan's identities are taken as axioms (`KanekoZagier.ramanujan_E₂`,
+`ramanujan_E₄`, `ramanujan_E₆`); see `Ramanujan.lean`.  What each result actually uses:
 
 ```
 #print axioms KanekoZagier.coeff_L2                     -- none beyond Lean's own three
 #print axioms KanekoZagier.coeff_L3                     -- none beyond Lean's own three
-#print axioms KanekoZagier.L2_eq_serre                  -- ramanujan_E2
-#print axioms KanekoZagier.L3_eq_serre                  -- ramanujan_E2, ramanujan_E4
-#print axioms KanekoZagier.L3S_comp_L2S                 -- ramanujan_E4, ramanujan_E6
-#print axioms KanekoZagier.L2S_comp_L3S                 -- ramanujan_E4, ramanujan_E6
+#print axioms KanekoZagier.L2_eq_serre                  -- ramanujan_E₂
+#print axioms KanekoZagier.L3_eq_serre                  -- ramanujan_E₂, ramanujan_E₄
+#print axioms KanekoZagier.L3S_comp_L2S                 -- ramanujan_E₄, ramanujan_E₆
+#print axioms KanekoZagier.L2S_comp_L3S                 -- ramanujan_E₄, ramanujan_E₆
 #print axioms KanekoZagier.L3_comp_L2_eq_L2_comp_L3     -- all three
 ```
 

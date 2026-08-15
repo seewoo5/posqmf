@@ -33,11 +33,11 @@ namespace KanekoZagier
 noncomputable section
 
 /-- `L_{2,k}^γ` in Serre form, `∂_k² + C E₄`, with `C = γ - k(k+2)/144`. -/
-def L2S (k C : ℝ) (f : ℝ⟦X⟧) : ℝ⟦X⟧ := serreDIter k 2 f + C • (E4 * f)
+def L2S (k C : ℝ) (f : ℝ⟦X⟧) : ℝ⟦X⟧ := serreDIter k 2 f + C • (E₄ * f)
 
 /-- `L_{3,k}^{(α,β)}` in Serre form, `∂_k³ + A E₄∂_k + B E₆`. -/
 def L3S (k A B : ℝ) (f : ℝ⟦X⟧) : ℝ⟦X⟧ :=
-  serreDIter k 3 f + A • (E4 * serreD k f) + B • (E6 * f)
+  serreDIter k 3 f + A • (E₄ * serreD k f) + B • (E₆ * f)
 
 lemma L2_eq_L2S (k γ : ℝ) (f : ℝ⟦X⟧) : L2 k γ f = L2S k (γ - k * (k + 2) / 144) f := by
   rw [L2_eq_serre, L2S]; module
@@ -53,29 +53,29 @@ lemma L3_eq_L3S (k α β : ℝ) (f : ℝ⟦X⟧) :
 `∂_k⁵ + (A+C)E₄∂_k³ + (B−C)E₆∂_k² + C(A+1/2)E₄²∂_k + C(B − A/3 − 1/9)E₄E₆`. -/
 theorem L3S_comp_L2S (k A B C : ℝ) (f : ℝ⟦X⟧) :
     L3S (k + 4) A B (L2S k C f)
-      = serreDIter k 5 f + (A + C) • (E4 * serreDIter k 3 f)
-        + (B - C) • (E6 * serreDIter k 2 f)
-        + (C * (A + 1 / 2)) • (E4 * E4 * serreD k f)
-        + (C * (B - A / 3 - 1 / 9)) • (E4 * E6 * f) := by
+      = serreDIter k 5 f + (A + C) • (E₄ * serreDIter k 3 f)
+        + (B - C) • (E₆ * serreDIter k 2 f)
+        + (C * (A + 1 / 2)) • (E₄ * E₄ * serreD k f)
+        + (C * (B - A / 3 - 1 / 9)) • (E₄ * E₆ * f) := by
   have g1 : serreD (k + 4) (L2S k C f)
-      = serreDIter k 3 f + C • ((-1 / 3 : ℝ) • (E6 * f) + E4 * serreD k f) := by
-    rw [L2S, serreD_add, serreD_smul, ← serreDIter_three, serreD_E4_mul (k + 4) k (by ring)]
+      = serreDIter k 3 f + C • ((-1 / 3 : ℝ) • (E₆ * f) + E₄ * serreD k f) := by
+    rw [L2S, serreD_add, serreD_smul, ← serreDIter_three, serreD_E₄_mul (k + 4) k (by ring)]
   have g2 : serreD (k + 4 + 2) (serreD (k + 4) (L2S k C f))
-      = serreDIter k 4 f + C • ((1 / 6 : ℝ) • (E4 * E4 * f)
-          + (-2 / 3 : ℝ) • (E6 * serreD k f) + E4 * serreDIter k 2 f) := by
+      = serreDIter k 4 f + C • ((1 / 6 : ℝ) • (E₄ * E₄ * f)
+          + (-2 / 3 : ℝ) • (E₆ * serreD k f) + E₄ * serreDIter k 2 f) := by
     rw [g1, serreD_add, serreD_smul, serreD_serreDIter k 3 (k + 4 + 2) (by push_cast; ring) f,
-      serreD_add, serreD_smul, serreD_E6_mul (k + 4 + 2) k (by ring),
-      serreD_E4_mul (k + 4 + 2) (k + 2) (by ring), ← serreDIter_two]
+      serreD_add, serreD_smul, serreD_E₆_mul (k + 4 + 2) k (by ring),
+      serreD_E₄_mul (k + 4 + 2) (k + 2) (by ring), ← serreDIter_two]
     module
   have g3 : serreD (k + 4 + 4) (serreD (k + 4 + 2) (serreD (k + 4) (L2S k C f)))
-      = serreDIter k 5 f + C • ((-1 / 9 : ℝ) • (E4 * E6 * f)
-          + (1 / 2 : ℝ) • (E4 * E4 * serreD k f) + (-1 : ℝ) • (E6 * serreDIter k 2 f)
-          + E4 * serreDIter k 3 f) := by
+      = serreDIter k 5 f + C • ((-1 / 9 : ℝ) • (E₄ * E₆ * f)
+          + (1 / 2 : ℝ) • (E₄ * E₄ * serreD k f) + (-1 : ℝ) • (E₆ * serreDIter k 2 f)
+          + E₄ * serreDIter k 3 f) := by
     rw [g2, serreD_add, serreD_smul, serreD_serreDIter k 4 (k + 4 + 4) (by push_cast; ring) f,
       serreD_add, serreD_add, serreD_smul, serreD_smul,
-      serreD_E4_sq_mul (k + 4 + 4) k (by ring),
-      serreD_E6_mul (k + 4 + 4) (k + 2) (by ring),
-      serreD_E4_mul (k + 4 + 4) (k + 4) (by ring), ← serreDIter_two, ← serreDIter_three]
+      serreD_E₄_sq_mul (k + 4 + 4) k (by ring),
+      serreD_E₆_mul (k + 4 + 4) (k + 2) (by ring),
+      serreD_E₄_mul (k + 4 + 4) (k + 4) (by ring), ← serreDIter_two, ← serreDIter_three]
     module
   rw [L3S, serreDIter_three (k + 4) (L2S k C f), serreDIter_two (k + 4) (L2S k C f), g3, g1, L2S]
   simp only [mul_add, mul_smul_comm, smul_add, smul_smul]
@@ -86,29 +86,29 @@ theorem L3S_comp_L2S (k A B C : ℝ) (f : ℝ⟦X⟧) :
 `∂_k⁵ + (A'+C')E₄∂_k³ + (B' − 2A'/3)E₆∂_k² + (A'(C'+1/6) − B')E₄²∂_k + B'(C'+1/3)E₄E₆`. -/
 theorem L2S_comp_L3S (k A' B' C' : ℝ) (f : ℝ⟦X⟧) :
     L2S (k + 6) C' (L3S k A' B' f)
-      = serreDIter k 5 f + (A' + C') • (E4 * serreDIter k 3 f)
-        + (B' - 2 * A' / 3) • (E6 * serreDIter k 2 f)
-        + (A' * (C' + 1 / 6) - B') • (E4 * E4 * serreD k f)
-        + (B' * (C' + 1 / 3)) • (E4 * E6 * f) := by
+      = serreDIter k 5 f + (A' + C') • (E₄ * serreDIter k 3 f)
+        + (B' - 2 * A' / 3) • (E₆ * serreDIter k 2 f)
+        + (A' * (C' + 1 / 6) - B') • (E₄ * E₄ * serreD k f)
+        + (B' * (C' + 1 / 3)) • (E₄ * E₆ * f) := by
   have h1 : serreD (k + 6) (L3S k A' B' f)
-      = serreDIter k 4 f + A' • ((-1 / 3 : ℝ) • (E6 * serreD k f) + E4 * serreDIter k 2 f)
-        + B' • ((-1 / 2 : ℝ) • (E4 * E4 * f) + E6 * serreD k f) := by
+      = serreDIter k 4 f + A' • ((-1 / 3 : ℝ) • (E₆ * serreD k f) + E₄ * serreDIter k 2 f)
+        + B' • ((-1 / 2 : ℝ) • (E₄ * E₄ * f) + E₆ * serreD k f) := by
     rw [L3S, serreD_add, serreD_add, serreD_smul, serreD_smul,
       serreD_serreDIter k 3 (k + 6) (by push_cast; ring) f,
-      serreD_E4_mul (k + 6) (k + 2) (by ring), serreD_E6_mul (k + 6) k (by ring),
+      serreD_E₄_mul (k + 6) (k + 2) (by ring), serreD_E₆_mul (k + 6) k (by ring),
       ← serreDIter_two]
   have h2 : serreD (k + 6 + 2) (serreD (k + 6) (L3S k A' B' f))
       = serreDIter k 5 f
-        + A' • ((1 / 6 : ℝ) • (E4 * E4 * serreD k f)
-            + (-2 / 3 : ℝ) • (E6 * serreDIter k 2 f) + E4 * serreDIter k 3 f)
-        + B' • ((1 / 3 : ℝ) • (E4 * E6 * f) + (-1 : ℝ) • (E4 * E4 * serreD k f)
-            + E6 * serreDIter k 2 f) := by
+        + A' • ((1 / 6 : ℝ) • (E₄ * E₄ * serreD k f)
+            + (-2 / 3 : ℝ) • (E₆ * serreDIter k 2 f) + E₄ * serreDIter k 3 f)
+        + B' • ((1 / 3 : ℝ) • (E₄ * E₆ * f) + (-1 : ℝ) • (E₄ * E₄ * serreD k f)
+            + E₆ * serreDIter k 2 f) := by
     rw [h1, serreD_add, serreD_add, serreD_smul, serreD_smul,
       serreD_serreDIter k 4 (k + 6 + 2) (by push_cast; ring) f, serreD_add, serreD_add,
       serreD_smul, serreD_smul,
-      serreD_E6_mul (k + 6 + 2) (k + 2) (by ring),
-      serreD_E4_mul (k + 6 + 2) (k + 4) (by ring),
-      serreD_E4_sq_mul (k + 6 + 2) k (by ring), ← serreDIter_two, ← serreDIter_three]
+      serreD_E₆_mul (k + 6 + 2) (k + 2) (by ring),
+      serreD_E₄_mul (k + 6 + 2) (k + 4) (by ring),
+      serreD_E₄_sq_mul (k + 6 + 2) k (by ring), ← serreDIter_two, ← serreDIter_three]
     module
   rw [L2S, serreDIter_two (k + 6) (L3S k A' B' f), h2, L3S]
   simp only [mul_add, mul_smul_comm, smul_add, smul_smul]

@@ -33,7 +33,7 @@ and the whole boundary case comes down to `A_w(r) ≥ 0`, `B_w(r) > 0` for `r �
 ## What is and is not formalized
 
 Neither conclusion assumes anything.  `gtildeSeries` generates the family from `G̃₀` by the
-recurrence, which makes the recurrence definitional, and `gode` *proves* the third-order equation
+recurrence, which makes the recurrence definitional, and `mldeG` *proves* the third-order equation
 by the intertwining criterion.
 
 `coeff_gtildeSeries_nonneg` therefore carries the Ramanujan axioms, on which
@@ -50,7 +50,7 @@ hypotheses, but does not discharge it.
 
 * `UncertaintyPrinciple.Aw_nonneg`, `Bw_pos`, `Kpp_pos`: the kernel estimates.
 * `UncertaintyPrinciple.gtildeStep_nonneg` and `gtildeStep_boundary`: one induction step.
-* `UncertaintyPrinciple.gode`: the third-order equation, proved by the intertwining criterion from
+* `UncertaintyPrinciple.mldeG`: the third-order equation, proved by the intertwining criterion from
   an explicit check on the constant `G̃₀`.
 * `UncertaintyPrinciple.coeff_gtildeSeries_nonneg`: `ã_n ≥ 0` for `0 ≤ n ≤ w/4 + 1`, every
   `w = 4N`, with every hypothesis discharged.
@@ -73,7 +73,7 @@ noncomputable section
 def alphaG (w : ℝ) : ℝ := -((w + 6) * (w + 16)) / 48
 
 /-- The parameter `α = -(w+6)/4` of the third-order operator annihilating `G̃_w`. -/
-def alphaOde (w : ℝ) : ℝ := -(w + 6) / 4
+def alphaOdeG (w : ℝ) : ℝ := -(w + 6) / 4
 
 /-- The positive scalar `c_w = 3(w+10)(w+14) / (16(w+4)(w+9)(w+11)(w+16))`. -/
 def cG (w : ℝ) : ℝ := 3 * (w + 10) * (w + 14) / (16 * (w + 4) * (w + 9) * (w + 11) * (w + 16))
@@ -109,16 +109,16 @@ lemma K2_G (w : ℝ) (n j : ℕ) :
 
 /-- The diagonal coefficient of the third-order operator, factored as `n(n+1)(4n-w-6)/4`. -/
 lemma kappa3_G (w : ℝ) (n : ℕ) :
-    kappa3 w (alphaOde w) 0 n = (n : ℝ) * ((n : ℝ) + 1) * (4 * n - w - 6) / 4 := by
-  rw [kappa3, alphaOde]; ring
+    kappa3 w (alphaOdeG w) 0 n = (n : ℝ) * ((n : ℝ) + 1) * (4 * n - w - 6) / 4 := by
+  rw [kappa3, alphaOdeG]; ring
 
 /-- The lower triangular coefficient of the third-order operator. -/
 lemma K3_G (w : ℝ) (n j : ℕ) :
-    K3 w (alphaOde w) 0 n j
+    K3 w (alphaOdeG w) 0 n j
       = (w + 2) * (6 * (j : ℝ) ^ 2 - 6 * (w + 1) * ((n : ℝ) - j) * j
             + w * (w + 1) * ((n : ℝ) - j) ^ 2) * (σ 1 (n - j) : ℝ)
         + 15 * (w + 6) * (w * ((n : ℝ) - j) - 4 * j) * (σ 3 (n - j) : ℝ) := by
-  rw [K3, alphaOde]; ring
+  rw [K3, alphaOdeG]; ring
 
 /-! ### Signs on the interior range -/
 
@@ -224,7 +224,7 @@ theorem Kpp_pos {w : ℝ} (hw : 0 ≤ w) {m : ℕ} (hm : 1 ≤ m) :
 /-- The identity behind the boundary case: eliminating `ã_{w/4+2}` between the recurrence and the
 third-order equation leaves the kernel `A_w(r)σ₁(r) + B_w(r)σ₃(r)` with `r = w/4 + 2 - j`. -/
 lemma Kpp_eq {N j : ℕ} {w : ℝ} (hw : w = 4 * N) (hj : j ≤ N + 1) :
-    16 * (w + 10) / (3 * (w + 8) * (w + 12)) * K3 w (alphaOde w) 0 (N + 2) j
+    16 * (w + 10) / (3 * (w + 8) * (w + 12)) * K3 w (alphaOdeG w) 0 (N + 2) j
         - K2 w (alphaG w) (N + 2) j
       = Aw w ((N + 2 - j : ℕ) : ℝ) * (σ 1 (N + 2 - j) : ℝ)
         + Bw w ((N + 2 - j : ℕ) : ℝ) * (σ 3 (N + 2 - j) : ℝ) := by
@@ -241,16 +241,16 @@ lemma Kpp_eq {N j : ℕ} {w : ℝ} (hw : w = 4 * N) (hj : j ≤ N + 1) :
 index the coefficient of `gtildeStep` is `c_w` times the pairing of the combined kernel with the
 lower coefficients. -/
 private lemma coeff_gtildeStep_boundary {N : ℕ} {w : ℝ} (hw : w = 4 * N) {Gt : ℝ⟦X⟧}
-    (hode : L3 w (alphaOde w) 0 Gt = 0) :
+    (hode : L3 w (alphaOdeG w) 0 Gt = 0) :
     coeff (N + 2) (gtildeStep w Gt)
       = cG w * ∑ j ∈ range (N + 2),
-          (16 * (w + 10) / (3 * (w + 8) * (w + 12)) * K3 w (alphaOde w) 0 (N + 2) j
+          (16 * (w + 10) / (3 * (w + 8) * (w + 12)) * K3 w (alphaOdeG w) 0 (N + 2) j
             - K2 w (alphaG w) (N + 2) j) * coeff j Gt := by
   have hw0 : 0 ≤ w := by rw [hw]; positivity
-  have hlin : kappa3 w (alphaOde w) 0 (N + 2) * coeff (N + 2) Gt
-      + ∑ j ∈ range (N + 2), K3 w (alphaOde w) 0 (N + 2) j * coeff j Gt = 0 := by
+  have hlin : kappa3 w (alphaOdeG w) 0 (N + 2) * coeff (N + 2) Gt
+      + ∑ j ∈ range (N + 2), K3 w (alphaOdeG w) 0 (N + 2) j * coeff j Gt = 0 := by
     rw [← coeff_L3, hode, _root_.map_zero]
-  have hk3 : kappa3 w (alphaOde w) 0 (N + 2) = (w + 8) * (w + 12) / 32 := by
+  have hk3 : kappa3 w (alphaOdeG w) 0 (N + 2) = (w + 8) * (w + 12) / 32 := by
     rw [kappa3_G, hw]
     push_cast
     ring
@@ -260,15 +260,15 @@ private lemma coeff_gtildeStep_boundary {N : ℕ} {w : ℝ} (hw : w = 4 * N) {Gt
     ring
   rw [hk3] at hlin
   have hsplit : ∑ j ∈ range (N + 2),
-      (16 * (w + 10) / (3 * (w + 8) * (w + 12)) * K3 w (alphaOde w) 0 (N + 2) j
+      (16 * (w + 10) / (3 * (w + 8) * (w + 12)) * K3 w (alphaOdeG w) 0 (N + 2) j
         - K2 w (alphaG w) (N + 2) j) * coeff j Gt
       = 16 * (w + 10) / (3 * (w + 8) * (w + 12))
-          * (∑ j ∈ range (N + 2), K3 w (alphaOde w) 0 (N + 2) j * coeff j Gt)
+          * (∑ j ∈ range (N + 2), K3 w (alphaOdeG w) 0 (N + 2) j * coeff j Gt)
         - ∑ j ∈ range (N + 2), K2 w (alphaG w) (N + 2) j * coeff j Gt := by
     rw [Finset.mul_sum, ← Finset.sum_sub_distrib]
     exact Finset.sum_congr rfl fun j _ ↦ by ring
   rw [coeff_gtildeStep, hk2, hsplit,
-    show ∑ j ∈ range (N + 2), K3 w (alphaOde w) 0 (N + 2) j * coeff j Gt
+    show ∑ j ∈ range (N + 2), K3 w (alphaOdeG w) 0 (N + 2) j * coeff j Gt
       = -((w + 8) * (w + 12) / 32 * coeff (N + 2) Gt) from by linarith]
   field_simp
   ring
@@ -276,7 +276,7 @@ private lemma coeff_gtildeStep_boundary {N : ℕ} {w : ℝ} (hw : w = 4 * N) {Gt
 /-- **Boundary step.**  At `n = w/4 + 2` the diagonal coefficient is positive, so the recurrence
 alone does not suffice; the third-order equation supplies the missing relation. -/
 theorem gtildeStep_boundary {N : ℕ} {w : ℝ} (hw : w = 4 * N) {Gt : ℝ⟦X⟧}
-    (hode : L3 w (alphaOde w) 0 Gt = 0) (hnn : ∀ j, j ≤ N + 1 → 0 ≤ coeff j Gt) :
+    (hode : L3 w (alphaOdeG w) 0 Gt = 0) (hnn : ∀ j, j ≤ N + 1 → 0 ≤ coeff j Gt) :
     0 ≤ coeff (N + 2) (gtildeStep w Gt) := by
   have hw0 : 0 ≤ w := by rw [hw]; positivity
   rw [coeff_gtildeStep_boundary hw hode]
@@ -289,19 +289,19 @@ theorem gtildeStep_boundary {N : ℕ} {w : ℝ} (hw : w = 4 * N) {Gt : ℝ⟦X�
 /-! ### The base case `G̃₀ = 3/(2¹¹·7)` -/
 
 /-- `G̃₀ = 3/(2¹¹·7)`, a positive constant. -/
-def gtilde0 : ℝ⟦X⟧ := (3 / 14336 : ℝ) • 1
+def gtilde₀ : ℝ⟦X⟧ := (3 / 14336 : ℝ) • 1
 
-lemma coeff_gtilde0 (n : ℕ) : coeff n gtilde0 = if n = 0 then 3 / 14336 else 0 := by
-  rw [gtilde0, PowerSeries.coeff_smul, smul_eq_mul, PowerSeries.coeff_one]
+lemma coeff_gtilde₀ (n : ℕ) : coeff n gtilde₀ = if n = 0 then 3 / 14336 else 0 := by
+  rw [gtilde₀, PowerSeries.coeff_smul, smul_eq_mul, PowerSeries.coeff_one]
   split_ifs <;> norm_num
 
-lemma coeff_gtilde0_nonneg (n : ℕ) : 0 ≤ coeff n gtilde0 := by
-  rw [coeff_gtilde0]; split_ifs <;> norm_num
+lemma coeff_gtilde₀_nonneg (n : ℕ) : 0 ≤ coeff n gtilde₀ := by
+  rw [coeff_gtilde₀]; split_ifs <;> norm_num
 
-lemma coeff_gtilde0_zero_pos : 0 < coeff 0 gtilde0 := by
-  rw [coeff_gtilde0]; norm_num
+lemma coeff_gtilde₀_zero_pos : 0 < coeff 0 gtilde₀ := by
+  rw [coeff_gtilde₀]; norm_num
 
-/-! ### The third-order equation, proved rather than assumed
+/-! ### The modular linear differential equation for `G̃_w`
 
 The recurrence applies `L_{2,w}^{α_w}` to `G̃_w`, so the intertwining criterion turns an operator
 annihilating `G̃_w` into one annihilating `G̃_{w+4}`.  Solving the first of the four constraints for
@@ -314,25 +314,25 @@ conclusion, since the right-hand side is `L_{2,w+6}^{γ'}` applied to `0`.) -/
 This does *not* formalize that the result is the paper's `G̃_w`: that identification rests on the
 uniqueness of `G_w = G̃_{w-12} Δ 𝓛_S + Ψ_w`, an argument about modular functions for `Γ(2)`. -/
 def gtildeSeries : ℕ → ℝ⟦X⟧
-  | 0 => gtilde0
+  | 0 => gtilde₀
   | N + 1 => gtildeStep (4 * (N : ℝ)) (gtildeSeries N)
 
 /-- The base case: `G̃₀` is a constant, and at `k = 0` with `β = 0` every coefficient of the
 undifferentiated term of `L_{3,k}^{(α,β)}` vanishes. -/
-lemma gode_zero : L3 0 (alphaOde 0) 0 gtilde0 = 0 := by simp [gtilde0, L3, D_smul]
+lemma mldeG_zero : L3 0 (alphaOdeG 0) 0 gtilde₀ = 0 := by simp [gtilde₀, L3, D_smul]
 
 /-- The third-order equation propagates along the recurrence, by the intertwining criterion. -/
-lemma gode_step {w : ℝ} {f : ℝ⟦X⟧} (h : L3 w (alphaOde w) 0 f = 0) :
-    L3 (w + 4) (alphaOde (w + 4)) 0 (gtildeStep w f) = 0 := by
-  rw [gtildeStep, smul_neg, ← neg_smul, L3_smul, L3_comp_L2_eq_L2_comp_L3 w (alphaOde (w + 4)) 0
-    (alphaG w) (alphaOde w) 0 (-((w + 10) * (w + 16)) / 48) ?_ ?_ ?_ ?_, h, L2_zero, smul_zero]
-  all_goals (simp only [shiftA, shiftB, shiftC, shiftA', shiftB', shiftC', alphaOde, alphaG]; ring)
+lemma mldeG_step {w : ℝ} {f : ℝ⟦X⟧} (h : L3 w (alphaOdeG w) 0 f = 0) :
+    L3 (w + 4) (alphaOdeG (w + 4)) 0 (gtildeStep w f) = 0 := by
+  rw [gtildeStep, smul_neg, ← neg_smul, L3_smul, L3_comp_L2_eq_L2_comp_L3 w (alphaOdeG (w + 4)) 0
+    (alphaG w) (alphaOdeG w) 0 (-((w + 10) * (w + 16)) / 48) ?_ ?_ ?_ ?_, h, L2_zero, smul_zero]
+  all_goals (simp only [shiftA, shiftB, shiftC, shiftA', shiftB', shiftC', alphaOdeG, alphaG]; ring)
 
 /-- **The third-order equation for `G̃_w`**, for every `w = 4N`. -/
-theorem gode (N : ℕ) : L3 (4 * (N : ℝ)) (alphaOde (4 * (N : ℝ))) 0 (gtildeSeries N) = 0 := by
+theorem mldeG (N : ℕ) : L3 (4 * (N : ℝ)) (alphaOdeG (4 * (N : ℝ))) 0 (gtildeSeries N) = 0 := by
   induction N with
-  | zero => simpa using gode_zero
-  | succ N ih => simpa [gtildeSeries, mul_add] using gode_step ih
+  | zero => simpa using mldeG_zero
+  | succ N ih => simpa [gtildeSeries, mul_add] using mldeG_step ih
 
 /-! ### The conclusion -/
 
@@ -340,20 +340,20 @@ theorem gode (N : ℕ) : L3 (4 * (N : ℝ)) (alphaOde (4 * (N : ℝ))) 0 (gtilde
 with `0 ≤ n ≤ w/4 + 1 = N + 1` is nonnegative. -/
 theorem coeff_gtildeSeries_nonneg (N : ℕ) : ∀ n, n ≤ N + 1 → 0 ≤ coeff n (gtildeSeries N) := by
   induction N with
-  | zero => intro n _; exact coeff_gtilde0_nonneg n
+  | zero => intro n _; exact coeff_gtilde₀_nonneg n
   | succ N ih =>
     intro n hn
     rw [gtildeSeries]
     obtain hlt | rfl : n ≤ N + 1 ∨ n = N + 2 := by omega
     · exact gtildeStep_nonneg rfl ih hlt
-    · exact gtildeStep_boundary rfl (gode N) ih
+    · exact gtildeStep_boundary rfl (mldeG N) ih
 
 /-- **The constant term is strictly positive.**  Taking `n = 0` in the recurrence gives the ratio
 `ã₀^{(w+4)} / ã₀^{(w)} = (w+6)(w+10)(w+14) / (256(w+4)(w+9)(w+11))`, which is positive; this is
 what makes the resulting bound on `A₊(d)` strict. -/
 theorem coeff_gtildeSeries_zero_pos (N : ℕ) : 0 < coeff 0 (gtildeSeries N) := by
   induction N with
-  | zero => exact coeff_gtilde0_zero_pos
+  | zero => exact coeff_gtilde₀_zero_pos
   | succ N ih =>
     have hw0 : 0 ≤ 4 * (N : ℝ) := by positivity
     rw [gtildeSeries, coeff_gtildeStep, Finset.range_zero, Finset.sum_empty, add_zero]
