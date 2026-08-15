@@ -52,8 +52,8 @@ paper.  `F₀` and `F₄` do not exist and are set to zero.
   the intertwining criterion from an explicit check on `F₈`.
 * `UncertaintyPrinciple.coeff_fSeries_eq_zero` and `coeff_fSeries_eq_one`: the vanishing order and
   the normalisation of `F_w`.
-* `UncertaintyPrinciple.hasWeight_fFam` and `hasWeight_ftildeFam`: `F_{4N}` and `F̃_{4N-2} = δF_{4N}`
-  carry the weights their names claim.
+* `UncertaintyPrinciple.hasWeight_fFam` and `hasWeight_ftildeFam`: `F_{4N}` and its `δ`-image
+  `F̃_{4N-2}` carry the weights their names claim.
 * `UncertaintyPrinciple.coeff_ftildeSeries_pos` and `coeff_ftildeSeries_boundary`: the conclusion,
   with every hypothesis discharged.
 
