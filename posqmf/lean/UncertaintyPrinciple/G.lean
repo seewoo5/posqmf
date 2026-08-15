@@ -32,14 +32,13 @@ and the whole boundary case comes down to `A_w(r) ≥ 0`, `B_w(r) > 0` for `r �
 
 ## What is and is not formalized
 
-The induction is stated twice.  `gtildePos` and `gtildeConstant_pos` take the base case, the
-recurrence and the third-order equation as explicit hypotheses, and use no axiom of
-`Ramanujan.lean`: that half rides on `coeff_L2` and `coeff_L3`, both unconditional.
+Neither conclusion assumes anything.  `gtildeSeries` generates the family from `G̃₀` by the
+recurrence, which makes the recurrence definitional, and `gode` *proves* the third-order equation
+by the intertwining criterion.
 
-`gtildeSeries` then generates the family from `G̃₀` by the recurrence, which makes the recurrence
-definitional, and `gode` *proves* the third-order equation by the intertwining criterion, so
-`coeff_gtildeSeries_nonneg` and `coeff_gtildeSeries_zero_pos` assume nothing.  That costs the
-Ramanujan axioms, on which `KanekoZagier.L3_comp_L2_eq_L2_comp_L3` depends.
+`coeff_gtildeSeries_nonneg` therefore carries the Ramanujan axioms, on which
+`KanekoZagier.L3_comp_L2_eq_L2_comp_L3` depends.  `coeff_gtildeSeries_zero_pos` never uses the
+third-order equation, so it stays free of them, riding only on `coeff_L2`.
 
 What remains unformalized is the identification of `gtildeSeries` with the paper's `G̃_w`: the
 recurrence itself is a theorem about the latter, and its derivation needs the uniqueness of the
@@ -51,13 +50,12 @@ hypotheses, but does not discharge it.
 
 * `UncertaintyPrinciple.Aw_nonneg`, `Bw_pos`, `Kpp_pos`: the kernel estimates.
 * `UncertaintyPrinciple.gtildeStep_nonneg` and `gtildeStep_boundary`: one induction step.
-* `UncertaintyPrinciple.gtildePos`: `ã_n ≥ 0` for `0 ≤ n ≤ w/4 + 1`, every `w = 4N`.
-* `UncertaintyPrinciple.gtildeConstant_pos`: the constant term stays strictly positive, which is
-  what makes the resulting bound strict.
 * `UncertaintyPrinciple.gode`: the third-order equation, proved by the intertwining criterion from
   an explicit check on the constant `G̃₀`.
-* `UncertaintyPrinciple.coeff_gtildeSeries_nonneg` and `coeff_gtildeSeries_zero_pos`: the same two
-  conclusions with every hypothesis discharged.
+* `UncertaintyPrinciple.coeff_gtildeSeries_nonneg`: `ã_n ≥ 0` for `0 ≤ n ≤ w/4 + 1`, every
+  `w = 4N`, with every hypothesis discharged.
+* `UncertaintyPrinciple.coeff_gtildeSeries_zero_pos`: the constant term stays strictly positive,
+  which is what makes the resulting bound strict.
 
 Weights are indexed by `N : ℕ` with `w = 4N`, so `w/4 + 1 = N + 1` and `w/4 + 2 = N + 2`.
 -/
@@ -84,9 +82,7 @@ def cG (w : ℝ) : ℝ := 3 * (w + 10) * (w + 14) / (16 * (w + 4) * (w + 9) * (w
 def gtildeStep (w : ℝ) (Gt : ℝ⟦X⟧) : ℝ⟦X⟧ := cG w • (-L2 w (alphaG w) Gt)
 
 private lemma denomG_pos {w : ℝ} (hw : 0 ≤ w) :
-    0 < 16 * (w + 4) * (w + 9) * (w + 11) * (w + 16) :=
-  mul_pos (mul_pos (mul_pos (mul_pos (by norm_num) (by linarith)) (by linarith))
-    (by linarith)) (by linarith)
+    0 < 16 * (w + 4) * (w + 9) * (w + 11) * (w + 16) := by positivity
 
 lemma cG_pos {w : ℝ} (hw : 0 ≤ w) : 0 < cG w :=
   div_pos (mul_pos (mul_pos (by norm_num) (by linarith)) (by linarith)) (denomG_pos hw)
@@ -255,9 +251,13 @@ private lemma coeff_gtildeStep_boundary {N : ℕ} {w : ℝ} (hw : w = 4 * N) {Gt
       + ∑ j ∈ range (N + 2), K3 w (alphaOde w) 0 (N + 2) j * coeff j Gt = 0 := by
     rw [← coeff_L3, hode, _root_.map_zero]
   have hk3 : kappa3 w (alphaOde w) 0 (N + 2) = (w + 8) * (w + 12) / 32 := by
-    rw [kappa3_G, hw]; push_cast; ring
+    rw [kappa3_G, hw]
+    push_cast
+    ring
   have hk2 : kappa2 w (alphaG w) (N + 2) = (w + 10) / 6 := by
-    rw [kappa2_G, hw]; push_cast; ring
+    rw [kappa2_G, hw]
+    push_cast
+    ring
   rw [hk3] at hlin
   have hsplit : ∑ j ∈ range (N + 2),
       (16 * (w + 10) / (3 * (w + 8) * (w + 12)) * K3 w (alphaOde w) 0 (N + 2) j
@@ -301,38 +301,6 @@ lemma coeff_gtilde0_nonneg (n : ℕ) : 0 ≤ coeff n gtilde0 := by
 lemma coeff_gtilde0_zero_pos : 0 < coeff 0 gtilde0 := by
   rw [coeff_gtilde0]; norm_num
 
-/-! ### The induction -/
-
-/-- **Nonnegativity of the Fourier coefficients of `G̃_w`.**  For `w = 4N`, every coefficient
-`ã_n` with `0 ≤ n ≤ w/4 + 1 = N + 1` is nonnegative. -/
-theorem gtildePos {Gt : ℕ → ℝ⟦X⟧} (hbase : Gt 0 = gtilde0)
-    (hrec : ∀ N : ℕ, Gt (N + 1) = gtildeStep (4 * (N : ℝ)) (Gt N))
-    (hode : ∀ N : ℕ, L3 (4 * (N : ℝ)) (alphaOde (4 * (N : ℝ))) 0 (Gt N) = 0)
-    (N : ℕ) : ∀ n, n ≤ N + 1 → 0 ≤ coeff n (Gt N) := by
-  induction N with
-  | zero => intro n _; rw [hbase]; exact coeff_gtilde0_nonneg n
-  | succ N ih =>
-    intro n hn
-    rw [hrec N]
-    obtain hlt | rfl : n ≤ N + 1 ∨ n = N + 2 := by omega
-    · exact gtildeStep_nonneg rfl ih hlt
-    · exact gtildeStep_boundary rfl (hode N) ih
-
-/-- **The constant term is strictly positive.**  Taking `n = 0` in the recurrence gives the ratio
-`ã₀^{(w+4)} / ã₀^{(w)} = (w+6)(w+10)(w+14) / (256(w+4)(w+9)(w+11))`, which is positive; this is
-what makes the resulting bound on `A₊(d)` strict. -/
-theorem gtildeConstant_pos {Gt : ℕ → ℝ⟦X⟧} (hbase : Gt 0 = gtilde0)
-    (hrec : ∀ N : ℕ, Gt (N + 1) = gtildeStep (4 * (N : ℝ)) (Gt N)) (N : ℕ) :
-    0 < coeff 0 (Gt N) := by
-  induction N with
-  | zero => rw [hbase]; exact coeff_gtilde0_zero_pos
-  | succ N ih =>
-    have hw0 : 0 ≤ 4 * (N : ℝ) := by positivity
-    rw [hrec N, coeff_gtildeStep, Finset.range_zero, Finset.sum_empty, add_zero]
-    refine mul_pos (cG_pos hw0) ?_
-    have := kappa2_G_neg (w := 4 * (N : ℝ)) (n := 0) hw0 (by push_cast; linarith)
-    nlinarith [ih]
-
 /-! ### The third-order equation, proved rather than assumed
 
 The recurrence applies `L_{2,w}^{α_w}` to `G̃_w`, so the intertwining criterion turns an operator
@@ -351,42 +319,47 @@ def gtildeSeries : ℕ → ℝ⟦X⟧
 
 /-- The base case: `G̃₀` is a constant, and at `k = 0` with `β = 0` every coefficient of the
 undifferentiated term of `L_{3,k}^{(α,β)}` vanishes. -/
-lemma gode_zero : L3 0 (alphaOde 0) 0 gtilde0 = 0 := by
-  rw [gtilde0, L3_smul, L3]
-  norm_num
+lemma gode_zero : L3 0 (alphaOde 0) 0 gtilde0 = 0 := by simp [gtilde0, L3, D_smul]
 
 /-- The third-order equation propagates along the recurrence, by the intertwining criterion. -/
 lemma gode_step {w : ℝ} {f : ℝ⟦X⟧} (h : L3 w (alphaOde w) 0 f = 0) :
     L3 (w + 4) (alphaOde (w + 4)) 0 (gtildeStep w f) = 0 := by
-  have hint := L3_comp_L2_eq_L2_comp_L3 w (alphaOde (w + 4)) 0 (alphaG w) (alphaOde w) 0
-    (-((w + 10) * (w + 16)) / 48) ?_ ?_ ?_ ?_ f
-  · rw [gtildeStep, smul_neg, ← neg_smul, L3_smul, hint, h, L2_zero, smul_zero]
-  all_goals
-    simp only [shiftA, shiftB, shiftC, shiftA', shiftB', shiftC', alphaOde, alphaG]
-    ring
+  rw [gtildeStep, smul_neg, ← neg_smul, L3_smul, L3_comp_L2_eq_L2_comp_L3 w (alphaOde (w + 4)) 0
+    (alphaG w) (alphaOde w) 0 (-((w + 10) * (w + 16)) / 48) ?_ ?_ ?_ ?_, h, L2_zero, smul_zero]
+  all_goals (simp only [shiftA, shiftB, shiftC, shiftA', shiftB', shiftC', alphaOde, alphaG]; ring)
 
 /-- **The third-order equation for `G̃_w`**, for every `w = 4N`. -/
-theorem gode (N : ℕ) :
-    L3 (4 * (N : ℝ)) (alphaOde (4 * (N : ℝ))) 0 (gtildeSeries N) = 0 := by
+theorem gode (N : ℕ) : L3 (4 * (N : ℝ)) (alphaOde (4 * (N : ℝ))) 0 (gtildeSeries N) = 0 := by
   induction N with
   | zero => simpa using gode_zero
-  | succ N ih =>
-    have := gode_step ih
-    rw [show 4 * (N : ℝ) + 4 = 4 * ((N : ℝ) + 1) by ring] at this
-    rw [gtildeSeries]
-    push_cast
-    exact this
+  | succ N ih => simpa [gtildeSeries, mul_add] using gode_step ih
 
 /-! ### The conclusion -/
 
-/-- **Nonnegativity of the Fourier coefficients of `G̃_w`**, with the recurrence definitional and
-the third-order equation discharged. -/
-theorem coeff_gtildeSeries_nonneg (N n : ℕ) (hn : n ≤ N + 1) : 0 ≤ coeff n (gtildeSeries N) :=
-  gtildePos rfl (fun _ ↦ rfl) gode N n hn
+/-- **Nonnegativity of the Fourier coefficients of `G̃_w`.**  For `w = 4N`, every coefficient `ã_n`
+with `0 ≤ n ≤ w/4 + 1 = N + 1` is nonnegative. -/
+theorem coeff_gtildeSeries_nonneg (N : ℕ) : ∀ n, n ≤ N + 1 → 0 ≤ coeff n (gtildeSeries N) := by
+  induction N with
+  | zero => intro n _; exact coeff_gtilde0_nonneg n
+  | succ N ih =>
+    intro n hn
+    rw [gtildeSeries]
+    obtain hlt | rfl : n ≤ N + 1 ∨ n = N + 2 := by omega
+    · exact gtildeStep_nonneg rfl ih hlt
+    · exact gtildeStep_boundary rfl (gode N) ih
 
-/-- The constant term, likewise. -/
-theorem coeff_gtildeSeries_zero_pos (N : ℕ) : 0 < coeff 0 (gtildeSeries N) :=
-  gtildeConstant_pos rfl (fun _ ↦ rfl) N
+/-- **The constant term is strictly positive.**  Taking `n = 0` in the recurrence gives the ratio
+`ã₀^{(w+4)} / ã₀^{(w)} = (w+6)(w+10)(w+14) / (256(w+4)(w+9)(w+11))`, which is positive; this is
+what makes the resulting bound on `A₊(d)` strict. -/
+theorem coeff_gtildeSeries_zero_pos (N : ℕ) : 0 < coeff 0 (gtildeSeries N) := by
+  induction N with
+  | zero => exact coeff_gtilde0_zero_pos
+  | succ N ih =>
+    have hw0 : 0 ≤ 4 * (N : ℝ) := by positivity
+    rw [gtildeSeries, coeff_gtildeStep, Finset.range_zero, Finset.sum_empty, add_zero]
+    refine mul_pos (cG_pos hw0) ?_
+    have := kappa2_G_neg (w := 4 * (N : ℝ)) (n := 0) hw0 (by push_cast; linarith)
+    nlinarith [ih]
 
 end
 

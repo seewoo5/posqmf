@@ -535,10 +535,9 @@ lemma mlde_zero : KanekoZagier.L3 10 2 0 (fSeries 0) = 0 := by
 /-- The differential equation propagates along the recurrence, by the intertwining criterion. -/
 lemma mlde_step {w : ℝ} {f : ℝ⟦X⟧} (h : KanekoZagier.L3 (w - 2) ((w - 4) / 4) 0 f = 0) :
     KanekoZagier.L3 (w + 2) (w / 4) 0 (cF w • SF w f) = 0 := by
-  have hint := KanekoZagier.L3_comp_L2_eq_L2_comp_L3 (w - 2) (w / 4) 0 (alphaF w)
-    ((w - 4) / 4) 0 (-(w * (w - 10)) / 48) ?_ ?_ ?_ ?_ f
-  · rw [SF, smul_neg, ← neg_smul, KanekoZagier.L3_smul, show w + 2 = w - 2 + 4 by ring, hint,
-      h, KanekoZagier.L2_zero, smul_zero]
+  rw [SF, smul_neg, ← neg_smul, KanekoZagier.L3_smul, show w + 2 = w - 2 + 4 by ring,
+    KanekoZagier.L3_comp_L2_eq_L2_comp_L3 (w - 2) (w / 4) 0 (alphaF w) ((w - 4) / 4) 0
+      (-(w * (w - 10)) / 48) ?_ ?_ ?_ ?_, h, KanekoZagier.L2_zero, smul_zero]
   all_goals
     simp only [KanekoZagier.shiftA, KanekoZagier.shiftB, KanekoZagier.shiftC,
       KanekoZagier.shiftA', KanekoZagier.shiftB', KanekoZagier.shiftC', alphaF]
