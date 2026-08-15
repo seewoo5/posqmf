@@ -1,4 +1,5 @@
 import posqmf.lean.DifferentialOperators.Coefficients
+import posqmf.lean.DifferentialOperators.Intertwine
 import posqmf.lean.SigmaBounds
 
 /-!
@@ -31,19 +32,20 @@ and the whole boundary case comes down to `A_w(r) ≥ 0`, `B_w(r) > 0` for `r �
 
 ## What is and is not formalized
 
-Everything downstream of the recurrence and the third-order equation is proved here,
-unconditionally.  Two inputs are hypotheses, exactly as the paper takes them:
+The induction is stated twice.  `gtildePos` and `gtildeConstant_pos` take the base case, the
+recurrence and the third-order equation as explicit hypotheses, and use no axiom of
+`Ramanujan.lean`: that half rides on `coeff_L2` and `coeff_L3`, both unconditional.
 
-* the recurrence, whose derivation needs the uniqueness of the decomposition
-  `G_w = G̃_{w-12} Δ 𝓛_S + Ψ_w`, an argument about modular functions for `Γ(2)` rather than about
-  `q`-expansions;
-* the third-order equation for `G̃_w`, which the paper deduces from the intertwining criterion.
-  (`KanekoZagier.L3_comp_L2_eq_L2_comp_L3` is the sufficiency half of that criterion, so this
-  hypothesis is within reach of the present development; deriving it would additionally need the
-  two parameter triples to be checked against the four constraints.)
+`gtildeSeries` then generates the family from `G̃₀` by the recurrence, which makes the recurrence
+definitional, and `gode` *proves* the third-order equation by the intertwining criterion, so
+`coeff_gtildeSeries_nonneg` and `coeff_gtildeSeries_zero_pos` assume nothing.  That costs the
+Ramanujan axioms, on which `KanekoZagier.L3_comp_L2_eq_L2_comp_L3` depends.
 
-Both appear as explicit hypotheses of `gtildePos`, so nothing is assumed silently.  No axiom of
-`Ramanujan.lean` is used: the argument rides on `coeff_L2` and `coeff_L3`, both unconditional.
+What remains unformalized is the identification of `gtildeSeries` with the paper's `G̃_w`: the
+recurrence itself is a theorem about the latter, and its derivation needs the uniqueness of the
+decomposition `G_w = G̃_{w-12} Δ 𝓛_S + Ψ_w`, an argument about modular functions for `Γ(2)` rather
+than about `q`-expansions.  Taking the recurrence as the definition moves that content out of the
+hypotheses, but does not discharge it.
 
 ## Main results
 
@@ -52,6 +54,10 @@ Both appear as explicit hypotheses of `gtildePos`, so nothing is assumed silentl
 * `UncertaintyPrinciple.gtildePos`: `ã_n ≥ 0` for `0 ≤ n ≤ w/4 + 1`, every `w = 4N`.
 * `UncertaintyPrinciple.gtildeConstant_pos`: the constant term stays strictly positive, which is
   what makes the resulting bound strict.
+* `UncertaintyPrinciple.gode`: the third-order equation, proved by the intertwining criterion from
+  an explicit check on the constant `G̃₀`.
+* `UncertaintyPrinciple.coeff_gtildeSeries_nonneg` and `coeff_gtildeSeries_zero_pos`: the same two
+  conclusions with every hypothesis discharged.
 
 Weights are indexed by `N : ℕ` with `w = 4N`, so `w/4 + 1 = N + 1` and `w/4 + 2 = N + 2`.
 -/
@@ -326,6 +332,61 @@ theorem gtildeConstant_pos {Gt : ℕ → ℝ⟦X⟧} (hbase : Gt 0 = gtilde0)
     refine mul_pos (cG_pos hw0) ?_
     have := kappa2_G_neg (w := 4 * (N : ℝ)) (n := 0) hw0 (by push_cast; linarith)
     nlinarith [ih]
+
+/-! ### The third-order equation, proved rather than assumed
+
+The recurrence applies `L_{2,w}^{α_w}` to `G̃_w`, so the intertwining criterion turns an operator
+annihilating `G̃_w` into one annihilating `G̃_{w+4}`.  Solving the first of the four constraints for
+the free parameter `γ'` gives `γ' = -(w+10)(w+16)/48`, and the remaining three constraints then
+hold identically.  (Note `γ' ≠ α^G_{w+4} = -(w+10)(w+20)/48`; its value is irrelevant to the
+conclusion, since the right-hand side is `L_{2,w+6}^{γ'}` applied to `0`.) -/
+
+/-- The family generated from `G̃₀` by the recurrence, which makes the recurrence definitional.
+
+This does *not* formalize that the result is the paper's `G̃_w`: that identification rests on the
+uniqueness of `G_w = G̃_{w-12} Δ 𝓛_S + Ψ_w`, an argument about modular functions for `Γ(2)`. -/
+def gtildeSeries : ℕ → ℝ⟦X⟧
+  | 0 => gtilde0
+  | N + 1 => gtildeStep (4 * (N : ℝ)) (gtildeSeries N)
+
+/-- The base case: `G̃₀` is a constant, and at `k = 0` with `β = 0` every coefficient of the
+undifferentiated term of `L_{3,k}^{(α,β)}` vanishes. -/
+lemma gode_zero : L3 0 (alphaOde 0) 0 gtilde0 = 0 := by
+  rw [gtilde0, L3_smul, L3]
+  norm_num
+
+/-- The third-order equation propagates along the recurrence, by the intertwining criterion. -/
+lemma gode_step {w : ℝ} {f : ℝ⟦X⟧} (h : L3 w (alphaOde w) 0 f = 0) :
+    L3 (w + 4) (alphaOde (w + 4)) 0 (gtildeStep w f) = 0 := by
+  have hint := L3_comp_L2_eq_L2_comp_L3 w (alphaOde (w + 4)) 0 (alphaG w) (alphaOde w) 0
+    (-((w + 10) * (w + 16)) / 48) ?_ ?_ ?_ ?_ f
+  · rw [gtildeStep, smul_neg, ← neg_smul, L3_smul, hint, h, L2_zero, smul_zero]
+  all_goals
+    simp only [shiftA, shiftB, shiftC, shiftA', shiftB', shiftC', alphaOde, alphaG]
+    ring
+
+/-- **The third-order equation for `G̃_w`**, for every `w = 4N`. -/
+theorem gode (N : ℕ) :
+    L3 (4 * (N : ℝ)) (alphaOde (4 * (N : ℝ))) 0 (gtildeSeries N) = 0 := by
+  induction N with
+  | zero => simpa using gode_zero
+  | succ N ih =>
+    have := gode_step ih
+    rw [show 4 * (N : ℝ) + 4 = 4 * ((N : ℝ) + 1) by ring] at this
+    rw [gtildeSeries]
+    push_cast
+    exact this
+
+/-! ### The conclusion -/
+
+/-- **Nonnegativity of the Fourier coefficients of `G̃_w`**, with the recurrence definitional and
+the third-order equation discharged. -/
+theorem coeff_gtildeSeries_nonneg (N n : ℕ) (hn : n ≤ N + 1) : 0 ≤ coeff n (gtildeSeries N) :=
+  gtildePos rfl (fun _ ↦ rfl) gode N n hn
+
+/-- The constant term, likewise. -/
+theorem coeff_gtildeSeries_zero_pos (N : ℕ) : 0 < coeff 0 (gtildeSeries N) :=
+  gtildeConstant_pos rfl (fun _ ↦ rfl) N
 
 end
 
