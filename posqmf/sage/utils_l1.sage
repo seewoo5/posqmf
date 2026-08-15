@@ -14,6 +14,8 @@ def qm_coefficients(qm, prec=20):
 
 def q_expansion_to_list(qexp, prec=20):
     """Convert a q-expansion to a list of coefficients up to precision `prec`."""
+    if qexp == 0:  # the zero form has `q_expansion` the integer 0
+        return [0] * prec
     return [qexp[i] for i in range(prec)]
 
 def qm_derivative_fold(qm, k):
@@ -167,6 +169,21 @@ def modular_comp(qm):
             comps[k] = QM(0)
         comps[k] += QM(v)
     return comps
+
+def qm_delta(qm):
+    r"""
+    Apply `\\delta = \\partial / \\partial E_2`.
+
+    If `F = f_0 + f_1 E_2 + \\cdots + f_r E_2^r`, then
+    `\\delta F = f_1 + 2 f_2 E_2 + \\cdots + r f_r E_2^{r-1}`.
+    This lowers the weight by 2 and the depth by 1, and `\\delta F = 0` exactly
+    when `F` is a modular form.
+    """
+    r = QM(0)
+    for k, v in qm._polynomial().dict().items():
+        if k >= 1:
+            r += k * QM(v) * E2^(k - 1)
+    return r
 
 def eisenstein(w):
     """Compute the Eisenstein series of weight `w`."""

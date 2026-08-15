@@ -28,6 +28,17 @@ Functions for extremal quasimodular forms of level $\Gamma_0(2)$ and $\Gamma_0(3
 
 - `l2_victor_miller_basis` and `l3_victor_miller_basis` compute Victor-Miller bases for modular forms of levels $\Gamma_0(2)$ and $\Gamma_0(3)$.
 
+### `kaneko_zagier.sage`
+
+The second- and third-order Kaneko-Zagier operators $L_{2,k}^{\alpha}$ and $L_{3,k}^{(\alpha, \beta)}$, which the families $F_w$, $G_w$, $Y_w$, $\widetilde{G}_w$, and $X_{w,2}$ all satisfy differential equations for.
+
+- `qm_L2` and `qm_L3` apply the operators to level 1 quasimodular forms, in Serre derivative form; `qm_L2_D` and `qm_L3_D` use the equivalent expressions in terms of $D = q \frac{d}{dq}$.
+`ls_L2`, `ls_L3`, `ls_L2_D`, and `ls_L3_D` are the counterparts on `QM2_LS`.
+
+- `kz2_kappa`, `kz2_K`, `kz3_kappa`, and `kz3_K` give the Fourier coefficients of the results, which turn the differential equations into linear recurrences.
+
+- `kz_intertwine_params` and `kz_intertwine_constraints` give the shifted parameters and the four constraints of the intertwining criterion $L_{3,k+4}^{(\alpha,\beta)} L_{2,k}^{\gamma} = L_{2,k+6}^{\gamma'}L_{3,k}^{(\alpha',\beta')}$.
+
 ### `fgh.sage`
 
 Functions for the Feigenbaum-Grabner-Hardin families of quasimodular forms used in the sign uncertainty principle computations.
@@ -47,6 +58,8 @@ Functions for level 1 quasimodular forms, including depths, $q$-expansion, (Serr
 - `qm_to_func` returns a function $t \mapsto F(it)$ defined on positive real numbers, for a given quasimodular form $F$.
 
 - `modular_comp` extract modualr form components of a given quasimodular form, i.e. for $F = f_0 + f_1 E_2 + f_2 E_2^2 + \cdots + f_n E_2^n$, it returns the dictionary of modular forms `{k : f_k}`.
+
+- `qm_delta` applies $\delta = \partial / \partial E_2$, which lowers the weight by 2 and the depth by 1.
 
 ### `utils_l2.sage`
 
