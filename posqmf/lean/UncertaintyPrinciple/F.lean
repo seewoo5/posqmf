@@ -111,9 +111,8 @@ lemma cF_pos {w : ℝ} (hw : 12 ≤ w) : 0 < cF w :=
 /-! ### Signs on the interior range -/
 
 /-- On the range `1 ≤ n ≤ w/4 - 2` the diagonal coefficient is negative. -/
-lemma kappa2_F_neg {w : ℝ} {n : ℕ} (hw : 12 ≤ w) (hn1 : 1 ≤ n) (hn : 4 * (n : ℝ) ≤ w - 8) :
+lemma kappa2_F_neg {w : ℝ} {n : ℕ} (hw : 12 ≤ w) (hn : 4 * (n : ℝ) ≤ w - 8) :
     kappa2 (w - 2) (alphaF w) n < 0 := by
-  have hn1' : 1 ≤ (n : ℝ) := by exact_mod_cast hn1
   rw [kappa2_F]
   exact div_neg_of_neg_of_pos
     (mul_neg_of_pos_of_neg (by linarith) (by linarith)) (by norm_num)
@@ -121,9 +120,8 @@ lemma kappa2_F_neg {w : ℝ} {n : ℕ} (hw : 12 ≤ w) (hn1 : 1 ≤ n) (hn : 4 *
 /-- On the range `1 ≤ j < n ≤ w/4 - 1` the lower triangular coefficient is negative. -/
 lemma K2_F_neg {w : ℝ} {n j : ℕ} (hw : 12 ≤ w) (hj : j < n) (hn : 4 * (n : ℝ) ≤ w - 4) :
     K2 (w - 2) (alphaF w) n j < 0 := by
-  have hnj : 1 ≤ n - j := by omega
-  have hgap : 1 ≤ (n : ℝ) - j := by
-    rw [← Nat.cast_sub hj.le]; exact_mod_cast hnj
+  have hnj : 1 ≤ n - j := by lia
+  have hgap : 1 ≤ (n : ℝ) - j := by rw [← Nat.cast_sub hj.le]; exact_mod_cast hnj
   have hn' : 0 ≤ (n : ℝ) := Nat.cast_nonneg n
   rw [K2_F]
   have t1 : 0 < 2 * (w - 1) * (w * ((n : ℝ) - j) - 2 * n) * (σ 1 (n - j) : ℝ) :=
@@ -149,7 +147,7 @@ lemma K2_F_boundary {N : ℕ} {w : ℝ} (hw : w = 4 * N + 12) :
     K2 (w - 2) (alphaF w) (N + 2) (N + 1) = -(6 * w ^ 2 - 67 * w + 196) := by
   have h1 : (σ 1 1 : ℝ) = 1 := by norm_num
   have h3 : (σ 3 1 : ℝ) = 1 := by norm_num
-  rw [K2_F, show N + 2 - (N + 1) = 1 by omega, h1, h3, hw]
+  rw [K2_F, show N + 2 - (N + 1) = 1 by lia, h1, h3, hw]
   push_cast
   ring
 
@@ -175,7 +173,7 @@ lemma coeff_ftildeStep (w : ℝ) (F Ft : ℝ⟦X⟧) (n : ℕ) :
 /-! ### One induction step, interior range -/
 
 private lemma weight_ge {N : ℕ} {w : ℝ} (hw : w = 4 * N + 12) : 12 ≤ w := by
-  rw [hw]; have : 0 ≤ (N : ℝ) := Nat.cast_nonneg N; linarith
+  grind
 
 /-- The `K`-sum is nonpositive on the range where every coefficient of `F̃` is known positive. -/
 private lemma K_sum_nonpos {N : ℕ} {w : ℝ} (hw : w = 4 * N + 12) {Ft : ℝ⟦X⟧}
@@ -186,8 +184,8 @@ private lemma K_sum_nonpos {N : ℕ} {w : ℝ} (hw : w = 4 * N + 12) {Ft : ℝ�
   rw [Finset.mem_range] at hj
   rcases Nat.eq_zero_or_pos j with rfl | hj1
   · rw [hFt0, mul_zero]
-  · refine mul_nonpos_of_nonpos_of_nonneg (K2_F_neg (weight_ge hw) (by omega) ?_).le
-      (hpos j hj1 (by omega)).le
+  · refine mul_nonpos_of_nonpos_of_nonneg (K2_F_neg (by grind) (by lia) ?_).le
+      (hpos j hj1 (by lia)).le
     rw [hw]
     have : (n : ℝ) ≤ (N : ℝ) + 2 := by exact_mod_cast hn
     linarith
@@ -201,17 +199,17 @@ theorem ftildeStep_pos {N : ℕ} {w : ℝ} (hw : w = 4 * N + 12) {F Ft : ℝ⟦X
   have hnR : (n : ℝ) ≤ (N : ℝ) + 1 := by exact_mod_cast hn
   have hFsum : ∑ j ∈ range n, (σ 1 (n - j) : ℝ) * coeff j F = 0 :=
     Finset.sum_eq_zero fun j hj ↦ by
-      rw [Finset.mem_range] at hj; rw [hF0 j (by omega), mul_zero]
+      rw [Finset.mem_range] at hj; rw [hF0 j (by lia), mul_zero]
   have hval : coeff n (ftildeStep w F Ft)
       = cF w * (-(kappa2 (w - 2) (alphaF w) n * coeff n Ft
           + ∑ j ∈ range n, K2 (w - 2) (alphaF w) n j * coeff j Ft)) := by
     rw [coeff_ftildeStep, hF0 n hn, hFsum]; ring
   have hkap : kappa2 (w - 2) (alphaF w) n * coeff n Ft < 0 :=
     mul_neg_of_neg_of_pos
-      (kappa2_F_neg (weight_ge hw) hn1 (by rw [hw]; linarith)) (hpos n hn1 (by omega))
+      (kappa2_F_neg (weight_ge hw) (by rw [hw]; linarith)) (hpos n hn1 (by lia))
   rw [hval]
   exact mul_pos (cF_pos (weight_ge hw))
-    (by linarith [K_sum_nonpos hw hFt0 hpos (n := n) (m := n) (by omega) le_rfl])
+    (by linarith [K_sum_nonpos hw hFt0 hpos (n := n) (m := n) (by lia) le_rfl])
 
 /-! ### One induction step, boundary index -/
 
@@ -222,13 +220,13 @@ theorem ftildeStep_boundary {N : ℕ} {w : ℝ} (hw : w = 4 * N + 12) {F Ft : �
     (hFt0 : coeff 0 Ft = 0) (hpos : ∀ j, 1 ≤ j → j ≤ N + 1 → 0 < coeff j Ft)
     (hbdry : 1 / 360 ≤ coeff (N + 1) Ft) :
     1 / 360 ≤ coeff (N + 2) (ftildeStep w F Ft) := by
-  have hw12 : 12 ≤ w := weight_ge hw
+  have hw12 : 12 ≤ w := by grind
   have hNw : (N : ℝ) = (w - 12) / 4 := by rw [hw]; ring
   have hkap : kappa2 (w - 2) (alphaF w) (N + 2) = 0 := by
     rw [kappa2_F]; push_cast; rw [hNw]; ring
   have hFsum : ∑ j ∈ range (N + 2), (σ 1 (N + 2 - j) : ℝ) * coeff j F = 0 :=
     Finset.sum_eq_zero fun j hj ↦ by
-      rw [Finset.mem_range] at hj; rw [hF0 j (by omega), mul_zero]
+      rw [Finset.mem_range] at hj; rw [hF0 j (by lia), mul_zero]
   have hval : coeff (N + 2) (ftildeStep w F Ft)
       = cF w * (-(∑ j ∈ range (N + 1), K2 (w - 2) (alphaF w) (N + 2) j * coeff j Ft)
           + (6 * w ^ 2 - 67 * w + 196) * coeff (N + 1) Ft - (2 * w - 11) / 36) := by
@@ -237,7 +235,7 @@ theorem ftildeStep_boundary {N : ℕ} {w : ℝ} (hw : w = 4 * N + 12) {F Ft : �
     rw [hNw]
     ring
   have hquad : 0 < 6 * w ^ 2 - 67 * w + 196 := by nlinarith [sq_nonneg (12 * w - 67)]
-  have hhead := K_sum_nonpos hw hFt0 hpos (n := N + 2) (m := N + 1) le_rfl (by omega)
+  have hhead := K_sum_nonpos hw hFt0 hpos (n := N + 2) (m := N + 1) le_rfl (by lia)
   rw [hval]
   calc 1 / 360 ≤ cF w * ((6 * w ^ 2 - 67 * w + 196) / 360 - (2 * w - 11) / 36) :=
         boundary_bound hw12
@@ -249,7 +247,7 @@ theorem ftildeStep_boundary {N : ℕ} {w : ℝ} (hw : w = 4 * N + 12) {F Ft : �
 
 private lemma coeff_E₄_of_pos {m : ℕ} (hm : 1 ≤ m) : coeff m E₄ = 240 * (σ 3 m : ℝ) := by
   rw [E₄, map_add, PowerSeries.coeff_smul, smul_eq_mul, coeff_qSigma, PowerSeries.coeff_one,
-    if_neg (by omega), zero_add]
+    if_neg (by lia), zero_add]
 
 private lemma coeff_E₄_nonneg (m : ℕ) : 0 ≤ coeff m E₄ := by
   rw [E₄, map_add, PowerSeries.coeff_smul, smul_eq_mul, coeff_qSigma, PowerSeries.coeff_one]
@@ -274,8 +272,7 @@ theorem ftilde₁₀_pos {n : ℕ} (hn : 1 ≤ n) : 0 < coeff n ftilde₁₀ := 
   have hsum : 0 ≤ ∑ j ∈ range n, (σ 3 (n - j) : ℝ) * coeff j (D E₄) :=
     Finset.sum_nonneg fun j _ ↦ by
       rw [coeff_D]
-      have := coeff_E₄_nonneg j
-      positivity
+      positivity [coeff_E₄_nonneg j]
   have hn' : 1 ≤ (n : ℝ) := by exact_mod_cast hn
   nlinarith [one_le_sigma (k := 3) hn]
 
@@ -297,9 +294,9 @@ private lemma ftilde_induction {F Ft : ℕ → ℝ⟦X⟧} (hbase : Ft 0 = ftild
     have hstepBdry : 1 / 360 ≤ coeff (N + 2) (Ft (N + 1)) := by
       rw [hrec N]; exact ftildeStep_boundary rfl (hF0 N) (hF1 N) hcusp hpos hbdry
     refine ⟨?_, fun j hj1 hj ↦ ?_, hstepBdry⟩
-    · rw [hrec N, coeff_ftildeStep, hcusp, hF0 N 0 (by omega)]; simp
-    · obtain hlt | rfl : j < N + 2 ∨ j = N + 2 := by omega
-      · exact hstepPos j hj1 (by omega)
+    · rw [hrec N, coeff_ftildeStep, hcusp, hF0 N 0 (by lia)]; simp
+    · obtain hlt | rfl : j < N + 2 ∨ j = N + 2 := by lia
+      · exact hstepPos j hj1 (by lia)
       · linarith [hstepBdry]
 
 end QExpansion
@@ -456,7 +453,7 @@ def fSeries (N : ℕ) : ℝ⟦X⟧ := qexp (fFam N)
 `N ≥ 2`. -/
 theorem ftildeSeries_succ {N : ℕ} (hN : 2 ≤ N) :
     ftildeSeries (N + 1) = ftildeStep (4 * (N : ℝ)) (fSeries N) (ftildeSeries N) := by
-  obtain ⟨M, rfl⟩ : ∃ M, N = M + 2 := ⟨N - 2, by omega⟩
+  obtain ⟨M, rfl⟩ : ∃ M, N = M + 2 := ⟨N - 2, by lia⟩
   change qexp (delta (fFam (M + 3))) = _
   rw [fFam, qexp_delta_fStep (hasWeight_fFam (M + 2))]
   rfl
@@ -503,18 +500,18 @@ lemma coeff_qexp_F₈ {n : ℕ} (hn : 1 ≤ n) :
 
 /-- **The vanishing order of `F_w`**, proved rather than assumed. -/
 theorem coeff_fSeries_eq_zero : ∀ N k : ℕ, k + 2 ≤ N → coeff k (fSeries N) = 0
-  | 0, _, h => absurd h (by omega)
-  | 1, _, h => absurd h (by omega)
+  | 0, _, h => absurd h (by lia)
+  | 1, _, h => absurd h (by lia)
   | 2, k, h => by
-    obtain rfl : k = 0 := by omega
+    obtain rfl : k = 0 := by lia
     exact coeff_qexp_F₈_zero
   | N + 3, k, h => by
     have ih : ∀ j, j + 2 ≤ N + 2 → coeff j (qexp (fFam (N + 2))) = 0 :=
       fun j hj ↦ coeff_fSeries_eq_zero (N + 2) j hj
     rw [fSeries, fFam, qexp_fStep, PowerSeries.coeff_smul, smul_eq_mul, coeff_SF,
       Finset.sum_eq_zero fun j hj ↦ by
-        rw [Finset.mem_range] at hj; rw [ih j (by omega), mul_zero]]
-    obtain hlt | rfl : k + 2 ≤ N + 2 ∨ k = N + 1 := by omega
+        rw [Finset.mem_range] at hj; rw [ih j (by lia), mul_zero]]
+    obtain hlt | rfl : k + 2 ≤ N + 2 ∨ k = N + 1 := by lia
     · rw [ih k hlt]; ring
     · rw [show (4 : ℝ) * ((N + 2 : ℕ) : ℝ) = 4 * (N : ℝ) + 8 by push_cast; ring,
         kappa2_F_zero rfl]
@@ -588,7 +585,7 @@ private theorem mldeF_aux (N : ℕ) :
 is the paper's equation with the weight read straight off the index. -/
 theorem mldeF (N : ℕ) (hN : 2 ≤ N) :
     KanekoZagier.L3 (4 * (N : ℝ) - 2) ((4 * (N : ℝ) - 4) / 4) 0 (fSeries N) = 0 := by
-  obtain ⟨M, rfl⟩ : ∃ M, N = M + 2 := ⟨N - 2, by omega⟩
+  obtain ⟨M, rfl⟩ : ∃ M, N = M + 2 := ⟨N - 2, by lia⟩
   rw [show (4 : ℝ) * ((M + 2 : ℕ) : ℝ) - 2 = 4 * (M : ℝ) + 6 by push_cast; ring,
     show ((4 : ℝ) * ((M + 2 : ℕ) : ℝ) - 4) / 4 = (4 * (M : ℝ) + 4) / 4 by push_cast; ring]
   exact mldeF_aux M
@@ -607,7 +604,7 @@ lemma kappa3_F (N : ℕ) :
 lemma K3_F (N : ℕ) :
     KanekoZagier.K3 (4 * (N : ℝ) + 6) ((4 * (N : ℝ) + 4) / 4) 0 (N + 2) (N + 1)
       = -8 * ((N : ℝ) ^ 3 + 3 * N ^ 2 + 14 * N + 9) := by
-  rw [KanekoZagier.K3, show N + 2 - (N + 1) = 1 by omega]
+  rw [KanekoZagier.K3, show N + 2 - (N + 1) = 1 by lia]
   norm_num
   ring
 
@@ -619,7 +616,7 @@ lemma kappa2_F_cusp (N : ℕ) :
 lemma K2_F_cusp (N : ℕ) :
     KanekoZagier.K2 (4 * (N : ℝ) + 8 - 2) (alphaF (4 * (N : ℝ) + 8)) (N + 2) (N + 1)
       = -4 * (24 * (N : ℝ) ^ 2 + 25 * N + 4) := by
-  rw [K2_F, show N + 2 - (N + 1) = 1 by omega]
+  rw [K2_F, show N + 2 - (N + 1) = 1 by lia]
   norm_num
   ring
 
@@ -632,8 +629,8 @@ private lemma coeff_fSeries_succ {N : ℕ} (h : coeff (N + 1) (fSeries (N + 2)) 
   rw [KanekoZagier.coeff_L3, map_zero, kappa3_F,
     Finset.sum_eq_single (N + 1)
       (fun j hj hne ↦ by
-        rw [coeff_fSeries_eq_zero (N + 2) j (by rw [Finset.mem_range] at hj; omega), mul_zero])
-      (fun hj ↦ absurd (Finset.mem_range.2 (by omega)) hj),
+        rw [coeff_fSeries_eq_zero (N + 2) j (by rw [Finset.mem_range] at hj; lia), mul_zero])
+      (fun hj ↦ absurd (Finset.mem_range.2 (by lia)) hj),
     K3_F, h, mul_one] at key
   rw [eq_div_iff (by positivity)]
   linarith [key]
@@ -674,8 +671,8 @@ private theorem coeff_fSeries_eq_one_aux (N : ℕ) : coeff (N + 1) (fSeries (N +
       show (4 : ℝ) * ((N + 2 : ℕ) : ℝ) = 4 * (N : ℝ) + 8 by push_cast; ring,
       PowerSeries.coeff_smul, smul_eq_mul, coeff_SF,
       Finset.sum_eq_single (N + 1)
-        (fun j hj hne ↦ by rw [hz j (by rw [Finset.mem_range] at hj; omega), mul_zero])
-        (fun hj ↦ absurd (Finset.mem_range.2 (by omega)) hj),
+        (fun j hj hne ↦ by rw [hz j (by rw [Finset.mem_range] at hj; lia), mul_zero])
+        (fun hj ↦ absurd (Finset.mem_range.2 (by lia)) hj),
       hb, h2, mul_one, kappa2_F_cusp, K2_F_cusp, cusp_normalization]
 
 /-! ### The conclusion -/
@@ -683,9 +680,8 @@ private theorem coeff_fSeries_eq_one_aux (N : ℕ) : coeff (N + 1) (fSeries (N +
 /-- **The normalisation of `F_w`**, proved rather than assumed: the first nonzero Fourier
 coefficient of `F_{4N}`, at the cusp index `N - 1`, is `1`. -/
 theorem coeff_fSeries_eq_one (N : ℕ) (hN : 2 ≤ N) : coeff (N - 1) (fSeries N) = 1 := by
-  obtain ⟨M, rfl⟩ : ∃ M, N = M + 2 := ⟨N - 2, by omega⟩
-  rw [show M + 2 - 1 = M + 1 by omega]
-  exact coeff_fSeries_eq_one_aux M
+  obtain ⟨M, rfl⟩ : ∃ M, N = M + 2 := ⟨N - 2, by lia⟩
+  rw [show M + 2 - 1 = M + 1 by lia, coeff_fSeries_eq_one_aux]
 
 /-! ### The conclusion -/
 
@@ -693,7 +689,7 @@ theorem coeff_fSeries_eq_one (N : ℕ) (hN : 2 ≤ N) : coeff (N - 1) (fSeries N
 private lemma ftildeSeries_succ' (N : ℕ) : ftildeSeries (N + 3 + 1)
     = ftildeStep (4 * (N : ℝ) + 12) (fSeries (N + 3)) (ftildeSeries (N + 3)) := by
   rw [show (4 : ℝ) * (N : ℝ) + 12 = 4 * ((N + 3 : ℕ) : ℝ) by push_cast; ring]
-  exact ftildeSeries_succ (by omega)
+  exact ftildeSeries_succ (by lia)
 
 /-- The induction of the `QExpansion` section, run on the concrete family: `F̃_{4N+10}` is a cusp
 form, its coefficients up to `N + 1` are positive, and the one at `N + 1` is at least `1/360`. -/
@@ -703,7 +699,7 @@ private lemma ftilde_facts (N : ℕ) :
       ∧ 1 / 360 ≤ coeff (N + 1) (ftildeSeries (N + 3)) :=
   ftilde_induction (F := fun N ↦ fSeries (N + 3)) (Ft := fun N ↦ ftildeSeries (N + 3))
     ftildeSeries_three ftildeSeries_succ'
-    (fun N k hk ↦ coeff_fSeries_eq_zero (N + 3) k (by omega))
+    (fun N k hk ↦ coeff_fSeries_eq_zero (N + 3) k (by lia))
     (fun N ↦ coeff_fSeries_eq_one_aux (N + 1)) N
 
 /-- **Positivity of the Fourier coefficients of `F̃_{w-2}`**, with nothing assumed: the recurrence,
@@ -713,8 +709,8 @@ the base case, the vanishing order and the normalisation are all proved from the
 `ftildeSeries N` is `F̃_{4N-2}`, and the range `1 ≤ j ≤ N - 2` is the paper's `1 ≤ j ≤ w/4 - 3`. -/
 theorem coeff_ftildeSeries_pos (N j : ℕ) (hN : 2 ≤ N) (hj1 : 1 ≤ j) (hj : j ≤ N - 2) :
     0 < coeff j (ftildeSeries N) := by
-  obtain ⟨M, rfl⟩ : ∃ M, N = M + 3 := ⟨N - 3, by omega⟩
-  exact (ftilde_facts M).2.1 j hj1 (by omega)
+  obtain ⟨M, rfl⟩ : ∃ M, N = M + 3 := ⟨N - 3, by lia⟩
+  exact (ftilde_facts M).2.1 j hj1 (by lia)
 
 /-- **The boundary coefficient.**  `ã_{w/4-2} ≥ 1/360`, at the index `N - 2` of `F̃_{4N-2}`.
 
@@ -722,8 +718,8 @@ Unlike the positivity range this one is not vacuous at small `N`, so `3 ≤ N` i
 cusp form, and at `N = 2` the statement would read `1/360 ≤ 0`. -/
 theorem coeff_ftildeSeries_boundary (N : ℕ) (hN : 3 ≤ N) :
     1 / 360 ≤ coeff (N - 2) (ftildeSeries N) := by
-  obtain ⟨M, rfl⟩ : ∃ M, N = M + 3 := ⟨N - 3, by omega⟩
-  rw [show M + 3 - 2 = M + 1 by omega]
+  obtain ⟨M, rfl⟩ : ∃ M, N = M + 3 := ⟨N - 3, by lia⟩
+  rw [show M + 3 - 2 = M + 1 by lia]
   exact (ftilde_facts M).2.2
 
 end PolynomialModel

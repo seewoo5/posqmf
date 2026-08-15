@@ -135,13 +135,13 @@ lemma kappa2_G_neg {w : ℝ} {n : ℕ} (hw : 0 ≤ w) (hn : 4 * (n : ℝ) ≤ w 
 theorem weight_gap_nonneg {w : ℝ} {n j : ℕ} (hw : 0 ≤ w) (hj : j < n) (hn : 4 * (n : ℝ) ≤ w + 4) :
     0 ≤ w * ((n : ℝ) - j) - 2 * j := by
   have hgap : 1 ≤ (n : ℝ) - j := by
-    rw [← Nat.cast_sub hj.le]; exact_mod_cast Nat.one_le_iff_ne_zero.mpr (by omega)
+    rw [← Nat.cast_sub hj.le]; exact_mod_cast Nat.one_le_iff_ne_zero.mpr (by lia)
   nlinarith
 
 /-- On `0 ≤ j < n ≤ w/4 + 1` the lower triangular coefficient is negative. -/
 lemma K2_G_neg {w : ℝ} {n j : ℕ} (hw : 0 ≤ w) (hj : j < n) (hn : 4 * (n : ℝ) ≤ w + 4) :
     K2 w (alphaG w) n j < 0 := by
-  have hnj : 1 ≤ n - j := by omega
+  have hnj : 1 ≤ n - j := by lia
   rw [K2_G]
   have t1 : 0 ≤ 2 * (w + 1) * (w * ((n : ℝ) - j) - 2 * j) * (σ 1 (n - j) : ℝ) :=
     mul_nonneg (mul_nonneg (by linarith) (weight_gap_nonneg hw hj hn)) (sigma_pos hnj).le
@@ -165,7 +165,7 @@ theorem gtildeStep_nonneg {N : ℕ} {w : ℝ} (hw : w = 4 * N) {Gt : ℝ⟦X⟧}
   have hsum : ∑ j ∈ range n, K2 w (alphaG w) n j * coeff j Gt ≤ 0 :=
     Finset.sum_nonpos fun j hj ↦ by
       rw [Finset.mem_range] at hj
-      exact mul_nonpos_of_nonpos_of_nonneg (K2_G_neg hw0 hj hnR).le (hnn j (by omega))
+      exact mul_nonpos_of_nonpos_of_nonneg (K2_G_neg hw0 hj hnR).le (hnn j (by lia))
   rw [coeff_gtildeStep]
   exact mul_nonneg (cG_pos hw0).le (by linarith)
 
@@ -229,7 +229,7 @@ lemma Kpp_eq {N j : ℕ} {w : ℝ} (hw : w = 4 * N) (hj : j ≤ N + 1) :
       = Aw w ((N + 2 - j : ℕ) : ℝ) * (σ 1 (N + 2 - j) : ℝ)
         + Bw w ((N + 2 - j : ℕ) : ℝ) * (σ 3 (N + 2 - j) : ℝ) := by
   have hcast : ((N + 2 - j : ℕ) : ℝ) = (N : ℝ) + 2 - j := by
-    rw [Nat.cast_sub (by omega)]; push_cast; ring
+    rw [Nat.cast_sub (by lia)]; push_cast; ring
   have h8 : (w + 8) ≠ 0 := by rw [hw]; positivity
   have h12 : (w + 12) ≠ 0 := by rw [hw]; positivity
   rw [K3_G, K2_G, Aw, Bw, hcast, hw]
@@ -282,9 +282,9 @@ theorem gtildeStep_boundary {N : ℕ} {w : ℝ} (hw : w = 4 * N) {Gt : ℝ⟦X�
   rw [coeff_gtildeStep_boundary hw hode]
   refine mul_nonneg (cG_pos hw0).le (Finset.sum_nonneg fun j hj ↦ ?_)
   rw [Finset.mem_range] at hj
-  refine mul_nonneg ?_ (hnn j (by omega))
-  rw [Kpp_eq hw (by omega)]
-  exact (Kpp_pos hw0 (by omega)).le
+  refine mul_nonneg ?_ (hnn j (by lia))
+  rw [Kpp_eq hw (by lia)]
+  exact (Kpp_pos hw0 (by lia)).le
 
 /-! ### The base case `G̃₀ = 3/(2¹¹·7)` -/
 
@@ -344,7 +344,7 @@ theorem coeff_gtildeSeries_nonneg (N : ℕ) : ∀ n, n ≤ N + 1 → 0 ≤ coeff
   | succ N ih =>
     intro n hn
     rw [gtildeSeries]
-    obtain hlt | rfl : n ≤ N + 1 ∨ n = N + 2 := by omega
+    obtain hlt | rfl : n ≤ N + 1 ∨ n = N + 2 := by lia
     · exact gtildeStep_nonneg rfl ih hlt
     · exact gtildeStep_boundary rfl (mldeG N) ih
 
