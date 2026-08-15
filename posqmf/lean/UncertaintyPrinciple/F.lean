@@ -416,7 +416,7 @@ def fFam : ℕ → QM
   | 0 => 0
   | 1 => 0
   | 2 => F₈
-  | N + 3 => cF (4 * (N : ℝ) + 8) • SFp (4 * (N : ℝ) + 8) (fFam (N + 2))
+  | N + 3 => cF (4 * N + 8) • SFp (4 * N + 8) (fFam (N + 2))
 
 lemma hasWeight_fFam : ∀ N : ℕ, HasWeight (fFam N) (4 * N)
   | 0 => hasWeight_zero

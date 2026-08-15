@@ -25,7 +25,10 @@ by pure algebra, with no need for the weighted Euler identity.
 ## Main results
 
 * `PolynomialModel.euler_D`: `⁅eulerOp, D⁆ = 2D`, i.e. `D` raises the weight by `2`.
+* `PolynomialModel.euler_delta`: `⁅eulerOp, δ⁆ = -2δ`, i.e. `δ` lowers the weight by `2`.
 * `PolynomialModel.delta_D`: `⁅δ, D⁆ = (1/12) eulerOp`, the `sl₂`-relation of Kaneko--Koike.
+  Together with the two above this is an `sl₂`-triple; `sl2_lie_e_f` states it in the
+  normalisation `e = D`, `h = eulerOp`, `f = -12δ`.
 * `PolynomialModel.delta_serreD`: `δ(∂_k G) = ∂_k(δG) + ((w-k)/12) G` for `G` of weight `w`.
 * `PolynomialModel.qexp_D`, `qexp_serreD`: the `q`-expansion map intertwines the polynomial `D` and
   `∂_k` with the ones on `ℝ⟦X⟧`.  This is where Ramanujan's identities enter.
@@ -199,6 +202,25 @@ theorem euler_delta : ⁅eulerOp, delta⁆ = (-2 : ℝ) • delta := by
   · exact h0
   · exact h1
   · exact h2
+
+/-! ### The `sl₂`-triple
+
+`D`, `δ` and the weight operator span a copy of `sl₂`.  In the standard normalisation take
+`e = D`, `h = eulerOp` and `f = -12δ`; then
+
+`⁅h, e⁆ = 2e`,   `⁅h, f⁆ = -2f`,   `⁅e, f⁆ = h`,
+
+which are `euler_D`, `euler_delta` and `sl2_lie_e_f` below.  The last is `delta_D` rescaled: `D`
+raises the weight by two, `δ` lowers it by two, and their bracket is the weight itself. -/
+
+/-- `⁅h, f⁆ = -2f` for `f = -12δ`, the weight-lowering half of the triple. -/
+theorem sl2_lie_h_f : ⁅eulerOp, (-12 : ℝ) • delta⁆ = (-2 : ℝ) • ((-12 : ℝ) • delta) := by
+  rw [lie_smul, euler_delta, smul_comm]
+
+/-- `⁅e, f⁆ = h`: the bracket of `D` with `-12δ` is the weight operator. -/
+theorem sl2_lie_e_f : ⁅D, (-12 : ℝ) • delta⁆ = eulerOp := by
+  rw [lie_smul, ← lie_skew D delta, delta_D]
+  module
 
 lemma hasWeight_delta {G : QM} {w : ℝ} (h : HasWeight G w) : HasWeight (delta G) (w - 2) := by
   have key := congrArg (fun T : Derivation ℝ QM QM ↦ T G) euler_delta

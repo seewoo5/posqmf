@@ -26,8 +26,6 @@ Notably the coefficient formulas of `Coefficients.lean` do *not* depend on them.
   is not needed: `E₆` only ever enters through `∂₆E₆`, handled in Serre form by `serreD_E₆`.
 -/
 
-open PowerSeries
-
 namespace QExpansion
 
 /-- **Ramanujan's identity** `E₂' = (E₂² - E₄)/12`, taken as an axiom. -/
