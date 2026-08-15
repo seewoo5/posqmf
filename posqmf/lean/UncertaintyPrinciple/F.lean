@@ -29,7 +29,7 @@ namespace of the layer it works in: `KanekoZagier` and `QuasiModular` both name 
 * `PolynomialModel` works in `ℝ[E₂,E₄,E₆]`, and discharges all of those hypotheses.  It has to:
   their derivation needs `δ = ∂/∂E₂`, which is not an operator on `q`-expansions and so cannot even
   be stated on the first layer.  The `F_w` family is *defined* here by its recurrence, making
-  `F̃_{w-2} := δF_w` an honest definition rather than a hypothesis; `delta_fStep` applies `δ` to
+  `F̃_{w-2} := δF_w` an honest definition rather than a hypothesis; `delta_SFp` applies `δ` to
   that definition, which is where the paper's collapse
   `(1/6)∂_wF_w + (1/6)∂_{w-2}F_w = (1/3)∂_{w-1}F_w` happens; and `qexp` transports the resulting
   polynomial identity to `ℝ⟦X⟧`, landing exactly on `ftildeStep`.
@@ -46,7 +46,7 @@ paper.  `F₀` and `F₄` do not exist and are set to zero.
   properties of `F_w`.
 * `UncertaintyPrinciple.quartic_nonneg`: `2w⁴ - 77w³ + 1018w² - 4312w + 4800 ≥ 0` for `w ≥ 12`,
   the inequality controlling the boundary coefficient.
-* `UncertaintyPrinciple.delta_fStep` and `qexp_delta_fStep`: the recurrence for `F̃`, in the
+* `UncertaintyPrinciple.delta_SFp` and `qexp_delta_SFp`: the recurrence for `F̃`, in the
   polynomial model and on `q`-expansions.
 * `UncertaintyPrinciple.mldeF`: the third-order equation `L_{3,w-2}^{((w-4)/4,0)}F_w = 0`, proved by
   the intertwining criterion from an explicit check on `F₈`.
@@ -313,17 +313,14 @@ open QuasiModular
 def SFp (w : ℝ) (G : QM) : QM :=
   ((w - 6) * (w - 5) / 36 : ℝ) • (E₄ * G) - serreD w (serreD (w - 2) G)
 
-/-- The right-hand side of the recurrence defining `F_{w+4}` from `F_w`. -/
-def fStep (w : ℝ) (Fw : QM) : QM := cF w • SFp w Fw
-
 lemma qexp_SFp (w : ℝ) (G : QM) : qexp (SFp w G) = SF w (qexp G) := by
   rw [SFp, SF, KanekoZagier.L2_eq_serre, KanekoZagier.serreDIter_two,
     show w - 2 + 2 = w by ring, alphaF, map_sub, map_smul, map_mul, qexp_E₄, qexp_serreD,
     qexp_serreD]
   module
 
-lemma hasWeight_fStep {w : ℝ} {G : QM} (h : HasWeight G w) : HasWeight (fStep w G) (w + 4) :=
-  HasWeight.smul _ <| HasWeight.sub
+lemma hasWeight_SFp {w : ℝ} {G : QM} (h : HasWeight G w) : HasWeight (SFp w G) (w + 4) :=
+  HasWeight.sub
     (HasWeight.congr_weight ((hasWeight_E₄.mul h).smul _) (by ring))
     (HasWeight.congr_weight (hasWeight_serreD w (hasWeight_serreD (w - 2) h)) (by ring))
 
@@ -332,17 +329,18 @@ lemma hasWeight_fStep {w : ℝ} {G : QM} (h : HasWeight G w) : HasWeight (fStep 
 /-- **The recurrence for `F̃`.**  Applying `δ` to the defining recurrence of `F_w` produces it
 for `F̃`.  The two uses of `delta_serreD` contribute `(1/6)∂_wF_w` and `(1/6)∂_{w-2}F_w`, which
 combine into `(1/3)∂_{w-1}F_w`. -/
-theorem delta_fStep {w : ℝ} {Fw : QM} (h : HasWeight Fw w) :
-    delta (fStep w Fw) = cF w • (SFp w (delta Fw) - (1 / 3 : ℝ) • serreD (w - 1) Fw) := by
-  rw [fStep, Derivation.map_smul, SFp, map_sub, Derivation.map_smul, Derivation.leibniz, delta_E₄,
+theorem delta_SFp {w : ℝ} {Fw : QM} (h : HasWeight Fw w) :
+    delta (SFp w Fw) = SFp w (delta Fw) - (1 / 3 : ℝ) • serreD (w - 1) Fw := by
+  rw [SFp, map_sub, Derivation.map_smul, Derivation.leibniz, delta_E₄,
     delta_serreD w (hasWeight_serreD (w - 2) h), delta_serreD (w - 2) h, serreD_add, serreD_smul,
     SFp, ← serreD_collapse w Fw, smul_zero, add_zero, smul_eq_mul]
   module
 
 /-- The recurrence, transported to `q`-expansions: it lands exactly on `ftildeStep`. -/
-theorem qexp_delta_fStep {w : ℝ} {Fw : QM} (h : HasWeight Fw w) :
-    qexp (delta (fStep w Fw)) = ftildeStep w (qexp Fw) (qexp (delta Fw)) := by
-  rw [delta_fStep h, ftildeStep, map_smul, map_sub, qexp_SFp, map_smul, qexp_serreD]
+theorem qexp_delta_SFp {w : ℝ} {Fw : QM} (h : HasWeight Fw w) :
+    qexp (delta (cF w • SFp w Fw)) = ftildeStep w (qexp Fw) (qexp (delta Fw)) := by
+  rw [Derivation.map_smul, delta_SFp h, ftildeStep, map_smul, map_sub, qexp_SFp, map_smul,
+    qexp_serreD]
 
 /-! ### The family and its base case -/
 
@@ -418,21 +416,22 @@ def fFam : ℕ → QM
   | 0 => 0
   | 1 => 0
   | 2 => F₈
-  | N + 3 => fStep (4 * (N : ℝ) + 8) (fFam (N + 2))
+  | N + 3 => cF (4 * (N : ℝ) + 8) • SFp (4 * (N : ℝ) + 8) (fFam (N + 2))
 
 lemma hasWeight_fFam : ∀ N : ℕ, HasWeight (fFam N) (4 * N)
   | 0 => hasWeight_zero
   | 1 => hasWeight_zero
   | 2 => by norm_num; exact hasWeight_F₈
-  | N + 3 => HasWeight.congr_weight
-      (hasWeight_fStep (HasWeight.congr_weight (hasWeight_fFam (N + 2)) (by push_cast; ring)))
-      (by push_cast; ring)
+  | N + 3 =>
+    have h : HasWeight (fFam (N + 2)) (4 * (N : ℝ) + 8) :=
+      HasWeight.congr_weight (hasWeight_fFam (N + 2)) (by push_cast; ring)
+    HasWeight.congr_weight ((hasWeight_SFp h).smul _) (by push_cast; ring)
 
 /-- The recurrence carries `F₈` to `F₁₂`, so the family generated here agrees with the second
 explicit form in the paper. -/
 lemma fFam_three : fFam 3 = F₁₂ := by
-  change fStep (4 * ((0 : ℕ) : ℝ) + 8) F₈ = F₁₂
-  rw [show (4 : ℝ) * ((0 : ℕ) : ℝ) + 8 = 8 by norm_num, fStep, SFp,
+  change cF (4 * ((0 : ℕ) : ℝ) + 8) • SFp (4 * ((0 : ℕ) : ℝ) + 8) F₈ = F₁₂
+  rw [show (4 : ℝ) * ((0 : ℕ) : ℝ) + 8 = 8 by norm_num, SFp,
     show (8 : ℝ) - 2 = 6 by norm_num, serreD_serreD_F₈, F₈, F₁₂, cF]
   norm_num
   simp only [smul_smul, smul_sub, smul_add, mul_smul_comm, mul_sub, mul_add,
@@ -460,7 +459,7 @@ theorem ftildeSeries_succ {N : ℕ} (hN : 2 ≤ N) :
   obtain ⟨M, rfl⟩ : ∃ M, N = M + 2 := ⟨N - 2, by lia⟩
   change qexp (delta (fFam (M + 3))) = _
   rw [show (4 : ℝ) * ((M + 2 : ℕ) : ℝ) = 4 * (M : ℝ) + 8 by push_cast; ring, fFam,
-    qexp_delta_fStep (HasWeight.congr_weight (hasWeight_fFam (M + 2)) (by push_cast; ring))]
+    qexp_delta_SFp (HasWeight.congr_weight (hasWeight_fFam (M + 2)) (by push_cast; ring))]
   rfl
 
 /-- **The base case of the induction, discharged**: `F̃₁₀ = δF₁₂`. -/
@@ -471,9 +470,6 @@ theorem ftildeSeries_three : ftildeSeries 3 = ftilde₁₀ := by
 
 The paper's `F_w` vanishes to order `⌊w/4⌋ - 1` at the cusp, so `fFam N`, of weight `4N`, vanishes
 to order `N - 1`: its coefficients below index `N - 1` are zero and the one at `N - 1` is `1`. -/
-
-lemma qexp_fStep (w : ℝ) (F : QM) : qexp (fStep w F) = cF w • SF w (qexp F) := by
-  rw [fStep, map_smul, qexp_SFp]
 
 lemma coeff_SF (w : ℝ) (f : ℝ⟦X⟧) (n : ℕ) :
     coeff n (SF w f) = -(KanekoZagier.kappa2 (w - 2) (alphaF w) n * coeff n f
@@ -513,7 +509,7 @@ theorem coeff_fSeries_eq_zero : ∀ N k : ℕ, k + 2 ≤ N → coeff k (fSeries 
   | N + 3, k, h => by
     have ih : ∀ j, j + 2 ≤ N + 2 → coeff j (qexp (fFam (N + 2))) = 0 :=
       fun j hj ↦ coeff_fSeries_eq_zero (N + 2) j hj
-    rw [fSeries, fFam, qexp_fStep, PowerSeries.coeff_smul, smul_eq_mul, coeff_SF,
+    rw [fSeries, fFam, map_smul, qexp_SFp, PowerSeries.coeff_smul, smul_eq_mul, coeff_SF,
       Finset.sum_eq_zero fun j hj ↦ by
         rw [Finset.mem_range] at hj; rw [ih j (by lia), mul_zero]]
     obtain hlt | rfl : k + 2 ≤ N + 2 ∨ k = N + 1 := by lia
@@ -579,7 +575,7 @@ private theorem mldeF_aux (N : ℕ) :
       exact ih)
     rw [show 4 * (N : ℝ) + 8 + 2 = 4 * ((N : ℝ) + 1) + 6 by ring,
       show (4 * (N : ℝ) + 8) / 4 = (4 * ((N : ℝ) + 1) + 4) / 4 by ring] at this
-    rw [fSeries, fFam, qexp_fStep]
+    rw [fSeries, fFam, map_smul, qexp_SFp]
     push_cast
     exact this
 
@@ -669,7 +665,7 @@ private theorem coeff_fSeries_eq_one_aux (N : ℕ) : coeff (N + 1) (fSeries (N +
         = 8 * ((N : ℝ) ^ 3 + 3 * N ^ 2 + 14 * N + 9) / (((N : ℝ) + 1) * ((N : ℝ) + 2)) :=
       coeff_fSeries_succ ih
     change coeff (N + 2) (fSeries (N + 3)) = 1
-    rw [fSeries, fFam, qexp_fStep,
+    rw [fSeries, fFam, map_smul, qexp_SFp,
       PowerSeries.coeff_smul, smul_eq_mul, coeff_SF,
       Finset.sum_eq_single (N + 1)
         (fun j hj hne ↦ by rw [hz j (by rw [Finset.mem_range] at hj; lia), mul_zero])

@@ -332,35 +332,27 @@ None of this is needed for the coefficient positivity above; it records the modu
 def SGp (w : ℝ) (G : QM) : QM :=
   ((w + 8) * (w + 9) / 36 : ℝ) • (E₄ * G) - serreD (w + 2) (serreD w G)
 
-/-- The right-hand side of the recurrence for `G̃`, polynomially. -/
-def gtildeStepP (w : ℝ) (G : QM) : QM := cG w • SGp w G
-
 lemma qexp_SGp (w : ℝ) (G : QM) :
     qexp (SGp w G) = -KanekoZagier.L2 w (alphaG w) (qexp G) := by
   rw [SGp, KanekoZagier.L2_eq_serre, KanekoZagier.serreDIter_two, alphaG, map_sub, map_smul,
     map_mul, qexp_E₄, qexp_serreD, qexp_serreD]
   module
 
-lemma qexp_gtildeStepP (w : ℝ) (G : QM) :
-    qexp (gtildeStepP w G) = gtildeStep w (qexp G) := by
-  rw [gtildeStepP, gtildeStep, map_smul, qexp_SGp]
-
-lemma hasWeight_gtildeStepP {w : ℝ} {G : QM} (h : HasWeight G w) :
-    HasWeight (gtildeStepP w G) (w + 4) :=
-  HasWeight.smul _ <| HasWeight.sub
+lemma hasWeight_SGp {w : ℝ} {G : QM} (h : HasWeight G w) : HasWeight (SGp w G) (w + 4) :=
+  HasWeight.sub
     (HasWeight.congr_weight ((hasWeight_E₄.mul h).smul _) (by ring))
     (HasWeight.congr_weight (hasWeight_serreD (w + 2) (hasWeight_serreD w h)) (by ring))
 
 /-- The family `G̃_{4N}` in the polynomial model. -/
 def gtildeFam : ℕ → QM
   | 0 => (3 / 14336 : ℝ) • 1
-  | N + 1 => gtildeStepP (4 * (N : ℝ)) (gtildeFam N)
+  | N + 1 => cG (4 * (N : ℝ)) • SGp (4 * (N : ℝ)) (gtildeFam N)
 
 lemma hasWeight_gtildeFam : ∀ N : ℕ, HasWeight (gtildeFam N) (4 * N)
   | 0 => by
     rw [gtildeFam]
     exact HasWeight.congr_weight (HasWeight.smul _ hasWeight_one) (by norm_num)
-  | N + 1 => HasWeight.congr_weight (hasWeight_gtildeStepP (hasWeight_gtildeFam N))
+  | N + 1 => HasWeight.congr_weight ((hasWeight_SGp (hasWeight_gtildeFam N)).smul _)
       (by push_cast; ring)
 
 /-- **`G̃_w` has depth `0`**: it is a modular form, a polynomial in `E₄` and `E₆` alone.  This is
@@ -372,7 +364,7 @@ lemma delta_gtildeFam : ∀ N : ℕ, delta (gtildeFam N) = 0
     have h1 : delta (serreD (4 * (N : ℝ)) (gtildeFam N)) = 0 := by
       rw [delta_serreD _ hw, delta_gtildeFam N]
       simp [serreD]
-    rw [gtildeFam, gtildeStepP, SGp, Derivation.map_smul, map_sub, Derivation.map_smul,
+    rw [gtildeFam, SGp, Derivation.map_smul, map_sub, Derivation.map_smul,
       Derivation.leibniz, delta_E₄, delta_gtildeFam N,
       delta_serreD _ (hasWeight_serreD _ hw), h1]
     simp [serreD]
@@ -397,7 +389,7 @@ def gtildeSeries (N : ℕ) : ℝ⟦X⟧ := qexp (gtildeFam N)
 /-- The recurrence, now a theorem rather than the definition. -/
 lemma gtildeSeries_succ (N : ℕ) :
     gtildeSeries (N + 1) = gtildeStep (4 * (N : ℝ)) (gtildeSeries N) := by
-  rw [gtildeSeries, gtildeSeries, gtildeFam, qexp_gtildeStepP]
+  rw [gtildeSeries, gtildeSeries, gtildeFam, map_smul, qexp_SGp, gtildeStep]
 
 end PolynomialModel
 
