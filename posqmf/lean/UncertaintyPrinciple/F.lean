@@ -24,8 +24,8 @@ namespace of the layer it works in: `KanekoZagier` and `QuasiModular` both name 
   recurrence `F̃_{w+2} = c_w(𝒮_w F̃_{w-2} - (1/3)∂_{w-1}F_w)`, where `𝒮_w = -L_{2,w-2}^{α_w}` and
   `α_w = -(w-10)(w-4)/48`: the specialised coefficient formulas, all the sign analysis, the
   boundary estimate, the base case `F̃₁₀ = (1/360)E₄X_{6,1}`, and the induction itself.  Its
-  conclusions `ftildePos` and `ftildeBoundary` take the recurrence and the vanishing order and
-  normalisation of `F_w` as explicit hypotheses.
+  induction is run by `ftilde_induction`, which takes the recurrence and the vanishing order and
+  normalisation of `F_w` as hypotheses; `PolynomialModel` supplies them.
 * `PolynomialModel` works in `ℝ[E₂,E₄,E₆]`, and discharges all of those hypotheses.  It has to:
   their derivation needs `δ = ∂/∂E₂`, which is not an operator on `q`-expansions and so cannot even
   be stated on the first layer.  The `F_w` family is *defined* here by its recurrence, making
@@ -42,9 +42,8 @@ paper.  `F₀` and `F₄` do not exist and are set to zero.
 
 ## Main results
 
-* `UncertaintyPrinciple.ftildeStep_pos` and `ftildeStep_boundary`: one induction step.
-* `UncertaintyPrinciple.ftildePos` and `ftildeBoundary`: the induction, with the properties of
-  `F_w` as hypotheses.
+* `UncertaintyPrinciple.ftildeStep_pos` and `ftildeStep_boundary`: one induction step, from the
+  properties of `F_w`.
 * `UncertaintyPrinciple.quartic_nonneg`: `2w⁴ - 77w³ + 1018w² - 4312w + 4800 ≥ 0` for `w ≥ 12`,
   the inequality controlling the boundary coefficient.
 * `UncertaintyPrinciple.delta_fStep` and `qexp_delta_fStep`: the recurrence for `F̃`, in the
@@ -303,34 +302,6 @@ private lemma ftilde_induction {F Ft : ℕ → ℝ⟦X⟧} (hbase : Ft 0 = ftild
       · exact hstepPos j hj1 (by omega)
       · linarith [hstepBdry]
 
-/-- **Positivity of the interior coefficients.**  For `w = 4N + 12`, every Fourier coefficient
-`ã_j` of `F̃_{w-2}` with `1 ≤ j ≤ w/4 - 3 = N` is positive. -/
-theorem ftildePos {F Ft : ℕ → ℝ⟦X⟧} (hbase : Ft 0 = ftilde₁₀)
-    (hrec : ∀ N, Ft (N + 1) = ftildeStep (4 * (N : ℝ) + 12) (F N) (Ft N))
-    (hF0 : ∀ N k, k ≤ N + 1 → coeff k (F N) = 0) (hF1 : ∀ N, coeff (N + 2) (F N) = 1)
-    (N j : ℕ) (hj1 : 1 ≤ j) (hj : j ≤ N + 1) : 0 < coeff j (Ft N) :=
-  (ftilde_induction hbase hrec hF0 hF1 N).2.1 j hj1 hj
-
-/-- **The boundary coefficient.**  For `w = 4N + 12`, the coefficient `ã_{w/4-2} = ã_{N+1}` of
-`F̃_{w-2}` is at least `1/360`. -/
-theorem ftildeBoundary {F Ft : ℕ → ℝ⟦X⟧} (hbase : Ft 0 = ftilde₁₀)
-    (hrec : ∀ N, Ft (N + 1) = ftildeStep (4 * (N : ℝ) + 12) (F N) (Ft N))
-    (hF0 : ∀ N k, k ≤ N + 1 → coeff k (F N) = 0) (hF1 : ∀ N, coeff (N + 2) (F N) = 1)
-    (N : ℕ) : 1 / 360 ≤ coeff (N + 1) (Ft N) :=
-  (ftilde_induction hbase hrec hF0 hF1 N).2.2
-
-/-- The hypotheses of `ftildePos` and `ftildeBoundary` are satisfiable, so neither statement is
-vacuous: any family of `F`'s with the right vanishing order will do, and `Ft` is then determined
-by the recurrence. -/
-example : ∃ F Ft : ℕ → ℝ⟦X⟧, Ft 0 = ftilde₁₀ ∧
-    (∀ N, Ft (N + 1) = ftildeStep (4 * (N : ℝ) + 12) (F N) (Ft N)) ∧
-    (∀ N k, k ≤ N + 1 → coeff k (F N) = 0) ∧ (∀ N, coeff (N + 2) (F N) = 1) :=
-  ⟨fun N ↦ X ^ (N + 2),
-   fun N ↦ Nat.rec ftilde₁₀ (fun n ih ↦ ftildeStep (4 * (n : ℝ) + 12) (X ^ (n + 2)) ih) N,
-   rfl, fun _ ↦ rfl,
-   fun _ _ hk ↦ by rw [PowerSeries.coeff_X_pow]; exact if_neg (by omega),
-   fun _ ↦ by rw [PowerSeries.coeff_X_pow]; exact if_pos rfl⟩
-
 end QExpansion
 
 section PolynomialModel
@@ -481,7 +452,7 @@ def ftildeSeries (N : ℕ) : ℝ⟦X⟧ := qexp (delta (fFam N))
 /-- The `q`-expansion of `F_w`. -/
 def fSeries (N : ℕ) : ℝ⟦X⟧ := qexp (fFam N)
 
-/-- **The recurrence hypothesis of `ftildePos`, discharged.**  It holds from `F₈` on, that is for
+/-- **The recurrence for `F̃`, discharged.**  It holds from `F₈` on, that is for
 `N ≥ 2`. -/
 theorem ftildeSeries_succ {N : ℕ} (hN : 2 ≤ N) :
     ftildeSeries (N + 1) = ftildeStep (4 * (N : ℝ)) (fSeries N) (ftildeSeries N) := by
@@ -490,7 +461,7 @@ theorem ftildeSeries_succ {N : ℕ} (hN : 2 ≤ N) :
   rw [fFam, qexp_delta_fStep (hasWeight_fFam (M + 2))]
   rfl
 
-/-- **The base case of `ftildePos`, discharged**: `F̃₁₀ = δF₁₂`. -/
+/-- **The base case of the induction, discharged**: `F̃₁₀ = δF₁₂`. -/
 theorem ftildeSeries_three : ftildeSeries 3 = ftilde₁₀ := by
   rw [ftildeSeries, fFam_three]; exact qexp_delta_F₁₂
 
@@ -597,8 +568,7 @@ lemma mldeF_step {w : ℝ} {f : ℝ⟦X⟧} (h : KanekoZagier.L3 (w - 2) ((w - 4
       KanekoZagier.shiftA', KanekoZagier.shiftB', KanekoZagier.shiftC', alphaF]
     ring
 
-/-- **The differential equation for `F_w`**, for every `w = 4N + 8`. -/
-theorem mldeF (N : ℕ) :
+private theorem mldeF_aux (N : ℕ) :
     KanekoZagier.L3 (4 * (N : ℝ) + 6) ((4 * (N : ℝ) + 4) / 4) 0 (fSeries (N + 2)) = 0 := by
   induction N with
   | zero => simpa using mldeF_zero
@@ -613,6 +583,15 @@ theorem mldeF (N : ℕ) :
       show (4 : ℝ) * ((N + 2 : ℕ) : ℝ) = 4 * (N : ℝ) + 8 by push_cast; ring]
     push_cast
     exact this
+
+/-- **The differential equation for `F_w`**: `L_{3,w-2}^{((w-4)/4,0)}F_w = 0` for `w = 4N`, which
+is the paper's equation with the weight read straight off the index. -/
+theorem mldeF (N : ℕ) (hN : 2 ≤ N) :
+    KanekoZagier.L3 (4 * (N : ℝ) - 2) ((4 * (N : ℝ) - 4) / 4) 0 (fSeries N) = 0 := by
+  obtain ⟨M, rfl⟩ : ∃ M, N = M + 2 := ⟨N - 2, by omega⟩
+  rw [show (4 : ℝ) * ((M + 2 : ℕ) : ℝ) - 2 = 4 * (M : ℝ) + 6 by push_cast; ring,
+    show ((4 : ℝ) * ((M + 2 : ℕ) : ℝ) - 4) / 4 = (4 * (M : ℝ) + 4) / 4 by push_cast; ring]
+  exact mldeF_aux M
 
 /-! ### The normalisation of `F_w`
 
@@ -646,10 +625,10 @@ lemma K2_F_cusp (N : ℕ) :
 
 /-- The second nonzero coefficient of `F_{4N+8}`, read off from the third-order equation.  This is
 the `b_{w/4}` of the paper. -/
-lemma coeff_fSeries_succ {N : ℕ} (h : coeff (N + 1) (fSeries (N + 2)) = 1) :
+private lemma coeff_fSeries_succ {N : ℕ} (h : coeff (N + 1) (fSeries (N + 2)) = 1) :
     coeff (N + 2) (fSeries (N + 2))
       = 8 * ((N : ℝ) ^ 3 + 3 * N ^ 2 + 14 * N + 9) / (((N : ℝ) + 1) * ((N : ℝ) + 2)) := by
-  have key := congrArg (coeff (N + 2)) (mldeF N)
+  have key := congrArg (coeff (N + 2)) (mldeF_aux N)
   rw [KanekoZagier.coeff_L3, map_zero, kappa3_F,
     Finset.sum_eq_single (N + 1)
       (fun j hj hne ↦ by
@@ -680,9 +659,7 @@ private lemma cusp_normalization (N : ℕ) :
   field_simp
   ring
 
-/-- **The normalisation of `F_w`**, proved rather than assumed: the leading coefficient of
-`F_{4N+8}`, at index `N+1`, is `1`. -/
-theorem coeff_fSeries_eq_one (N : ℕ) : coeff (N + 1) (fSeries (N + 2)) = 1 := by
+private theorem coeff_fSeries_eq_one_aux (N : ℕ) : coeff (N + 1) (fSeries (N + 2)) = 1 := by
   induction N with
   | zero => simpa using coeff_qexp_F₈ (n := 1) le_rfl
   | succ N ih =>
@@ -703,24 +680,41 @@ theorem coeff_fSeries_eq_one (N : ℕ) : coeff (N + 1) (fSeries (N + 2)) = 1 := 
 
 /-! ### The conclusion -/
 
-/-- The recurrence in the form `ftildePos` wants it, with the weight `4(N+3) = 4N+12`. -/
+/-- **The normalisation of `F_w`**, proved rather than assumed: the first nonzero Fourier
+coefficient of `F_{4N}`, at the cusp index `N - 1`, is `1`. -/
+theorem coeff_fSeries_eq_one (N : ℕ) (hN : 2 ≤ N) : coeff (N - 1) (fSeries N) = 1 := by
+  obtain ⟨M, rfl⟩ : ∃ M, N = M + 2 := ⟨N - 2, by omega⟩
+  rw [show M + 2 - 1 = M + 1 by omega]
+  exact coeff_fSeries_eq_one_aux M
+
+/-! ### The conclusion -/
+
+/-- The recurrence in the shape the induction wants it, with the weight `4(N+3) = 4N+12`. -/
 private lemma ftildeSeries_succ' (N : ℕ) : ftildeSeries (N + 3 + 1)
     = ftildeStep (4 * (N : ℝ) + 12) (fSeries (N + 3)) (ftildeSeries (N + 3)) := by
   rw [show (4 : ℝ) * (N : ℝ) + 12 = 4 * ((N + 3 : ℕ) : ℝ) by push_cast; ring]
   exact ftildeSeries_succ (by omega)
 
-/-- **Positivity of the Fourier coefficients of `F̃_{w-2}`**, with every hypothesis of `ftildePos`
-discharged: the recurrence, the base case, the vanishing order and the normalisation are all proved
-from the definition of the `F_w` family in the polynomial model.
+/-- The induction of the `QExpansion` section, run on the concrete family: `F̃_{4N+10}` is a cusp
+form, its coefficients up to `N + 1` are positive, and the one at `N + 1` is at least `1/360`. -/
+private lemma ftilde_facts (N : ℕ) :
+    coeff 0 (ftildeSeries (N + 3)) = 0
+      ∧ (∀ j, 1 ≤ j → j ≤ N + 1 → 0 < coeff j (ftildeSeries (N + 3)))
+      ∧ 1 / 360 ≤ coeff (N + 1) (ftildeSeries (N + 3)) :=
+  ftilde_induction (F := fun N ↦ fSeries (N + 3)) (Ft := fun N ↦ ftildeSeries (N + 3))
+    ftildeSeries_three ftildeSeries_succ'
+    (fun N k hk ↦ coeff_fSeries_eq_zero (N + 3) k (by omega))
+    (fun N ↦ coeff_fSeries_eq_one_aux (N + 1)) N
+
+/-- **Positivity of the Fourier coefficients of `F̃_{w-2}`**, with nothing assumed: the recurrence,
+the base case, the vanishing order and the normalisation are all proved from the definition of the
+`F_w` family in the polynomial model.
 
 `ftildeSeries N` is `F̃_{4N-2}`, and the range `1 ≤ j ≤ N - 2` is the paper's `1 ≤ j ≤ w/4 - 3`. -/
 theorem coeff_ftildeSeries_pos (N j : ℕ) (hN : 2 ≤ N) (hj1 : 1 ≤ j) (hj : j ≤ N - 2) :
     0 < coeff j (ftildeSeries N) := by
   obtain ⟨M, rfl⟩ : ∃ M, N = M + 3 := ⟨N - 3, by omega⟩
-  exact ftildePos (F := fun N ↦ fSeries (N + 3)) (Ft := fun N ↦ ftildeSeries (N + 3))
-    ftildeSeries_three ftildeSeries_succ'
-    (fun N k hk ↦ coeff_fSeries_eq_zero (N + 3) k (by omega))
-    (fun N ↦ coeff_fSeries_eq_one (N + 1)) M j hj1 (by omega)
+  exact (ftilde_facts M).2.1 j hj1 (by omega)
 
 /-- **The boundary coefficient.**  `ã_{w/4-2} ≥ 1/360`, at the index `N - 2` of `F̃_{4N-2}`.
 
@@ -730,10 +724,7 @@ theorem coeff_ftildeSeries_boundary (N : ℕ) (hN : 3 ≤ N) :
     1 / 360 ≤ coeff (N - 2) (ftildeSeries N) := by
   obtain ⟨M, rfl⟩ : ∃ M, N = M + 3 := ⟨N - 3, by omega⟩
   rw [show M + 3 - 2 = M + 1 by omega]
-  exact ftildeBoundary (F := fun N ↦ fSeries (N + 3)) (Ft := fun N ↦ ftildeSeries (N + 3))
-    ftildeSeries_three ftildeSeries_succ'
-    (fun N k hk ↦ coeff_fSeries_eq_zero (N + 3) k (by omega))
-    (fun N ↦ coeff_fSeries_eq_one (N + 1)) M
+  exact (ftilde_facts M).2.2
 
 end PolynomialModel
 
