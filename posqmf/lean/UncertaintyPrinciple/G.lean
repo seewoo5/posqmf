@@ -358,8 +358,8 @@ def gtildeFam : ℕ → QM
 
 lemma hasWeight_gtildeFam : ∀ N : ℕ, HasWeight (gtildeFam N) (4 * N)
   | 0 => by
-    rw [gtildeFam, show (4 : ℝ) * ((0 : ℕ) : ℝ) = 0 by norm_num]
-    exact HasWeight.smul _ hasWeight_one
+    rw [gtildeFam]
+    exact HasWeight.congr_weight (HasWeight.smul _ hasWeight_one) (by norm_num)
   | N + 1 => HasWeight.congr_weight (hasWeight_gtildeStepP (hasWeight_gtildeFam N))
       (by push_cast; ring)
 

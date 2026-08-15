@@ -418,20 +418,21 @@ def fFam : ℕ → QM
   | 0 => 0
   | 1 => 0
   | 2 => F₈
-  | N + 3 => fStep (4 * ((N + 2 : ℕ) : ℝ)) (fFam (N + 2))
+  | N + 3 => fStep (4 * (N : ℝ) + 8) (fFam (N + 2))
 
 lemma hasWeight_fFam : ∀ N : ℕ, HasWeight (fFam N) (4 * N)
   | 0 => hasWeight_zero
   | 1 => hasWeight_zero
   | 2 => by norm_num; exact hasWeight_F₈
-  | N + 3 => HasWeight.congr_weight (hasWeight_fStep (hasWeight_fFam (N + 2)))
+  | N + 3 => HasWeight.congr_weight
+      (hasWeight_fStep (HasWeight.congr_weight (hasWeight_fFam (N + 2)) (by push_cast; ring)))
       (by push_cast; ring)
 
 /-- The recurrence carries `F₈` to `F₁₂`, so the family generated here agrees with the second
 explicit form in the paper. -/
 lemma fFam_three : fFam 3 = F₁₂ := by
-  change fStep (4 * (((0 + 2 : ℕ) : ℝ))) F₈ = F₁₂
-  rw [show (4 : ℝ) * (((0 + 2 : ℕ) : ℝ)) = 8 by norm_num, fStep, SFp,
+  change fStep (4 * ((0 : ℕ) : ℝ) + 8) F₈ = F₁₂
+  rw [show (4 : ℝ) * ((0 : ℕ) : ℝ) + 8 = 8 by norm_num, fStep, SFp,
     show (8 : ℝ) - 2 = 6 by norm_num, serreD_serreD_F₈, F₈, F₁₂, cF]
   norm_num
   simp only [smul_smul, smul_sub, smul_add, mul_smul_comm, mul_sub, mul_add,
@@ -458,7 +459,8 @@ theorem ftildeSeries_succ {N : ℕ} (hN : 2 ≤ N) :
     ftildeSeries (N + 1) = ftildeStep (4 * (N : ℝ)) (fSeries N) (ftildeSeries N) := by
   obtain ⟨M, rfl⟩ : ∃ M, N = M + 2 := ⟨N - 2, by lia⟩
   change qexp (delta (fFam (M + 3))) = _
-  rw [fFam, qexp_delta_fStep (hasWeight_fFam (M + 2))]
+  rw [show (4 : ℝ) * ((M + 2 : ℕ) : ℝ) = 4 * (M : ℝ) + 8 by push_cast; ring, fFam,
+    qexp_delta_fStep (HasWeight.congr_weight (hasWeight_fFam (M + 2)) (by push_cast; ring))]
   rfl
 
 /-- **The base case of the induction, discharged**: `F̃₁₀ = δF₁₂`. -/
@@ -516,9 +518,7 @@ theorem coeff_fSeries_eq_zero : ∀ N k : ℕ, k + 2 ≤ N → coeff k (fSeries 
         rw [Finset.mem_range] at hj; rw [ih j (by lia), mul_zero]]
     obtain hlt | rfl : k + 2 ≤ N + 2 ∨ k = N + 1 := by lia
     · rw [ih k hlt]; ring
-    · rw [show (4 : ℝ) * ((N + 2 : ℕ) : ℝ) = 4 * (N : ℝ) + 8 by push_cast; ring,
-        kappa2_F_zero rfl]
-      ring
+    · rw [kappa2_F_zero rfl]; ring
 
 /-! ### The modular linear differential equation for `F_w`
 
@@ -579,8 +579,7 @@ private theorem mldeF_aux (N : ℕ) :
       exact ih)
     rw [show 4 * (N : ℝ) + 8 + 2 = 4 * ((N : ℝ) + 1) + 6 by ring,
       show (4 * (N : ℝ) + 8) / 4 = (4 * ((N : ℝ) + 1) + 4) / 4 by ring] at this
-    rw [fSeries, fFam, qexp_fStep,
-      show (4 : ℝ) * ((N + 2 : ℕ) : ℝ) = 4 * (N : ℝ) + 8 by push_cast; ring]
+    rw [fSeries, fFam, qexp_fStep]
     push_cast
     exact this
 
@@ -589,8 +588,9 @@ is the paper's equation with the weight read straight off the index. -/
 theorem mldeF (N : ℕ) (hN : 2 ≤ N) :
     KanekoZagier.L3 (4 * (N : ℝ) - 2) ((4 * (N : ℝ) - 4) / 4) 0 (fSeries N) = 0 := by
   obtain ⟨M, rfl⟩ : ∃ M, N = M + 2 := ⟨N - 2, by lia⟩
-  rw [show (4 : ℝ) * ((M + 2 : ℕ) : ℝ) - 2 = 4 * (M : ℝ) + 6 by push_cast; ring,
-    show ((4 : ℝ) * ((M + 2 : ℕ) : ℝ) - 4) / 4 = (4 * (M : ℝ) + 4) / 4 by push_cast; ring]
+  push_cast
+  rw [show (4 : ℝ) * ((M : ℝ) + 2) - 2 = 4 * (M : ℝ) + 6 by ring,
+    show ((4 : ℝ) * ((M : ℝ) + 2) - 4) / 4 = (4 * (M : ℝ) + 4) / 4 by ring]
   exact mldeF_aux M
 
 /-! ### The normalisation of `F_w`
@@ -670,7 +670,6 @@ private theorem coeff_fSeries_eq_one_aux (N : ℕ) : coeff (N + 1) (fSeries (N +
       coeff_fSeries_succ ih
     change coeff (N + 2) (fSeries (N + 3)) = 1
     rw [fSeries, fFam, qexp_fStep,
-      show (4 : ℝ) * ((N + 2 : ℕ) : ℝ) = 4 * (N : ℝ) + 8 by push_cast; ring,
       PowerSeries.coeff_smul, smul_eq_mul, coeff_SF,
       Finset.sum_eq_single (N + 1)
         (fun j hj hne ↦ by rw [hz j (by rw [Finset.mem_range] at hj; lia), mul_zero])
