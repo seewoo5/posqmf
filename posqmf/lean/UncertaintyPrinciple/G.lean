@@ -37,12 +37,11 @@ Neither conclusion assumes anything.  `gtildeSeries` generates the family from `
 recurrence, which makes the recurrence definitional, and `mldeG` *proves* the third-order equation
 by the intertwining criterion.
 
-`coeff_gtildeSeries_nonneg` therefore carries the Ramanujan axioms, on which
-`KanekoZagier.L3_comp_L2_eq_L2_comp_L3` depends.  `coeff_gtildeSeries_zero_pos` never uses the
-third-order equation, so it stays free of them, riding only on `coeff_L2`.
-
-The `PolynomialModel` section at the end is additive: it exhibits `G̃_w` as a modular form but
-nothing in `QExpansion` depends on it, so those axiom counts are unaffected.
+`G̃_{4N}` is *defined* in the polynomial model, as `gtildeFam`, and `gtildeSeries` is its
+`q`-expansion; the recurrence is then the theorem `gtildeSeries_succ` rather than the definition.
+Both conclusions therefore carry the Ramanujan axioms, which `qexp` needs.  Everything in
+`QExpansion`, and the polynomial facts `hasWeight_gtildeFam` and `delta_gtildeFam`, are free of
+them.
 
 What remains unformalized is the identification of `gtildeSeries` with the paper's `G̃_w`: the
 recurrence itself is a theorem about the latter, and its derivation needs the uniqueness of the
@@ -60,9 +59,9 @@ hypotheses, but does not discharge it.
   `w = 4N`, with every hypothesis discharged.
 * `UncertaintyPrinciple.coeff_gtildeSeries_zero_pos`: the constant term stays strictly positive,
   which is what makes the resulting bound strict.
-* `UncertaintyPrinciple.delta_gtildeFam` and `qexp_gtildeFam`: `G̃_w` exhibited in the polynomial
-  model as a modular form of weight `4N`, with `δG̃_w = 0`.  This is the paper's assertion that
-  `G̃_{w-12}` is a level 1 modular form; nothing above depends on it.
+* `UncertaintyPrinciple.hasWeight_gtildeFam` and `delta_gtildeFam`: `G̃_{4N}` is a modular form of
+  weight `4N`, with `δG̃_w = 0`.  This is the paper's assertion that `G̃_{w-12}` is a level 1
+  modular form.
 
 Weights are indexed by `N : ℕ` with `w = 4N`, so `w/4 + 1 = N + 1` and `w/4 + 2 = N + 2`.
 -/
@@ -312,66 +311,6 @@ lemma coeff_gtilde₀_nonneg (n : ℕ) : 0 ≤ coeff n gtilde₀ := by
 lemma coeff_gtilde₀_zero_pos : 0 < coeff 0 gtilde₀ := by
   rw [coeff_gtilde₀]; norm_num
 
-/-! ### The modular linear differential equation for `G̃_w`
-
-The recurrence applies `L_{2,w}^{α_w}` to `G̃_w`, so the intertwining criterion turns an operator
-annihilating `G̃_w` into one annihilating `G̃_{w+4}`.  Solving the first of the four constraints for
-the free parameter `γ'` gives `γ' = -(w+10)(w+16)/48`, and the remaining three constraints then
-hold identically.  (Note `γ' ≠ α^G_{w+4} = -(w+10)(w+20)/48`; its value is irrelevant to the
-conclusion, since the right-hand side is `L_{2,w+6}^{γ'}` applied to `0`.) -/
-
-/-- The family generated from `G̃₀` by the recurrence, which makes the recurrence definitional.
-
-This does *not* formalize that the result is the paper's `G̃_w`: that identification rests on the
-uniqueness of `G_w = G̃_{w-12} Δ 𝓛_S + Ψ_w`, an argument about modular functions for `Γ(2)`. -/
-def gtildeSeries : ℕ → ℝ⟦X⟧
-  | 0 => gtilde₀
-  | N + 1 => gtildeStep (4 * (N : ℝ)) (gtildeSeries N)
-
-/-- The base case: `G̃₀` is a constant, and at `k = 0` with `β = 0` every coefficient of the
-undifferentiated term of `L_{3,k}^{(α,β)}` vanishes. -/
-lemma mldeG_zero : L3 0 (alphaOdeG 0) 0 gtilde₀ = 0 := by simp [gtilde₀, L3, D_smul]
-
-/-- The third-order equation propagates along the recurrence, by the intertwining criterion. -/
-lemma mldeG_step {w : ℝ} {f : ℝ⟦X⟧} (h : L3 w (alphaOdeG w) 0 f = 0) :
-    L3 (w + 4) (alphaOdeG (w + 4)) 0 (gtildeStep w f) = 0 := by
-  rw [gtildeStep, smul_neg, ← neg_smul, L3_smul, L3_comp_L2_eq_L2_comp_L3 w (alphaOdeG (w + 4)) 0
-    (alphaG w) (alphaOdeG w) 0 (-((w + 10) * (w + 16)) / 48) ?_ ?_ ?_ ?_, h, L2_zero, smul_zero]
-  all_goals (simp only [shiftA, shiftB, shiftC, shiftA', shiftB', shiftC', alphaOdeG, alphaG]; ring)
-
-/-- **The third-order equation for `G̃_w`**, for every `w = 4N`. -/
-theorem mldeG (N : ℕ) : L3 (4 * (N : ℝ)) (alphaOdeG (4 * (N : ℝ))) 0 (gtildeSeries N) = 0 := by
-  induction N with
-  | zero => simpa using mldeG_zero
-  | succ N ih => simpa [gtildeSeries, mul_add] using mldeG_step ih
-
-/-! ### The conclusion -/
-
-/-- **Nonnegativity of the Fourier coefficients of `G̃_w`.**  For `w = 4N`, every coefficient `ã_n`
-with `0 ≤ n ≤ w/4 + 1 = N + 1` is nonnegative. -/
-theorem coeff_gtildeSeries_nonneg (N : ℕ) : ∀ n, n ≤ N + 1 → 0 ≤ coeff n (gtildeSeries N) := by
-  induction N with
-  | zero => intro n _; exact coeff_gtilde₀_nonneg n
-  | succ N ih =>
-    intro n hn
-    rw [gtildeSeries]
-    obtain hlt | rfl : n ≤ N + 1 ∨ n = N + 2 := by lia
-    · exact gtildeStep_nonneg rfl ih hlt
-    · exact gtildeStep_boundary rfl (mldeG N) ih
-
-/-- **The constant term is strictly positive.**  Taking `n = 0` in the recurrence gives the ratio
-`ã₀^{(w+4)} / ã₀^{(w)} = (w+6)(w+10)(w+14) / (256(w+4)(w+9)(w+11))`, which is positive; this is
-what makes the resulting bound on `A₊(d)` strict. -/
-theorem coeff_gtildeSeries_zero_pos (N : ℕ) : 0 < coeff 0 (gtildeSeries N) := by
-  induction N with
-  | zero => exact coeff_gtilde₀_zero_pos
-  | succ N ih =>
-    have hw0 : 0 ≤ 4 * (N : ℝ) := by positivity
-    rw [gtildeSeries, coeff_gtildeStep, Finset.range_zero, Finset.sum_empty, add_zero]
-    refine mul_pos (cG_pos hw0) ?_
-    have := kappa2_G_neg (w := 4 * (N : ℝ)) (n := 0) hw0 (by push_cast; linarith)
-    nlinarith [ih]
-
 end QExpansion
 
 section PolynomialModel
@@ -438,13 +377,79 @@ lemma delta_gtildeFam : ∀ N : ℕ, delta (gtildeFam N) = 0
       delta_serreD _ (hasWeight_serreD _ hw), h1]
     simp [serreD]
 
-/-- The polynomial family and the `q`-series one agree, so `gtildeSeries N` is the `q`-expansion of
-a modular form of weight `4N`. -/
-theorem qexp_gtildeFam : ∀ N : ℕ, qexp (gtildeFam N) = gtildeSeries N
-  | 0 => by rw [gtildeFam, gtildeSeries, gtilde₀, map_smul, map_one]
-  | N + 1 => by rw [gtildeFam, gtildeSeries, qexp_gtildeStepP, qexp_gtildeFam N]
+/-! ### The modular linear differential equation for `G̃_w`
+
+The recurrence applies `L_{2,w}^{α_w}` to `G̃_w`, so the intertwining criterion turns an operator
+annihilating `G̃_w` into one annihilating `G̃_{w+4}`.  Solving the first of the four constraints for
+the free parameter `γ'` gives `γ' = -(w+10)(w+16)/48`, and the remaining three constraints then
+hold identically.  (Note `γ' ≠ α^G_{w+4} = -(w+10)(w+20)/48`; its value is irrelevant to the
+conclusion, since the right-hand side is `L_{2,w+6}^{γ'}` applied to `0`.) -/
+
+/-- The `q`-expansion of `G̃_{4N}`.
+
+This does *not* formalize that it is the paper's `G̃_w`: that identification rests on the uniqueness
+of `G_w = G̃_{w-12} Δ 𝓛_S + Ψ_w`, an argument about modular functions for `Γ(2)`. -/
+def gtildeSeries (N : ℕ) : ℝ⟦X⟧ := qexp (gtildeFam N)
+
+@[simp] lemma gtildeSeries_zero : gtildeSeries 0 = gtilde₀ := by
+  rw [gtildeSeries, gtildeFam, gtilde₀, map_smul, map_one]
+
+/-- The recurrence, now a theorem rather than the definition. -/
+lemma gtildeSeries_succ (N : ℕ) :
+    gtildeSeries (N + 1) = gtildeStep (4 * (N : ℝ)) (gtildeSeries N) := by
+  rw [gtildeSeries, gtildeSeries, gtildeFam, qexp_gtildeStepP]
 
 end PolynomialModel
+
+section Conclusion
+
+open ArithmeticFunction KanekoZagier
+
+/-- The base case: `G̃₀` is a constant, and at `k = 0` with `β = 0` every coefficient of the
+undifferentiated term of `L_{3,k}^{(α,β)}` vanishes. -/
+lemma mldeG_zero : L3 0 (alphaOdeG 0) 0 gtilde₀ = 0 := by simp [gtilde₀, L3, D_smul]
+
+/-- The third-order equation propagates along the recurrence, by the intertwining criterion. -/
+lemma mldeG_step {w : ℝ} {f : ℝ⟦X⟧} (h : L3 w (alphaOdeG w) 0 f = 0) :
+    L3 (w + 4) (alphaOdeG (w + 4)) 0 (gtildeStep w f) = 0 := by
+  rw [gtildeStep, smul_neg, ← neg_smul, L3_smul, L3_comp_L2_eq_L2_comp_L3 w (alphaOdeG (w + 4)) 0
+    (alphaG w) (alphaOdeG w) 0 (-((w + 10) * (w + 16)) / 48) ?_ ?_ ?_ ?_, h, L2_zero, smul_zero]
+  all_goals (simp only [shiftA, shiftB, shiftC, shiftA', shiftB', shiftC', alphaOdeG, alphaG]; ring)
+
+/-- **The third-order equation for `G̃_w`**, for every `w = 4N`. -/
+theorem mldeG (N : ℕ) : L3 (4 * (N : ℝ)) (alphaOdeG (4 * (N : ℝ))) 0 (gtildeSeries N) = 0 := by
+  induction N with
+  | zero => simpa using mldeG_zero
+  | succ N ih => simpa [gtildeSeries_succ, mul_add] using mldeG_step ih
+
+/-! ### The conclusion -/
+
+/-- **Nonnegativity of the Fourier coefficients of `G̃_w`.**  For `w = 4N`, every coefficient `ã_n`
+with `0 ≤ n ≤ w/4 + 1 = N + 1` is nonnegative. -/
+theorem coeff_gtildeSeries_nonneg (N : ℕ) : ∀ n, n ≤ N + 1 → 0 ≤ coeff n (gtildeSeries N) := by
+  induction N with
+  | zero => intro n _; rw [gtildeSeries_zero]; exact coeff_gtilde₀_nonneg n
+  | succ N ih =>
+    intro n hn
+    rw [gtildeSeries_succ]
+    obtain hlt | rfl : n ≤ N + 1 ∨ n = N + 2 := by lia
+    · exact gtildeStep_nonneg rfl ih hlt
+    · exact gtildeStep_boundary rfl (mldeG N) ih
+
+/-- **The constant term is strictly positive.**  Taking `n = 0` in the recurrence gives the ratio
+`ã₀^{(w+4)} / ã₀^{(w)} = (w+6)(w+10)(w+14) / (256(w+4)(w+9)(w+11))`, which is positive; this is
+what makes the resulting bound on `A₊(d)` strict. -/
+theorem coeff_gtildeSeries_zero_pos (N : ℕ) : 0 < coeff 0 (gtildeSeries N) := by
+  induction N with
+  | zero => rw [gtildeSeries_zero]; exact coeff_gtilde₀_zero_pos
+  | succ N ih =>
+    have hw0 : 0 ≤ 4 * (N : ℝ) := by positivity
+    rw [gtildeSeries_succ, coeff_gtildeStep, Finset.range_zero, Finset.sum_empty, add_zero]
+    refine mul_pos (cG_pos hw0) ?_
+    have := kappa2_G_neg (w := 4 * (N : ℝ)) (n := 0) hw0 (by push_cast; linarith)
+    nlinarith [ih]
+
+end Conclusion
 
 end
 
