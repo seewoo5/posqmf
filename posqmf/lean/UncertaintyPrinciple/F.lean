@@ -320,12 +320,10 @@ lemma qexp_SFp (w : ℝ) (G : QM) : qexp (SFp w G) = SF w (qexp G) := by
     qexp_serreD]
   module
 
-lemma hasWeight_SFp {w : ℝ} {G : QM} (h : HasWeight G w) : HasWeight (SFp w G) (w + 4) :=
-  HasWeight.sub (HasWeight.congr_weight ((hasWeight_E₄.mul h).smul _) (by ring))
-    (HasWeight.congr_weight (hasWeight_serreD w (hasWeight_serreD (w - 2) h)) (by ring))
-
 lemma hasWeight_fStep {w : ℝ} {G : QM} (h : HasWeight G w) : HasWeight (fStep w G) (w + 4) :=
-  (hasWeight_SFp h).smul _
+  HasWeight.smul _ <| HasWeight.sub
+    (HasWeight.congr_weight ((hasWeight_E₄.mul h).smul _) (by ring))
+    (HasWeight.congr_weight (hasWeight_serreD w (hasWeight_serreD (w - 2) h)) (by ring))
 
 /-! ### Applying `δ` -/
 
@@ -428,20 +426,17 @@ lemma hasWeight_fFam : ∀ N : ℕ, HasWeight (fFam N) (4 * N)
   | N + 3 => HasWeight.congr_weight (hasWeight_fStep (hasWeight_fFam (N + 2)))
       (by push_cast; ring)
 
-private lemma fStep_F₈ : fStep 8 F₈ = F₁₂ := by
-  rw [fStep, SFp, show (8 : ℝ) - 2 = 6 by norm_num, serreD_serreD_F₈, F₈, F₁₂, cF]
+/-- The recurrence carries `F₈` to `F₁₂`, so the family generated here agrees with the second
+explicit form in the paper. -/
+lemma fFam_three : fFam 3 = F₁₂ := by
+  change fStep (4 * (((0 + 2 : ℕ) : ℝ))) F₈ = F₁₂
+  rw [show (4 : ℝ) * (((0 + 2 : ℕ) : ℝ)) = 8 by norm_num, fStep, SFp,
+    show (8 : ℝ) - 2 = 6 by norm_num, serreD_serreD_F₈, F₈, F₁₂, cF]
   norm_num
   simp only [smul_smul, smul_sub, smul_add, mul_smul_comm, mul_sub, mul_add,
     pow_succ, pow_zero, one_mul]
   simp only [mul_comm, mul_left_comm]
   module
-
-/-- The recurrence carries `F₈` to `F₁₂`, so the family generated here agrees with the second
-explicit form in the paper. -/
-lemma fFam_three : fFam 3 = F₁₂ := by
-  change fStep (4 * (((0 + 2 : ℕ) : ℝ))) (fFam 2) = F₁₂
-  rw [show (4 : ℝ) * (((0 + 2 : ℕ) : ℝ)) = 8 by norm_num]
-  exact fStep_F₈
 
 /-- The `q`-expansion of `F̃`, i.e. of `δF_w`. -/
 def ftildeSeries (N : ℕ) : ℝ⟦X⟧ := qexp (delta (fFam N))
@@ -685,12 +680,6 @@ theorem coeff_fSeries_eq_one (N : ℕ) (hN : 2 ≤ N) : coeff (N - 1) (fSeries N
 
 /-! ### The conclusion -/
 
-/-- The recurrence in the shape the induction wants it, with the weight `4(N+3) = 4N+12`. -/
-private lemma ftildeSeries_succ' (N : ℕ) : ftildeSeries (N + 3 + 1)
-    = ftildeStep (4 * (N : ℝ) + 12) (fSeries (N + 3)) (ftildeSeries (N + 3)) := by
-  rw [show (4 : ℝ) * (N : ℝ) + 12 = 4 * ((N + 3 : ℕ) : ℝ) by push_cast; ring]
-  exact ftildeSeries_succ (by lia)
-
 /-- The induction of the `QExpansion` section, run on the concrete family: `F̃_{4N+10}` is a cusp
 form, its coefficients up to `N + 1` are positive, and the one at `N + 1` is at least `1/360`. -/
 private lemma ftilde_facts (N : ℕ) :
@@ -698,7 +687,10 @@ private lemma ftilde_facts (N : ℕ) :
       ∧ (∀ j, 1 ≤ j → j ≤ N + 1 → 0 < coeff j (ftildeSeries (N + 3)))
       ∧ 1 / 360 ≤ coeff (N + 1) (ftildeSeries (N + 3)) :=
   ftilde_induction (F := fun N ↦ fSeries (N + 3)) (Ft := fun N ↦ ftildeSeries (N + 3))
-    ftildeSeries_three ftildeSeries_succ'
+    ftildeSeries_three
+    (fun N ↦ by
+      rw [show (4 : ℝ) * (N : ℝ) + 12 = 4 * ((N + 3 : ℕ) : ℝ) by push_cast; ring]
+      exact ftildeSeries_succ (by lia))
     (fun N k hk ↦ coeff_fSeries_eq_zero (N + 3) k (by lia))
     (fun N ↦ coeff_fSeries_eq_one_aux (N + 1)) N
 
