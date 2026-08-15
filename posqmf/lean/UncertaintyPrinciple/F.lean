@@ -52,6 +52,8 @@ paper.  `F₀` and `F₄` do not exist and are set to zero.
   the intertwining criterion from an explicit check on `F₈`.
 * `UncertaintyPrinciple.coeff_fSeries_eq_zero` and `coeff_fSeries_eq_one`: the vanishing order and
   the normalisation of `F_w`.
+* `UncertaintyPrinciple.hasWeight_fFam` and `hasWeight_ftildeFam`: `F_{4N}` and `F̃_{4N-2} = δF_{4N}`
+  carry the weights their names claim.
 * `UncertaintyPrinciple.coeff_ftildeSeries_pos` and `coeff_ftildeSeries_boundary`: the conclusion,
   with every hypothesis discharged.
 
@@ -437,10 +439,17 @@ lemma fFam_three : fFam 3 = F₁₂ := by
   simp only [mul_comm, mul_left_comm]
   module
 
-/-- The `q`-expansion of `F̃`, i.e. of `δF_w`. -/
-def ftildeSeries (N : ℕ) : ℝ⟦X⟧ := qexp (delta (fFam N))
+/-- `F̃_{4N-2} = δF_{4N}` in the polynomial model. -/
+def ftildeFam (N : ℕ) : QM := delta (fFam N)
 
-/-- The `q`-expansion of `F_w`. -/
+/-- `F̃_{4N-2}` has weight `4N - 2`: `δ` lowers the weight by two. -/
+lemma hasWeight_ftildeFam (N : ℕ) : HasWeight (ftildeFam N) (4 * N - 2) :=
+  hasWeight_delta (hasWeight_fFam N)
+
+/-- The `q`-expansion of `F̃_{4N-2}`. -/
+def ftildeSeries (N : ℕ) : ℝ⟦X⟧ := qexp (ftildeFam N)
+
+/-- The `q`-expansion of `F_{4N}`. -/
 def fSeries (N : ℕ) : ℝ⟦X⟧ := qexp (fFam N)
 
 /-- **The recurrence for `F̃`, discharged.**  It holds from `F₈` on, that is for
@@ -454,7 +463,7 @@ theorem ftildeSeries_succ {N : ℕ} (hN : 2 ≤ N) :
 
 /-- **The base case of the induction, discharged**: `F̃₁₀ = δF₁₂`. -/
 theorem ftildeSeries_three : ftildeSeries 3 = ftilde₁₀ := by
-  rw [ftildeSeries, fFam_three]; exact qexp_delta_F₁₂
+  rw [ftildeSeries, ftildeFam, fFam_three]; exact qexp_delta_F₁₂
 
 /-! ### Vanishing order of `F_w`
 

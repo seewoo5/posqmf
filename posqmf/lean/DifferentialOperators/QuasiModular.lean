@@ -182,6 +182,32 @@ theorem delta_D : ⁅delta, D⁆ = (1 / 12 : ℝ) • eulerOp := by
   · exact h1
   · exact h2
 
+/-- `δ` lowers the weight by `2`: `[E, δ] = -2δ`.  Only the `E₂` generator contributes, since
+`δE₄ = δE₆ = 0`. -/
+theorem euler_delta : ⁅eulerOp, delta⁆ = (-2 : ℝ) • delta := by
+  refine derivation_ext fun i ↦ ?_
+  have h0 : ⁅eulerOp, delta⁆ E₂ = ((-2 : ℝ) • delta) E₂ := by
+    rw [Derivation.commutator_apply, Derivation.smul_apply, delta_E₂, eulerOp_E₂]
+    simp [Derivation.map_smul]
+  have h1 : ⁅eulerOp, delta⁆ E₄ = ((-2 : ℝ) • delta) E₄ := by
+    rw [Derivation.commutator_apply, Derivation.smul_apply, delta_E₄, eulerOp_E₄]
+    simp [Derivation.map_smul]
+  have h2 : ⁅eulerOp, delta⁆ E₆ = ((-2 : ℝ) • delta) E₆ := by
+    rw [Derivation.commutator_apply, Derivation.smul_apply, delta_E₆, eulerOp_E₆]
+    simp [Derivation.map_smul]
+  fin_cases i
+  · exact h0
+  · exact h1
+  · exact h2
+
+lemma hasWeight_delta {G : QM} {w : ℝ} (h : HasWeight G w) : HasWeight (delta G) (w - 2) := by
+  have key := congrArg (fun T : Derivation ℝ QM QM ↦ T G) euler_delta
+  simp only [Derivation.commutator_apply, Derivation.smul_apply] at key
+  simp only [HasWeight] at h ⊢
+  rw [h, Derivation.map_smul, sub_eq_iff_eq_add] at key
+  rw [key]
+  module
+
 lemma hasWeight_D {G : QM} {w : ℝ} (h : HasWeight G w) : HasWeight (D G) (w + 2) := by
   have key := congrArg (fun T : Derivation ℝ QM QM ↦ T G) euler_D
   simp only [Derivation.commutator_apply, Derivation.smul_apply] at key
