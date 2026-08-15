@@ -113,7 +113,7 @@ lemma serreD_E₄_sq_mul (v w : ℝ) (hv : v = w + 8) (f : ℝ⟦X⟧) :
 
 /-- The twofold Serre derivative written out in terms of `D`:
 `∂_k²F = F'' - ((k+1)/6)E₂F' + (k(k+1)/12)E₂'F + (k(k+2)/144)E₄F`.
-Comparing with `L2` this is exactly `L_{2,k} = ∂_k² - (k(k+2)/144)E₄`. -/
+Comparing with `L₂` this is exactly `L_{2,k} = ∂_k² - (k(k+2)/144)E₄`. -/
 theorem serreD_two_eq (k : ℝ) (f : ℝ⟦X⟧) :
     serreDIter k 2 f = D (D f) - ((k + 1) / 6) • (E₂ * D f) + (k * (k + 1) / 12) • (D E₂ * f)
       + (k * (k + 2) / 144) • (E₄ * f) := by

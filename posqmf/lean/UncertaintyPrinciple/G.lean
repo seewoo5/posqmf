@@ -89,7 +89,7 @@ def alphaOdeG (w : ℝ) : ℝ := -(w + 6) / 4
 def cG (w : ℝ) : ℝ := 3 * (w + 10) * (w + 14) / (16 * (w + 4) * (w + 9) * (w + 11) * (w + 16))
 
 /-- The right-hand side of the recurrence for `G̃`: `c_w(-L_{2,w}^{α_w} G̃_w)`. -/
-def gtildeStep (w : ℝ) (Gt : ℝ⟦X⟧) : ℝ⟦X⟧ := cG w • (-L2 w (alphaG w) Gt)
+def gtildeStep (w : ℝ) (Gt : ℝ⟦X⟧) : ℝ⟦X⟧ := cG w • (-L₂ w (alphaG w) Gt)
 
 private lemma denomG_pos {w : ℝ} (hw : 0 ≤ w) :
     0 < 16 * (w + 4) * (w + 9) * (w + 11) * (w + 16) := by positivity
@@ -99,44 +99,44 @@ lemma cG_pos {w : ℝ} (hw : 0 ≤ w) : 0 < cG w :=
 
 lemma coeff_gtildeStep (w : ℝ) (Gt : ℝ⟦X⟧) (n : ℕ) :
     coeff n (gtildeStep w Gt)
-      = cG w * (-(kappa2 w (alphaG w) n * coeff n Gt
-          + ∑ j ∈ range n, K2 w (alphaG w) n j * coeff j Gt)) := by
-  rw [gtildeStep, PowerSeries.coeff_smul, smul_eq_mul, map_neg, coeff_L2]
+      = cG w * (-(κ₂ w (alphaG w) n * coeff n Gt
+          + ∑ j ∈ range n, K₂ w (alphaG w) n j * coeff j Gt)) := by
+  rw [gtildeStep, PowerSeries.coeff_smul, smul_eq_mul, map_neg, coeff_L₂]
 
 /-! ### The specialised coefficient functions -/
 
 /-- The diagonal coefficient of `L_{2,w}^{α_w}`, factored. -/
-lemma kappa2_G (w : ℝ) (n : ℕ) :
-    kappa2 w (alphaG w) n = (12 * n + w + 16) * (4 * n - w - 6) / 48 := by
-  rw [kappa2, alphaG]; ring
+lemma κ₂_G (w : ℝ) (n : ℕ) :
+    κ₂ w (alphaG w) n = (12 * n + w + 16) * (4 * n - w - 6) / 48 := by
+  rw [κ₂, alphaG]; ring
 
 /-- The lower triangular coefficient of `L_{2,w}^{α_w}`, in the paper's form. -/
-lemma K2_G (w : ℝ) (n j : ℕ) :
-    K2 w (alphaG w) n j
+lemma K₂_G (w : ℝ) (n j : ℕ) :
+    K₂ w (alphaG w) n j
       = -2 * (w + 1) * (w * ((n : ℝ) - j) - 2 * j) * (σ 1 (n - j) : ℝ)
         - 5 * (w + 6) * (w + 16) * (σ 3 (n - j) : ℝ) := by
-  rw [K2, alphaG]; ring
+  rw [K₂, alphaG]; ring
 
 /-- The diagonal coefficient of the third-order operator, factored as `n(n+1)(4n-w-6)/4`. -/
-lemma kappa3_G (w : ℝ) (n : ℕ) :
-    kappa3 w (alphaOdeG w) 0 n = (n : ℝ) * ((n : ℝ) + 1) * (4 * n - w - 6) / 4 := by
-  rw [kappa3, alphaOdeG]; ring
+lemma κ₃_G (w : ℝ) (n : ℕ) :
+    κ₃ w (alphaOdeG w) 0 n = (n : ℝ) * ((n : ℝ) + 1) * (4 * n - w - 6) / 4 := by
+  rw [κ₃, alphaOdeG]; ring
 
 /-- The lower triangular coefficient of the third-order operator. -/
-lemma K3_G (w : ℝ) (n j : ℕ) :
-    K3 w (alphaOdeG w) 0 n j
+lemma K₃_G (w : ℝ) (n j : ℕ) :
+    K₃ w (alphaOdeG w) 0 n j
       = (w + 2) * (6 * (j : ℝ) ^ 2 - 6 * (w + 1) * ((n : ℝ) - j) * j
             + w * (w + 1) * ((n : ℝ) - j) ^ 2) * (σ 1 (n - j) : ℝ)
         + 15 * (w + 6) * (w * ((n : ℝ) - j) - 4 * j) * (σ 3 (n - j) : ℝ) := by
-  rw [K3, alphaOdeG]; ring
+  rw [K₃, alphaOdeG]; ring
 
 /-! ### Signs on the interior range -/
 
 /-- On `0 ≤ n ≤ w/4 + 1` the diagonal coefficient is negative. -/
-lemma kappa2_G_neg {w : ℝ} {n : ℕ} (hw : 0 ≤ w) (hn : 4 * (n : ℝ) ≤ w + 4) :
-    kappa2 w (alphaG w) n < 0 := by
+lemma κ₂_G_neg {w : ℝ} {n : ℕ} (hw : 0 ≤ w) (hn : 4 * (n : ℝ) ≤ w + 4) :
+    κ₂ w (alphaG w) n < 0 := by
   have hn0 : 0 ≤ (n : ℝ) := Nat.cast_nonneg n
-  rw [kappa2_G]
+  rw [κ₂_G]
   exact div_neg_of_neg_of_pos
     (mul_neg_of_pos_of_neg (by linarith) (by linarith)) (by norm_num)
 
@@ -149,10 +149,10 @@ theorem weight_gap_nonneg {w : ℝ} {n j : ℕ} (hw : 0 ≤ w) (hj : j < n) (hn 
   nlinarith
 
 /-- On `0 ≤ j < n ≤ w/4 + 1` the lower triangular coefficient is negative. -/
-lemma K2_G_neg {w : ℝ} {n j : ℕ} (hw : 0 ≤ w) (hj : j < n) (hn : 4 * (n : ℝ) ≤ w + 4) :
-    K2 w (alphaG w) n j < 0 := by
+lemma K₂_G_neg {w : ℝ} {n j : ℕ} (hw : 0 ≤ w) (hj : j < n) (hn : 4 * (n : ℝ) ≤ w + 4) :
+    K₂ w (alphaG w) n j < 0 := by
   have hnj : 1 ≤ n - j := by lia
-  rw [K2_G]
+  rw [K₂_G]
   have t1 : 0 ≤ 2 * (w + 1) * (w * ((n : ℝ) - j) - 2 * j) * (σ 1 (n - j) : ℝ) :=
     mul_nonneg (mul_nonneg (by linarith) (weight_gap_nonneg hw hj hn)) (sigma_pos hnj).le
   have t2 : 0 < 5 * (w + 6) * (w + 16) * (σ 3 (n - j) : ℝ) :=
@@ -170,12 +170,12 @@ theorem gtildeStep_nonneg {N : ℕ} {w : ℝ} (hw : w = 4 * N) {Gt : ℝ⟦X⟧}
   have hnR : 4 * (n : ℝ) ≤ w + 4 := by
     rw [hw]; have : (n : ℝ) ≤ (N : ℝ) + 1 := by exact_mod_cast hn
     linarith
-  have hdiag : kappa2 w (alphaG w) n * coeff n Gt ≤ 0 :=
-    mul_nonpos_of_nonpos_of_nonneg (kappa2_G_neg hw0 hnR).le (hnn n hn)
-  have hsum : ∑ j ∈ range n, K2 w (alphaG w) n j * coeff j Gt ≤ 0 :=
+  have hdiag : κ₂ w (alphaG w) n * coeff n Gt ≤ 0 :=
+    mul_nonpos_of_nonpos_of_nonneg (κ₂_G_neg hw0 hnR).le (hnn n hn)
+  have hsum : ∑ j ∈ range n, K₂ w (alphaG w) n j * coeff j Gt ≤ 0 :=
     Finset.sum_nonpos fun j hj ↦ by
       rw [Finset.mem_range] at hj
-      exact mul_nonpos_of_nonpos_of_nonneg (K2_G_neg hw0 hj hnR).le (hnn j (by lia))
+      exact mul_nonpos_of_nonpos_of_nonneg (K₂_G_neg hw0 hj hnR).le (hnn j (by lia))
   rw [coeff_gtildeStep]
   exact mul_nonneg (cG_pos hw0).le (by linarith)
 
@@ -234,15 +234,15 @@ theorem Kpp_pos {w : ℝ} (hw : 0 ≤ w) {m : ℕ} (hm : 1 ≤ m) :
 /-- The identity behind the boundary case: eliminating `ã_{w/4+2}` between the recurrence and the
 third-order equation leaves the kernel `A_w(r)σ₁(r) + B_w(r)σ₃(r)` with `r = w/4 + 2 - j`. -/
 lemma Kpp_eq {N j : ℕ} {w : ℝ} (hw : w = 4 * N) (hj : j ≤ N + 1) :
-    16 * (w + 10) / (3 * (w + 8) * (w + 12)) * K3 w (alphaOdeG w) 0 (N + 2) j
-        - K2 w (alphaG w) (N + 2) j
+    16 * (w + 10) / (3 * (w + 8) * (w + 12)) * K₃ w (alphaOdeG w) 0 (N + 2) j
+        - K₂ w (alphaG w) (N + 2) j
       = Aw w ((N + 2 - j : ℕ) : ℝ) * (σ 1 (N + 2 - j) : ℝ)
         + Bw w ((N + 2 - j : ℕ) : ℝ) * (σ 3 (N + 2 - j) : ℝ) := by
   have hcast : ((N + 2 - j : ℕ) : ℝ) = (N : ℝ) + 2 - j := by
     rw [Nat.cast_sub (by lia)]; push_cast; ring
   have h8 : (w + 8) ≠ 0 := by rw [hw]; positivity
   have h12 : (w + 12) ≠ 0 := by rw [hw]; positivity
-  rw [K3_G, K2_G, Aw, Bw, hcast, hw]
+  rw [K₃_G, K₂_G, Aw, Bw, hcast, hw]
   push_cast
   field_simp
   ring
@@ -251,34 +251,34 @@ lemma Kpp_eq {N j : ℕ} {w : ℝ} (hw : w = 4 * N) (hj : j ≤ N + 1) :
 index the coefficient of `gtildeStep` is `c_w` times the pairing of the combined kernel with the
 lower coefficients. -/
 private lemma coeff_gtildeStep_boundary {N : ℕ} {w : ℝ} (hw : w = 4 * N) {Gt : ℝ⟦X⟧}
-    (hode : L3 w (alphaOdeG w) 0 Gt = 0) :
+    (hode : L₃ w (alphaOdeG w) 0 Gt = 0) :
     coeff (N + 2) (gtildeStep w Gt)
       = cG w * ∑ j ∈ range (N + 2),
-          (16 * (w + 10) / (3 * (w + 8) * (w + 12)) * K3 w (alphaOdeG w) 0 (N + 2) j
-            - K2 w (alphaG w) (N + 2) j) * coeff j Gt := by
+          (16 * (w + 10) / (3 * (w + 8) * (w + 12)) * K₃ w (alphaOdeG w) 0 (N + 2) j
+            - K₂ w (alphaG w) (N + 2) j) * coeff j Gt := by
   have hw0 : 0 ≤ w := by rw [hw]; positivity
-  have hlin : kappa3 w (alphaOdeG w) 0 (N + 2) * coeff (N + 2) Gt
-      + ∑ j ∈ range (N + 2), K3 w (alphaOdeG w) 0 (N + 2) j * coeff j Gt = 0 := by
-    rw [← coeff_L3, hode, _root_.map_zero]
-  have hk3 : kappa3 w (alphaOdeG w) 0 (N + 2) = (w + 8) * (w + 12) / 32 := by
-    rw [kappa3_G, hw]
+  have hlin : κ₃ w (alphaOdeG w) 0 (N + 2) * coeff (N + 2) Gt
+      + ∑ j ∈ range (N + 2), K₃ w (alphaOdeG w) 0 (N + 2) j * coeff j Gt = 0 := by
+    rw [← coeff_L₃, hode, _root_.map_zero]
+  have hk3 : κ₃ w (alphaOdeG w) 0 (N + 2) = (w + 8) * (w + 12) / 32 := by
+    rw [κ₃_G, hw]
     push_cast
     ring
-  have hk2 : kappa2 w (alphaG w) (N + 2) = (w + 10) / 6 := by
-    rw [kappa2_G, hw]
+  have hk2 : κ₂ w (alphaG w) (N + 2) = (w + 10) / 6 := by
+    rw [κ₂_G, hw]
     push_cast
     ring
   rw [hk3] at hlin
   have hsplit : ∑ j ∈ range (N + 2),
-      (16 * (w + 10) / (3 * (w + 8) * (w + 12)) * K3 w (alphaOdeG w) 0 (N + 2) j
-        - K2 w (alphaG w) (N + 2) j) * coeff j Gt
+      (16 * (w + 10) / (3 * (w + 8) * (w + 12)) * K₃ w (alphaOdeG w) 0 (N + 2) j
+        - K₂ w (alphaG w) (N + 2) j) * coeff j Gt
       = 16 * (w + 10) / (3 * (w + 8) * (w + 12))
-          * (∑ j ∈ range (N + 2), K3 w (alphaOdeG w) 0 (N + 2) j * coeff j Gt)
-        - ∑ j ∈ range (N + 2), K2 w (alphaG w) (N + 2) j * coeff j Gt := by
+          * (∑ j ∈ range (N + 2), K₃ w (alphaOdeG w) 0 (N + 2) j * coeff j Gt)
+        - ∑ j ∈ range (N + 2), K₂ w (alphaG w) (N + 2) j * coeff j Gt := by
     rw [Finset.mul_sum, ← Finset.sum_sub_distrib]
     exact Finset.sum_congr rfl fun j _ ↦ by ring
   rw [coeff_gtildeStep, hk2, hsplit,
-    show ∑ j ∈ range (N + 2), K3 w (alphaOdeG w) 0 (N + 2) j * coeff j Gt
+    show ∑ j ∈ range (N + 2), K₃ w (alphaOdeG w) 0 (N + 2) j * coeff j Gt
       = -((w + 8) * (w + 12) / 32 * coeff (N + 2) Gt) from by linarith]
   field_simp
   ring
@@ -286,7 +286,7 @@ private lemma coeff_gtildeStep_boundary {N : ℕ} {w : ℝ} (hw : w = 4 * N) {Gt
 /-- **Boundary step.**  At `n = w/4 + 2` the diagonal coefficient is positive, so the recurrence
 alone does not suffice; the third-order equation supplies the missing relation. -/
 theorem gtildeStep_boundary {N : ℕ} {w : ℝ} (hw : w = 4 * N) {Gt : ℝ⟦X⟧}
-    (hode : L3 w (alphaOdeG w) 0 Gt = 0) (hnn : ∀ j, j ≤ N + 1 → 0 ≤ coeff j Gt) :
+    (hode : L₃ w (alphaOdeG w) 0 Gt = 0) (hnn : ∀ j, j ≤ N + 1 → 0 ≤ coeff j Gt) :
     0 ≤ coeff (N + 2) (gtildeStep w Gt) := by
   have hw0 : 0 ≤ w := by rw [hw]; positivity
   rw [coeff_gtildeStep_boundary hw hode]
@@ -333,8 +333,8 @@ def SGp (w : ℝ) (G : QM) : QM :=
   ((w + 8) * (w + 9) / 36 : ℝ) • (E₄ * G) - serreD (w + 2) (serreD w G)
 
 lemma qexp_SGp (w : ℝ) (G : QM) :
-    qexp (SGp w G) = -KanekoZagier.L2 w (alphaG w) (qexp G) := by
-  rw [SGp, KanekoZagier.L2_eq_serre, QExpansion.serreDIter_two, alphaG, map_sub, map_smul,
+    qexp (SGp w G) = -KanekoZagier.L₂ w (alphaG w) (qexp G) := by
+  rw [SGp, KanekoZagier.L₂_eq_serre, QExpansion.serreDIter_two, alphaG, map_sub, map_smul,
     map_mul, qexp_E₄, qexp_serreD, qexp_serreD]
   module
 
@@ -399,17 +399,17 @@ open ArithmeticFunction QExpansion KanekoZagier
 
 /-- The base case: `G̃₀` is a constant, and at `k = 0` with `β = 0` every coefficient of the
 undifferentiated term of `L_{3,k}^{(α,β)}` vanishes. -/
-lemma mldeG_zero : L3 0 (alphaOdeG 0) 0 gtilde₀ = 0 := by simp [gtilde₀, L3, D_smul]
+lemma mldeG_zero : L₃ 0 (alphaOdeG 0) 0 gtilde₀ = 0 := by simp [gtilde₀, L₃, D_smul]
 
 /-- The third-order equation propagates along the recurrence, by the intertwining criterion. -/
-lemma mldeG_step {w : ℝ} {f : ℝ⟦X⟧} (h : L3 w (alphaOdeG w) 0 f = 0) :
-    L3 (w + 4) (alphaOdeG (w + 4)) 0 (gtildeStep w f) = 0 := by
-  rw [gtildeStep, smul_neg, ← neg_smul, L3_smul, L3_comp_L2_eq_L2_comp_L3 w (alphaOdeG (w + 4)) 0
-    (alphaG w) (alphaOdeG w) 0 (-((w + 10) * (w + 16)) / 48) ?_ ?_ ?_ ?_, h, L2_zero, smul_zero]
+lemma mldeG_step {w : ℝ} {f : ℝ⟦X⟧} (h : L₃ w (alphaOdeG w) 0 f = 0) :
+    L₃ (w + 4) (alphaOdeG (w + 4)) 0 (gtildeStep w f) = 0 := by
+  rw [gtildeStep, smul_neg, ← neg_smul, L₃_smul, L₃_comp_L₂_eq_L₂_comp_L₃ w (alphaOdeG (w + 4)) 0
+    (alphaG w) (alphaOdeG w) 0 (-((w + 10) * (w + 16)) / 48) ?_ ?_ ?_ ?_, h, L₂_zero, smul_zero]
   all_goals (simp only [shiftA, shiftB, shiftC, shiftA', shiftB', shiftC', alphaOdeG, alphaG]; ring)
 
 /-- **The third-order equation for `G̃_w`**, for every `w = 4N`. -/
-theorem mldeG (N : ℕ) : L3 (4 * (N : ℝ)) (alphaOdeG (4 * (N : ℝ))) 0 (gtildeSeries N) = 0 := by
+theorem mldeG (N : ℕ) : L₃ (4 * (N : ℝ)) (alphaOdeG (4 * (N : ℝ))) 0 (gtildeSeries N) = 0 := by
   induction N with
   | zero => simpa using mldeG_zero
   | succ N ih => simpa [gtildeSeries_succ, mul_add] using mldeG_step ih
@@ -438,7 +438,7 @@ theorem coeff_gtildeSeries_zero_pos (N : ℕ) : 0 < coeff 0 (gtildeSeries N) := 
     have hw0 : 0 ≤ 4 * (N : ℝ) := by positivity
     rw [gtildeSeries_succ, coeff_gtildeStep, Finset.range_zero, Finset.sum_empty, add_zero]
     refine mul_pos (cG_pos hw0) ?_
-    have := kappa2_G_neg (w := 4 * (N : ℝ)) (n := 0) hw0 (by push_cast; linarith)
+    have := κ₂_G_neg (w := 4 * (N : ℝ)) (n := 0) hw0 (by push_cast; linarith)
     nlinarith [ih]
 
 end Conclusion

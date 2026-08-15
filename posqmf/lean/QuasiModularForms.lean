@@ -39,12 +39,12 @@ criterion.
 ## Verification-plan items covered
 
 * **1.1** the `D`-form and Serre form of the third-order operator agree:
-  `KanekoZagier.L3_eq_serre` (together with `KanekoZagier.L2_eq_serre` for the second-order case).
-* **1.2** Fourier coefficients of `L_{2,k}^α`: `KanekoZagier.coeff_L2`.
-* **1.3** Fourier coefficients of `L_{3,k}^{(α,β)}`: `KanekoZagier.coeff_L3`.
-* **1.4** the two `∂_k⁵` normal forms: `KanekoZagier.L3S_comp_L2S` and
-  `KanekoZagier.L2S_comp_L3S`.
-* **1.5**, `⟸` half: `KanekoZagier.L3_comp_L2_eq_L2_comp_L3` — the four constraints on the
+  `KanekoZagier.L₃_eq_serre` (together with `KanekoZagier.L₂_eq_serre` for the second-order case).
+* **1.2** Fourier coefficients of `L_{2,k}^α`: `KanekoZagier.coeff_L₂`.
+* **1.3** Fourier coefficients of `L_{3,k}^{(α,β)}`: `KanekoZagier.coeff_L₃`.
+* **1.4** the two `∂_k⁵` normal forms: `KanekoZagier.L₃S_comp_L₂S` and
+  `KanekoZagier.L₂S_comp_L₃S`.
+* **1.5**, `⟸` half: `KanekoZagier.L₃_comp_L₂_eq_L₂_comp_L₃` — the four constraints on the
   shifted parameters imply the intertwining relation.  The `⟹` half needs uniqueness of the
   Serre-derivative normal form and is not formalized here.
 
@@ -54,13 +54,13 @@ Ramanujan's identities are taken as axioms (`QExpansion.ramanujan_E₂`,
 `ramanujan_E₄`, `ramanujan_E₆`); see `Ramanujan.lean`.  What each result actually uses:
 
 ```
-#print axioms KanekoZagier.coeff_L2                     -- none beyond Lean's own three
-#print axioms KanekoZagier.coeff_L3                     -- none beyond Lean's own three
-#print axioms KanekoZagier.L2_eq_serre                  -- ramanujan_E₂
-#print axioms KanekoZagier.L3_eq_serre                  -- ramanujan_E₂, ramanujan_E₄
-#print axioms KanekoZagier.L3S_comp_L2S                 -- ramanujan_E₄, ramanujan_E₆
-#print axioms KanekoZagier.L2S_comp_L3S                 -- ramanujan_E₄, ramanujan_E₆
-#print axioms KanekoZagier.L3_comp_L2_eq_L2_comp_L3     -- all three
+#print axioms KanekoZagier.coeff_L₂                     -- none beyond Lean's own three
+#print axioms KanekoZagier.coeff_L₃                     -- none beyond Lean's own three
+#print axioms KanekoZagier.L₂_eq_serre                  -- ramanujan_E₂
+#print axioms KanekoZagier.L₃_eq_serre                  -- ramanujan_E₂, ramanujan_E₄
+#print axioms KanekoZagier.L₃S_comp_L₂S                 -- ramanujan_E₄, ramanujan_E₆
+#print axioms KanekoZagier.L₂S_comp_L₃S                 -- ramanujan_E₄, ramanujan_E₆
+#print axioms KanekoZagier.L₃_comp_L₂_eq_L₂_comp_L₃     -- all three
 ```
 
 The coefficient formulas are unconditional: they read the `D`-forms of the two operators directly
