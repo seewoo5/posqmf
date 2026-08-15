@@ -346,7 +346,7 @@ lemma hasWeight_SGp {w : ℝ} {G : QM} (h : HasWeight G w) : HasWeight (SGp w G)
 /-- The family `G̃_{4N}` in the polynomial model. -/
 def gtildeFam : ℕ → QM
   | 0 => (3 / 14336 : ℝ) • 1
-  | N + 1 => cG (4 * (N : ℝ)) • SGp (4 * (N : ℝ)) (gtildeFam N)
+  | N + 1 => cG (4 * N) • SGp (4 * N) (gtildeFam N)
 
 lemma hasWeight_gtildeFam : ∀ N : ℕ, HasWeight (gtildeFam N) (4 * N)
   | 0 => by
