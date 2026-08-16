@@ -112,15 +112,15 @@ $$
 ## Lean code
 
 The lean code under the directory `lean` verifies several inequalities on quasimodular forms and their coefficients.
-The first three files were initially written by AxiomProver and manually golfed afterwards.
-`X_16_5.lean` and `D_6_3.lean` were written by Claude Opus 4.7.
 
-- `polymod_monotone.lean` verifies (41) of "Inequalities involving polynomials and quasimodular forms".
-- `polymod_ineq1.lean` verifies (60) of "Inequalities involving polynomials and quasimodular forms".
-- `polymod_ineq2.lean` verifies (61) of "Inequalities involving polynomials and quasimodular forms".
-- `X_16_5.lean` verifies that the extremal quasimodular form $X_{16, 5}$ of weight $16$ and depth $5$ has negative coefficients for $n \ge 250$. Negativity for $8 \le n < 250$ is checked separately in `miscellaneous.ipynb`.
-- `D_6_3.lean` verifies the positivity of the coefficients of $\mathcal{D}_{6, 3}$.
-- `SigmaBounds.lean` include basic inequalities for the divisor sum function, which are used in the above two files.
+### `PolymodInequalities`
+
+The three files under `lean/PolymodInequalities` verify the inequalities (41), (60), and (61) of the paper [*Inequalities involving polynomials and quasimodular forms*](https://arxiv.org/abs/2602.10536).
+These were initially written by AxiomProver and manually golfed afterwards.
+
+- `polymod_monotone.lean` verifies (41).
+- `polymod_ineq1.lean` verifies (60).
+- `polymod_ineq2.lean` verifies (61).
 
 ### `QuasiModularForms`
 
@@ -148,3 +148,9 @@ The directory `lean/UncertaintyPrinciple` formalizes the coefficient-positivity 
 Most results use the Ramanujan axioms of `QuasiModularForms/Ramanujan.lean`. The exceptions are `LogInequalities.lean` and the `QExpansion` sections of both files, which never meet the polynomial model — as do the polynomial facts themselves, since only the $q$-expansion map `qexp` needs those axioms.
 
 Neither file identifies its family with the paper's $F_w$ and $\widetilde{G}_w$. For $F$ the vanishing order, normalization and differential equation are all proved, which is what characterizes the extremal quasimodular form. For $\widetilde{G}$ the recurrence is taken as the definition; deriving it from $G_w = \widetilde{G}_{w-12} \Delta \mathcal{L}_S + \Psi_w$ is an argument about modular functions for $\Gamma(2)$ and lies outside the development.
+
+### Miscellaneous
+
+- `X_16_5.lean` verifies that the extremal quasimodular form $X_{16, 5}$ of weight $16$ and depth $5$ has negative coefficients for $n \ge 250$. Negativity for $8 \le n < 250$ is checked separately in `miscellaneous.ipynb`. Written by Claude Opus 4.7.
+- `D_6_3.lean` verifies the positivity of the coefficients of $\mathcal{D}_{6, 3}$. Written by Claude Opus 4.7.
+- `SigmaBounds.lean` include basic inequalities for the divisor sum function, which are used in the above two files. Written by Claude Opus 4.7.

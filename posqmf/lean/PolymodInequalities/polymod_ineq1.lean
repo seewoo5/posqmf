@@ -2,6 +2,7 @@ import Mathlib.Algebra.Order.Ring.Star
 import Mathlib.Algebra.Order.Star.Real
 import Mathlib.Analysis.SpecialFunctions.Pow.Real
 import Mathlib.NumberTheory.ArithmeticFunction.Misc
+
 abbrev divisorCount (n : ℕ) : ℕ := (ArithmeticFunction.sigma 0) n
 
 private lemma sigma0_mul_rpow_le_pow7 (m : ℕ) (hm : 1 ≤ m) :
