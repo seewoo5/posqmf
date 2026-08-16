@@ -1,6 +1,6 @@
-## Sage codes
+## Sage code
 
-The sage codes under the directory `sage` provides several functions for computations with quasimodular forms and extremal quasimodular forms.
+The sage code under the directory `sage` provides several functions for computations with quasimodular forms and extremal quasimodular forms.
 
 ### `extremal_eis.sage`
 
@@ -109,9 +109,9 @@ $$
 
 - `rqm_homogeneous_comps` and `rqm2_homogeneous_comps` extract each of homogeneous components from possibly inhomogeneous input.
 
-## Lean codes
+## Lean code
 
-The lean codes under the directory `lean` verifies several inequalities on quasimodular forms and their coefficients.
+The lean code under the directory `lean` verifies several inequalities on quasimodular forms and their coefficients.
 The first three files were initially written by AxiomProver and manually golfed afterwards.
 `X_16_5.lean` and `D_6_3.lean` were written by Claude Opus 4.7.
 
