@@ -656,7 +656,7 @@ private lemma cusp_normalization (N : ℕ) :
 
 private theorem coeff_fSeries_eq_one_aux (N : ℕ) : coeff (N + 1) (fSeries (N + 2)) = 1 := by
   induction N with
-  | zero => simpa using coeff_qexp_F₈ (n := 1) le_rfl
+  | zero => simpa [fSeries, fFam] using coeff_qexp_F₈ (n := 1) le_rfl
   | succ N ih =>
     have hz : ∀ j, j + 2 ≤ N + 2 → coeff j (qexp (fFam (N + 2))) = 0 :=
       fun j hj ↦ coeff_fSeries_eq_zero (N + 2) j hj

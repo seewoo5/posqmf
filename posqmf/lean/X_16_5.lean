@@ -1,12 +1,11 @@
 import Mathlib.Algebra.Order.Ring.Star
+import Mathlib.Algebra.Order.Star.Real
 import Mathlib.Analysis.SpecialFunctions.Integrals.Basic
 import Mathlib.Analysis.SpecialFunctions.Pow.Real
 import Mathlib.Analysis.SumIntegralComparisons
-import Mathlib.Data.Real.StarOrdered
 import Mathlib.MeasureTheory.Integral.IntervalIntegral.FundThmCalculus
 import Mathlib.NumberTheory.ArithmeticFunction.Misc
 import posqmf.lean.SigmaBounds
-
 /-!
 # Negativity of the non-leading coefficients of `X_{16,5}`
 

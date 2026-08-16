@@ -56,14 +56,12 @@ private lemma hasDerivAt_log_one_add {x : ℝ} (hx : 0 ≤ x) :
 private lemma hasDerivAt_logIneq1 (x : ℝ) (hx : 0 ≤ x) :
     HasDerivAt (fun t : ℝ ↦ log (1 + t) - 2 * t / (t + 2))
       (x ^ 2 / ((x + 1) * (x + 2) ^ 2)) x := by
-  have h2 : 0 < x + 2 := by linarith
-  have hdiv : HasDerivAt (fun t : ℝ ↦ 2 * t / (t + 2)) (4 / (x + 2) ^ 2) x := by
-    have h := ((hasDerivAt_id x).const_mul (2 : ℝ)).div ((hasDerivAt_id x).add_const (2 : ℝ)) h2.ne'
-    norm_num at h
-    convert h using 1
-    field_simp
-    ring
-  convert (hasDerivAt_log_one_add hx).sub hdiv using 1
+  have h1 : (0 : ℝ) < 1 + x := by linarith
+  have h2 : (0 : ℝ) < x + 2 := by linarith
+  have hdiv : HasDerivAt (fun t : ℝ ↦ 2 * t / (t + 2)) (4 / (x + 2) ^ 2) x :=
+    (((hasDerivAt_id x).const_mul (2 : ℝ)).div ((hasDerivAt_id x).add_const (2 : ℝ))
+      h2.ne').congr_deriv (by norm_num; ring)
+  refine ((hasDerivAt_log_one_add hx).sub hdiv).congr_deriv ?_
   field_simp
   ring
 
@@ -88,23 +86,18 @@ private lemma hasDerivAt_logIneqY8 (x : ℝ) (hx : 0 ≤ x) :
     HasDerivAt (fun t : ℝ ↦ log (1 + t)
         - (11 * t ^ 4 + 28 * t ^ 3 + 18 * t ^ 2 + 12 * t) / (12 * (t ^ 2 + t + 1) ^ 2))
       (x ^ 4 * (2 * x ^ 2 + 7 * x + 7) / (2 * (x + 1) * (x ^ 2 + x + 1) ^ 3)) x := by
+  have h1 : (0 : ℝ) < 1 + x := by linarith
   have hnum : HasDerivAt (fun t : ℝ ↦ 11 * t ^ 4 + 28 * t ^ 3 + 18 * t ^ 2 + 12 * t)
-      (44 * x ^ 3 + 84 * x ^ 2 + 36 * x + 12) x := by
-    have h := ((((hasDerivAt_pow 4 x).const_mul (11 : ℝ)).add
-      ((hasDerivAt_pow 3 x).const_mul (28 : ℝ))).add
-      ((hasDerivAt_pow 2 x).const_mul (18 : ℝ))).add ((hasDerivAt_id x).const_mul (12 : ℝ))
-    norm_num at h
-    convert h using 1
-    ring
+      (44 * x ^ 3 + 84 * x ^ 2 + 36 * x + 12) x :=
+    ((((hasDerivAt_pow 4 x).const_mul (11 : ℝ)).add ((hasDerivAt_pow 3 x).const_mul (28 : ℝ))).add
+      ((hasDerivAt_pow 2 x).const_mul (18 : ℝ))).add
+        ((hasDerivAt_id x).const_mul (12 : ℝ)) |>.congr_deriv (by norm_num; ring)
   have hd : HasDerivAt (fun t : ℝ ↦ 12 * (t ^ 2 + t + 1) ^ 2)
-      (24 * (x ^ 2 + x + 1) * (2 * x + 1)) x := by
-    have h := ((((hasDerivAt_pow 2 x).add (hasDerivAt_id x)).add_const (1 : ℝ)).pow 2).const_mul
-      (12 : ℝ)
-    norm_num at h
-    convert h using 1
-    ring
-  convert (hasDerivAt_log_one_add hx).sub
-    (hnum.div hd (mul_pos (by norm_num) (pow_pos (quadratic_pos x) 2)).ne') using 1
+      (24 * (x ^ 2 + x + 1) * (2 * x + 1)) x :=
+    ((((hasDerivAt_pow 2 x).add (hasDerivAt_id x)).add_const (1 : ℝ)).pow 2).const_mul
+      (12 : ℝ) |>.congr_deriv (by norm_num; ring)
+  refine ((hasDerivAt_log_one_add hx).sub
+    (hnum.div hd (by positivity : (12 : ℝ) * (x ^ 2 + x + 1) ^ 2 ≠ 0))).congr_deriv ?_
   field_simp
   ring
 
