@@ -26,11 +26,9 @@ form, i.e. that `∂_k⁵`, `E₄∂_k³`, `E₆∂_k²`, `E₄²∂_k` and `E�
 operators.  That direction remains a Sage check.
 -/
 
-open PowerSeries
-
 namespace KanekoZagier
 
-open QExpansion
+open PowerSeries QExpansion
 
 noncomputable section
 

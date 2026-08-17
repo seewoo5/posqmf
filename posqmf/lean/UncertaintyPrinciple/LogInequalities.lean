@@ -108,8 +108,7 @@ private lemma hasDerivAt_logIneqY8 (x : ℝ) (hx : 0 ≤ x) :
 /-- **The `Y_8` base case**:
 `(x²+x+1)² log(1+x) > (11x⁴+28x³+18x²+12x)/12` for every `x > 0`. -/
 theorem logIneq_Y₈ {x : ℝ} (hx : 0 < x) :
-    (11 * x ^ 4 + 28 * x ^ 3 + 18 * x ^ 2 + 12 * x) / 12
-      < (x ^ 2 + x + 1) ^ 2 * log (1 + x) := by
+    (11 * x ^ 4 + 28 * x ^ 3 + 18 * x ^ 2 + 12 * x) / 12 < (x ^ 2 + x + 1) ^ 2 * log (1 + x) := by
   have key : (11 * x ^ 4 + 28 * x ^ 3 + 18 * x ^ 2 + 12 * x) / (12 * (x ^ 2 + x + 1) ^ 2)
       < log (1 + x) := sub_pos.mp <| pos_of_hasDerivAt_pos
     (f := fun t : ℝ ↦ log (1 + t)

@@ -139,7 +139,7 @@ The $q$-expansion layer (`Basic`, `Eisenstein`, `Ramanujan`, `Serre`) lives in n
 
 ### `UncertaintyPrinciple`
 
-The directory `lean/UncertaintyPrinciple` formalizes the coefficient-positivity arguments of "Positive quasimodular forms and the sign uncertainty principle" that sit on top of the operator layer.
+The directory `lean/UncertaintyPrinciple` formalizes the coefficient-positivity arguments of the paper [*Positive quasimodular forms and the sign uncertainty principle*](AddLinkLater) that sit on top of the operator layer.
 
 - `LogInequalities.lean` proves the four elementary logarithm inequalities behind the base cases of the positivity of $Y_w$ (Lemma 4.10 and the $Y_4$, $Y_8$, $Y_{10}$ cases of Theorem 4.11), via the mean value theorem.
 - `F.lean` proves positivity of the Fourier coefficients of $\widetilde{F}_{w-2}$ (Proposition 4.5), assuming nothing. Its `QExpansion` section runs the induction in $\mathbb{R}[[q]]$ from the recurrence (Lemma 4.4); its `PolynomialModel` section defines the family by that recurrence, indexed so that `fFam N` is the paper's $F_{4N}$ (with $F_8$ explicit and $F_0, F_4$ set to zero), sets $\widetilde{F}_{w-2} := \delta F_w$ (as `ftildeFam`, of weight $4N-2$, with `ftildeSeries` its $q$-expansion), and supplies the vanishing order and the normalization, the latter through the modular linear differential equation $L_{3,w-2}^{((w-4)/4,\,0)}F_w = 0$. The two sections open different namespaces, since `KanekoZagier` and `QuasiModular` both name $D$, $E_2, E_4, E_6$ and $\partial_k$.

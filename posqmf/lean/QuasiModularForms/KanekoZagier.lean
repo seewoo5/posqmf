@@ -17,11 +17,9 @@ identities proved here, which are identities of formal power series.
   `+ (β + kα/12 - k²(k+3)/864)E₆`.  This is item 1.1 of the verification plan.
 -/
 
-open PowerSeries
+open PowerSeries QExpansion
 
 namespace KanekoZagier
-
-open QExpansion
 
 noncomputable section
 

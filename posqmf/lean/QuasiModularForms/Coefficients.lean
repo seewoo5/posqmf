@@ -16,12 +16,10 @@ Both proofs use only the `D`-forms `L₂` and `L₃` and the `q`-expansions of `
 particular they are independent of the Ramanujan axioms of `Ramanujan.lean`.
 -/
 
-open ArithmeticFunction Finset PowerSeries
+open ArithmeticFunction Finset PowerSeries QExpansion
 open scoped sigma
 
 namespace KanekoZagier
-
-open QExpansion
 
 noncomputable section
 
