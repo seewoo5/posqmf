@@ -1,6 +1,6 @@
 import Mathlib.Algebra.Order.Ring.Star
+import Mathlib.Algebra.Order.Star.Real
 import Mathlib.Analysis.SpecialFunctions.Pow.Real
-import Mathlib.Data.Real.StarOrdered
 
 private lemma two_rpow_pos (x : ℝ) : (0 : ℝ) < (2 : ℝ) ^ x :=
   Real.rpow_pos_of_pos (by norm_num) x

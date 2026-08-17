@@ -1,6 +1,6 @@
 import Mathlib.Algebra.Order.Ring.Star
+import Mathlib.Algebra.Order.Star.Real
 import Mathlib.Analysis.SpecialFunctions.Pow.Real
-import Mathlib.Data.Real.StarOrdered
 import Mathlib.NumberTheory.ArithmeticFunction.Misc
 
 abbrev divisorCount (n : ℕ) : ℕ := (ArithmeticFunction.sigma 0) n
