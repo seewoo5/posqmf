@@ -26,7 +26,7 @@ from posqmf import *
 
 ## `uncertainty_principle.ipynb`
 
-`uncertainty_principle.ipynb` contains computations related to the paper [*Positive quasimodular forms and the sign uncertainty principle*](AddLinkLater) and Chapter 8 and 9 of my thesis. It checks certain identities related to the Feigenbaum-Grabner-Hardin's family of quasiomodular forms $\{F_w\}$ and $\{G_w\}$ for their Fourier eigenfunctions, which are used to prove new upper bounds for the Bourgain-Clozel-Kahane's sign uncertainty principle constant in certain dimensions.
+`uncertainty_principle.ipynb` contains computations related to the paper [*Positive quasimodular forms and the sign uncertainty principle*](https://arxiv.org/abs/2608.15415) and Chapter 8 and 9 of my thesis. It checks certain identities related to the Feigenbaum-Grabner-Hardin's family of quasiomodular forms $\{F_w\}$ and $\{G_w\}$ for their Fourier eigenfunctions, which are used to prove new upper bounds for the Bourgain-Clozel-Kahane's sign uncertainty principle constant in certain dimensions.
 Also, it contains code checking signs of Fourier coefficients of extremal eisenstein series, which are used to prove new lower bounds.
 
 ## `miscellaneous.ipynb`
