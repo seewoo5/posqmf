@@ -1,7 +1,7 @@
 # Notebooks
 
 Supplementary Jupyter notebooks for some of my papers and thesis.
-Each notebook imports the `posqmf` package from the repository root, so run `bash posqmf/preparse.sh` first (see the [main README](../README.md)).
+Each notebook imports the `posqmf` package from the repository root, so run `bash posqmf/preparse.sh` first (see [`posqmf/README.md`](../posqmf/README.md)).
 
 ## `sphere_packing_ineq.ipynb`
 

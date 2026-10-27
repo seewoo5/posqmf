@@ -1,3 +1,11 @@
+## `preparse.sh`
+
+Running `bash posqmf/preparse.sh` (from any directory) will generate python scripts (including `__init__.py`) under the directory `posqmf`, from the `sage` files in `posqmf/sage`. This allows you to use import them directly as
+
+```
+from posqmf import *
+```
+
 ## Sage code
 
 The sage code under the directory `sage` provides several functions for computations with quasimodular forms and extremal quasimodular forms.
