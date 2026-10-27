@@ -37,7 +37,7 @@ jobs:
           jupyter kernelspec list
 
       - name: Generate Python modules from Sage sources
-        run: bash preparse.sh
+        run: bash posqmf/preparse.sh
 
       - name: Execute notebooks
         run: |

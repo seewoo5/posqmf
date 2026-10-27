@@ -4,9 +4,9 @@ This repository contains Sage and Lean code related to (positivity of) quasimodu
 
 Requirements: SageMath version >= 10.9
 
-## `preparse.sh`
+## `posqmf/preparse.sh`
 
-Running `sh preparse.sh` will generate python scripts (including `__init__.py`) under the directory `posqmf`, from the `sage` files in `posqmf/sage`. This allows you to use import them directly as
+Running `bash posqmf/preparse.sh` (from any directory) will generate python scripts (including `__init__.py`) under the directory `posqmf`, from the `sage` files in `posqmf/sage`. This allows you to use import them directly as
 
 ```
 from posqmf import *
