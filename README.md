@@ -12,26 +12,6 @@ Running `sh preparse.sh` will generate python scripts (including `__init__.py`) 
 from posqmf import *
 ```
 
-## `notebooks/sphere_packing_ineq.ipynb`
+## `notebooks`
 
-`sphere_packing_ineq.ipynb` checks the identities in the paper [*Algebraic proof of modular form inequalities for optimal sphere packings*](https://arxiv.org/abs/2406.14659).
-
-## `notebooks/polymod.ipynb`
-
-`polymod.ipynb` checks the identities in the paper [*Inequalities involving polynomials and quasimodular forms*](https://arxiv.org/abs/2602.10536).
-
-## `notebooks/extremal_qm_high_level.ipynb`
-
-`extremal_qm_high_level.ipynb` contains code related to Chapter 7 of my thesis, which checks the uniqueness and identities related to the extremal quasimodular forms of level $\Gamma_0(N)$ and depth $s$, where $`(N, s) \in \{(2, 1), (2, 2), (3, 1), (4, 1)\}`$. It also computes Victor-Miller basis for level $\Gamma_0(2)$ and $\Gamma_0(3)$.
-
-## `notebooks/uncertainty_principle.ipynb`
-
-`uncertainty_principle.ipynb` contains computations related to the paper [*Positive quasimodular forms and the sign uncertainty principle*](https://arxiv.org/abs/2608.15415) and Chapter 8 and 9 of my thesis. It checks certain identities related to the Feigenbaum-Grabner-Hardin's family of quasiomodular forms $`\{F_w\}`$ and $`\{G_w\}`$ for their Fourier eigenfunctions, which are used to prove new upper bounds for the Bourgain-Clozel-Kahane's sign uncertainty principle constant in certain dimensions.
-Also, it contains code checking signs of Fourier coefficients of extremal eisenstein series, which are used to prove new lower bounds.
-
-## `notebooks/miscellaneous.ipynb`
-
-`miscellaneous.ipynb` contains some miscellaneous code related to quasimodular forms, including
-
-- Uniqueness of extremal quasimodular forms of weight $\le 200$ and depth $5 \le s \le 10$.
-- Non-positiveness of $X_{16, 5}$.
+The directory `notebooks` contains the Jupyter notebooks; see [`notebooks/README.md`](notebooks/README.md) for what each of them checks.
