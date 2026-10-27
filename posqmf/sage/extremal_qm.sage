@@ -90,4 +90,8 @@ def is_extremal_qm_unique(weight, depth):
     bs = qm_basis(weight, depth)
     d = dim_qm(weight, depth)
     m = matrix([qm_coefficients(qm_, d) for qm_ in bs])
+    # The entries are integers, so invertibility modulo a prime implies invertibility over QQ.
+    # This is much faster than the exact check, which is only needed when it fails.
+    if m.denominator() == 1 and m.change_ring(GF(previous_prime(2^31))).is_invertible():
+        return True
     return m.is_invertible()
