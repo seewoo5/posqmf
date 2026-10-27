@@ -33,7 +33,7 @@ jobs:
 
       - name: Register Sage Jupyter kernel
         run: |
-          sage -python -c "from sage.repl.ipython_kernel.install import SageKernelSpec; SageKernelSpec.update(prefix='$CONDA_PREFIX')"
+          python -c "from sage.repl.ipython_kernel.install import SageKernelSpec; SageKernelSpec.update(prefix='$CONDA_PREFIX')"
           jupyter kernelspec list
 
       - name: Generate Python modules from Sage sources
