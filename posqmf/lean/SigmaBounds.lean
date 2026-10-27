@@ -1,5 +1,5 @@
+import Mathlib.Basic.Real.Basic
 import Mathlib.Data.Nat.Cast.Field
-import Mathlib.Data.Real.Basic
 import Mathlib.NumberTheory.ArithmeticFunction.Misc
 import Mathlib.Tactic.FieldSimp
 import Mathlib.Tactic.IntervalCases
