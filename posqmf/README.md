@@ -30,7 +30,7 @@ Functions for extremal quasimodular forms of level $\Gamma_0(2)$ and $\Gamma_0(3
 
 ### `kaneko_zagier.sage`
 
-The second- and third-order Kaneko-Zagier operators $L_{2,k}^{\alpha}$ and $L_{3,k}^{(\alpha, \beta)}$, which the families $F_w$, $G_w$, $Y_w$, $\widetilde{G}_w$, and $X_{w,2}$ all satisfy differential equations for.
+The second- and third-order Kaneko-Zagier operators $`L_{2,k}^{\alpha}`$ and $`L_{3,k}^{(\alpha, \beta)}`$, which the families $F_w$, $G_w$, $Y_w$, $`\widetilde{G}_w`$, and $`X_{w,2}`$ all satisfy differential equations for.
 
 - `qm_L2` and `qm_L3` apply the operators to level 1 quasimodular forms, in Serre derivative form; `qm_L2_D` and `qm_L3_D` use the equivalent expressions in terms of $D = q \frac{d}{dq}$.
 `ls_L2`, `ls_L3`, `ls_L2_D`, and `ls_L3_D` are the counterparts on `QM2_LS`.
@@ -45,7 +45,7 @@ Functions for the Feigenbaum-Grabner-Hardin families of quasimodular forms used 
 
 - `F`, `G`, and `Y` compute $F_w$, $G_w$, and $Y_w$, respectively.
 
-- `Ftilde` and `Gtilde` compute $\widetilde{F}_{w}$ and $\widetilde{G}_{w}$, respectively.
+- `Ftilde` and `Gtilde` compute $`\widetilde{F}_{w}`$ and $`\widetilde{G}_{w}`$, respectively.
 
 ### `utils_l1.sage`
 
@@ -104,9 +104,9 @@ and product rule.
 
 - `rqm_S_action` and `rqm2_S_action` compute the slash action by $S$ for homogeneous elements in `RQM` and `RQM2`. The action $|\_{w}S$ on $F \cdot \left(\frac{1}{\pi}\right)^a \cdot \left(\frac{i}{z}\right)^b$ becomes
 
-$$
-\begin{align*}&(F|\_{w-a-b}S) \cdot \left(\frac{1}{\pi}\right)^{a} \left(\frac{i}{-1/z}\right)^{b} z^{-a-b} \\ &= (-1)^{(a+b)/2} \cdot (F|\_{w-a-b}S) \cdot \left(\frac{1}{\pi}\right)^a \cdot \left(\frac{i}{z}\right)^a.\end{align*}
-$$
+```math
+\begin{align*}&(F|_{w-a-b}S) \cdot \left(\frac{1}{\pi}\right)^{a} \left(\frac{i}{-1/z}\right)^{b} z^{-a-b} \\ &= (-1)^{(a+b)/2} \cdot (F|_{w-a-b}S) \cdot \left(\frac{1}{\pi}\right)^a \cdot \left(\frac{i}{z}\right)^a.\end{align*}
+```
 
 - `rqm_homogeneous_comps` and `rqm2_homogeneous_comps` extract each of homogeneous components from possibly inhomogeneous input.
 
@@ -144,12 +144,12 @@ The $q$-expansion layer (`Basic`, `Eisenstein`, `Ramanujan`, `Serre`) lives in n
 The directory `lean/UncertaintyPrinciple` formalizes the coefficient-positivity arguments of the paper [*Positive quasimodular forms and the sign uncertainty principle*](https://arxiv.org/abs/2608.15415) that sit on top of the operator layer.
 
 - `LogInequalities.lean` proves the four elementary logarithm inequalities behind the base cases of the positivity of $Y_w$ (Lemma 4.10 and the $Y_4$, $Y_8$, $Y_{10}$ cases of Theorem 4.11), via the mean value theorem.
-- `F.lean` proves positivity of the Fourier coefficients of $\widetilde{F}_{w-2}$ (Proposition 4.5), assuming nothing. Its `QExpansion` section runs the induction in $\mathbb{R}[[q]]$ from the recurrence (Lemma 4.4); its `PolynomialModel` section defines the family by that recurrence, indexed so that `fFam N` is the paper's $F_{4N}$ (with $F_8$ explicit and $F_0, F_4$ set to zero), sets $\widetilde{F}_{w-2} := \delta F_w$ (as `ftildeFam`, of weight $4N-2$, with `ftildeSeries` its $q$-expansion), and supplies the vanishing order and the normalization, the latter through the modular linear differential equation $L_{3,w-2}^{((w-4)/4,\,0)}F_w = 0$. The two sections open different namespaces, since `KanekoZagier` and `QuasiModular` both name $D$, $E_2, E_4, E_6$ and $\partial_k$.
-- `G.lean` proves nonnegativity of the Fourier coefficients of $\widetilde{G}_w$ (Propositions 4.21 and 4.22), also assuming nothing, plus strict positivity of the constant term. Its third-order equation is proved by the intertwining criterion from a check on the constant $\widetilde{G}_0$. The positivity argument needs no polynomial model, since no $\delta$ appears; the family is nevertheless defined there, as $\widetilde{G}_{4N}$ of weight $4N$ with $\delta\widetilde{G}_w = 0$ — the paper's level 1 modular form — which the $q$-expansion layer cannot state; `gtildeSeries` is its $q$-expansion and the recurrence becomes a theorem.
+- `F.lean` proves positivity of the Fourier coefficients of $`\widetilde{F}_{w-2}`$ (Proposition 4.5), assuming nothing. Its `QExpansion` section runs the induction in $\mathbb{R}[[q]]$ from the recurrence (Lemma 4.4); its `PolynomialModel` section defines the family by that recurrence, indexed so that `fFam N` is the paper's $`F_{4N}`$ (with $F_8$ explicit and $F_0, F_4$ set to zero), sets $`\widetilde{F}_{w-2} := \delta F_w`$ (as `ftildeFam`, of weight $4N-2$, with `ftildeSeries` its $q$-expansion), and supplies the vanishing order and the normalization, the latter through the modular linear differential equation $`L_{3,w-2}^{((w-4)/4,\,0)}F_w = 0`$. The two sections open different namespaces, since `KanekoZagier` and `QuasiModular` both name $D$, $E_2, E_4, E_6$ and $\partial_k$.
+- `G.lean` proves nonnegativity of the Fourier coefficients of $`\widetilde{G}_w`$ (Propositions 4.21 and 4.22), also assuming nothing, plus strict positivity of the constant term. Its third-order equation is proved by the intertwining criterion from a check on the constant $`\widetilde{G}_0`$. The positivity argument needs no polynomial model, since no $\delta$ appears; the family is nevertheless defined there, as $`\widetilde{G}_{4N}`$ of weight $4N$ with $`\delta\widetilde{G}_w = 0`$ — the paper's level 1 modular form — which the $q$-expansion layer cannot state; `gtildeSeries` is its $q$-expansion and the recurrence becomes a theorem.
 
 Most results use the Ramanujan axioms of `QuasiModularForms/Ramanujan.lean`. The exceptions are `LogInequalities.lean` and the `QExpansion` sections of both files, which never meet the polynomial model — as do the polynomial facts themselves, since only the $q$-expansion map `qexp` needs those axioms.
 
-Neither file identifies its family with the paper's $F_w$ and $\widetilde{G}_w$. For $F$ the vanishing order, normalization and differential equation are all proved, which is what characterizes the extremal quasimodular form. For $\widetilde{G}$ the recurrence is taken as the definition; deriving it from $G_w = \widetilde{G}_{w-12} \Delta \mathcal{L}_S + \Psi_w$ is an argument about modular functions for $\Gamma(2)$ and lies outside the development.
+Neither file identifies its family with the paper's $F_w$ and $`\widetilde{G}_w`$. For $F$ the vanishing order, normalization and differential equation are all proved, which is what characterizes the extremal quasimodular form. For $\widetilde{G}$ the recurrence is taken as the definition; deriving it from $`G_w = \widetilde{G}_{w-12} \Delta \mathcal{L}_S + \Psi_w`$ is an argument about modular functions for $\Gamma(2)$ and lies outside the development.
 
 ### Miscellaneous
 
