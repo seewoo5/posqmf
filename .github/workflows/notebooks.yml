@@ -63,7 +63,9 @@ jobs:
             cat "executed-notebooks/$(basename "${notebooks[i]}").log"
             echo "::endgroup::"
           done
-          exit "${failed}"
+          # Only call `exit` on failure: in this login shell it runs ~/.bash_logout, whose failing
+          # clear_console turns even `exit 0` into exit code 1 under `set -e`
+          if [ "${failed}" -ne 0 ]; then exit 1; fi
 
       - name: Upload executed notebooks
         if: always()
