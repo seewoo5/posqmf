@@ -17,4 +17,4 @@ rev = "v4.33.0"
 
 [[lean_lib]]
 name = "posqmf"
-globs = ["posqmf.+"]
+globs = ["D_6_3", "PolymodInequalities.+", "QuasiModularForms.+", "SigmaBounds", "UncertaintyPrinciple.+", "X_16_5"]

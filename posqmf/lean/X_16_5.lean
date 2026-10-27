@@ -5,7 +5,7 @@ import Mathlib.Analysis.SpecialFunctions.Pow.Real
 import Mathlib.Analysis.SumIntegralComparisons
 import Mathlib.MeasureTheory.Integral.IntervalIntegral.FundThmCalculus
 import Mathlib.NumberTheory.ArithmeticFunction.Misc
-import posqmf.lean.SigmaBounds
+import SigmaBounds
 /-!
 # Negativity of the non-leading coefficients of `X_{16,5}`
 

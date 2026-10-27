@@ -1,7 +1,7 @@
-import posqmf.lean.QuasiModularForms.Coefficients
-import posqmf.lean.QuasiModularForms.Intertwine
-import posqmf.lean.QuasiModularForms.PolynomialModel
-import posqmf.lean.SigmaBounds
+import QuasiModularForms.Coefficients
+import QuasiModularForms.Intertwine
+import QuasiModularForms.PolynomialModel
+import SigmaBounds
 
 /-!
 # The family `F_w` and the positivity of `F̃_{w-2}`

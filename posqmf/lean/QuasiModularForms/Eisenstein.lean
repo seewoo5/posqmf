@@ -1,5 +1,5 @@
 import Mathlib.NumberTheory.ArithmeticFunction.Misc
-import posqmf.lean.QuasiModularForms.Basic
+import QuasiModularForms.Basic
 
 /-!
 # The Eisenstein series `E₂`, `E₄`, `E₆` as formal `q`-expansions

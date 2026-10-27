@@ -113,6 +113,7 @@ $$
 ## Lean code
 
 The lean code under the directory `lean` verifies several inequalities on quasimodular forms and their coefficients.
+It is a Lake project of its own (`lakefile.toml`, `lean-toolchain`, and `lake-manifest.json` live there too), so run `lake build` inside `posqmf/lean`.
 
 ### `PolymodInequalities`
 

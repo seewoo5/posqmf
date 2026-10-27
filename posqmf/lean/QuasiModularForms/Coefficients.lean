@@ -1,4 +1,4 @@
-import posqmf.lean.QuasiModularForms.KanekoZagier
+import QuasiModularForms.KanekoZagier
 
 /-!
 # Fourier coefficients of the Kaneko--Zagier operators

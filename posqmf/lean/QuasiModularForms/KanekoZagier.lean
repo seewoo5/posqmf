@@ -1,4 +1,4 @@
-import posqmf.lean.QuasiModularForms.Serre
+import QuasiModularForms.Serre
 
 /-!
 # The Kaneko--Zagier operators `L_{2,k}^α` and `L_{3,k}^{(α,β)}`
