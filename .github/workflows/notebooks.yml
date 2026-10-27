@@ -43,16 +43,27 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p executed-notebooks
-          for notebook in notebooks/*.ipynb; do
-            echo "::group::${notebook}"
+          # The notebooks are independent, so execute them in parallel and show each log afterwards
+          notebooks=(notebooks/*.ipynb)
+          pids=()
+          for notebook in "${notebooks[@]}"; do
             jupyter nbconvert \
               --to notebook \
               --execute "${notebook}" \
               --output-dir executed-notebooks \
               --ExecutePreprocessor.kernel_name=sagemath \
-              --ExecutePreprocessor.timeout=-1
+              --ExecutePreprocessor.timeout=-1 \
+              > "executed-notebooks/$(basename "${notebook}").log" 2>&1 &
+            pids+=($!)
+          done
+          failed=0
+          for i in "${!notebooks[@]}"; do
+            if wait "${pids[i]}"; then status=passed; else status=FAILED; failed=1; fi
+            echo "::group::${notebooks[i]} (${status})"
+            cat "executed-notebooks/$(basename "${notebooks[i]}").log"
             echo "::endgroup::"
           done
+          exit "${failed}"
 
       - name: Upload executed notebooks
         if: always()
