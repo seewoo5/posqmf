@@ -2,7 +2,7 @@
 
 This repository contains Sage and Lean code related to (positivity of) quasimodular forms, along with supplementary Jupyter notebooks for some of my papers and thesis.
 
-Requirements: SageMath version >= 10.6
+Requirements: SageMath version >= 10.9
 
 ## `preparse.sh`
 
