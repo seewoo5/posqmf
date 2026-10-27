@@ -65,7 +65,8 @@ Functions for level 1 quasimodular forms, including depths, $q$-expansion, (Serr
 
 Functions for level $\Gamma(2)$ quasimodular forms.
 These are implemented as polynomials in three variables, $H_2$ (`H2`), $H_4$ (`H4`), $E_2$ (`E2`).
-$q$-expansions are given in terms of `qh`, which corresponds to $q^{1/2}$.
+$q$-expansions (`qm2_q_series`) are Puiseux series in `q` with exponents in $\frac{1}{2}\mathbb{Z}$, using Sage's `PuiseuxSeriesRing`.
+The precision `prec` is the exponent of the error term $O(q^{\mathrm{prec}})$, and may be a half-integer; coefficient lists (`qm2_coefficients`) run over $q^0, q^{1/2}, q^1, \dots$.
 
 - `print_qm2` gives $q$-expansion, weight, depth, cusp order, and the polynomial expansion of a given quasimodular form.
 
@@ -80,7 +81,7 @@ Functions for the ring `QM2_LS = QM2[LS]`, used to compute $G_w$ and $Y_w$ in `f
 
 - `ls_components` extracts the two components $A$ and $B$ from an element $A + B \cdot \mathcal{L}_S$.
 
-- `ls_q_series`, `ls_coefficients`, and `ls_cusp_order` compute $q^{1/2}$-expansions, coefficients, and cusp orders.
+- `ls_q_series`, `ls_coefficients`, and `ls_cusp_order` compute $q$-expansions (as Puiseux series), coefficients, and cusp orders.
 
 - `ls_derivative` and `ls_serre_derivative` extend the derivative and Serre derivative to `QM2_LS`.
 

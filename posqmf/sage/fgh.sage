@@ -92,9 +92,9 @@ def G(w):
         r *= 3 * (u - 2) * (u + 2) / (16 * (u - 8) * (u - 3) * (u - 1) * (u + 4))
     r = QM2_LS(r)
     if w % 4 == 0:
-        assert ls_cusp_order(r, prec=(w - 2) // 2 + 5) == (w - 2) / 4
+        assert ls_cusp_order(r, prec=(w - 2) / 4 + 5 / 2) == (w - 2) / 4
     else:
-        assert ls_cusp_order(r, prec=(w - 4) // 2 + 5) == (w - 4) / 4
+        assert ls_cusp_order(r, prec=(w - 4) / 4 + 5 / 2) == (w - 4) / 4
     return r
 
 @lru_cache
@@ -147,7 +147,7 @@ def Y(w):
         r = (6 / (u + 3)) * ls_serre_derivative(Yu, u)
     r = QM2_LS(r)
     if w % 4 == 0:
-        assert ls_cusp_order(r, prec=(w + 2) // 2 + 5) == (w + 2) / 4
+        assert ls_cusp_order(r, prec=(w + 2) / 4 + 5 / 2) == (w + 2) / 4
     else:
-        assert ls_cusp_order(r, prec=w // 2 + 5) == w / 4
+        assert ls_cusp_order(r, prec=w / 4 + 5 / 2) == w / 4
     return r

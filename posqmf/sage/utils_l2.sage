@@ -1,4 +1,5 @@
 import os
+from functools import lru_cache
 
 load(os.path.dirname(os.path.abspath(__file__)) + "/sage/utils_l1.sage")
 
@@ -58,10 +59,10 @@ def qm2_serre_derivative_fold(qm, r, k=None):
         return qm2_serre_derivative(qm2_serre_derivative_fold(qm, r-1, k), k + 2 * (r-1))
 
 # q-series
-# Note that the variable `q` in the expansion is in fact e^(pi * i * z), which is `q^(1/2)`.
-# The default precision is fixed (which is enough for our purpose), but you can increase it
-prec = 80
-qh = var('qh')  # q^1/2
+# Level Gamma(2) forms are expanded in powers of q^(1/2), so their q-expansions are Puiseux series
+# in q = e^(2 * pi * i * z), e.g. H2 = 16 * q^(1/2) + 64 * q^(3/2) + O(q^(5/2)).
+# The precision `prec` always refers to the error term O(q^prec), and may be a half-integer.
+PS.<q> = PuiseuxSeriesRing(QQ)
 
 
 def r4(k):
@@ -72,63 +73,57 @@ def r4(k):
     else:
         return 8 * sigma(k, 1)
 
-# q-series of Jacobi thetanulle functions
-H3ser = 1
-for i in range(1, prec):
-    H3ser += r4(i) * qh^i
-H4ser = 1
-for i in range(1, prec):
-    H4ser += (-1)^i * r4(i) * qh^i
-H2ser = H3ser - H4ser
+@lru_cache
+def qm2_gens_q_series(prec):
+    """Return the q-series of the generators `H2`, `H4`, `E2_` up to `O(q^prec)`."""
+    # Jacobi thetanulle functions, H3 = Theta_3^4 = H2 + H4
+    H3ser = O(q^prec)
+    H4ser = O(q^prec)
+    for i in range(ceil(2 * prec)):
+        H3ser += r4(i) * q^(i / 2)
+        H4ser += (-1)^i * r4(i) * q^(i / 2)
+    # Eisenstein series
+    E2ser = 1 + O(q^prec)
+    for i in range(1, ceil(prec)):
+        E2ser -= 24 * sigma(i, 1) * q^i
+    return H3ser - H4ser, H4ser, E2ser
 
-# q-series of Eisenstein series
-E2ser = 1
-for i in range(1, prec):
-    E2ser -= 24 * sigma(i, 1) * qh^(2 * i)
-
-E4ser = 1
-for i in range(1, prec):
-    E4ser += 240 * sigma(i, 3) * qh^(2 * i)
-    
-E6ser = 1
-for i in range(1, prec):
-    E6ser -= 504 * sigma(i, 5) * qh^(2 * i)
-
-def qm2_q_series(qm, prec=20):
-    """Return the q-series expansion (in `q^(1/2)`) up to precision `prec`."""
-    r = qh - qh
-    H2ser_ = H2ser.series(qh, prec)
-    H4ser_ = H4ser.series(qh, prec)
-    E2ser_ = E2ser.series(qh, prec)
+def qm2_q_series(qm, prec=10):
+    """Return the q-series expansion up to `O(q^prec)`, as a Puiseux series in `q`."""
+    H2ser, H4ser, E2ser = qm2_gens_q_series(prec)
+    r = O(q^prec)
     for (a, b, e), coeff in qm.dict().items():
-        r += coeff * H2ser_^a * H4ser_^b * E2ser_^e
-    return r.series(qh, prec)
+        r += coeff * H2ser^a * H4ser^b * E2ser^e
+    return r
 
-def qm2_coefficients(qm, prec=20):
-    """Return Fourier coefficients from the level Gamma(2) q-series expansion."""
-    return qm2_q_series(qm, prec).list()
+def q_series_coefficients(qser, prec):
+    """Return the coefficients of `q^0, q^(1/2), ..., q^(prec - 1/2)` in a Puiseux series."""
+    # Index the underlying Laurent series in `q^(1/e)`, since `qser[n]` truncates `n * e` to an integer
+    l = qser.laurent_part()
+    e = qser.ramification_index()
+    return [l[i * e // 2] if (i * e) % 2 == 0 else 0 for i in range(ceil(2 * prec))]
+
+def qm2_coefficients(qm, prec=10):
+    """Return the Fourier coefficients of `q^0, q^(1/2), ..., q^(prec - 1/2)`."""
+    return q_series_coefficients(qm2_q_series(qm, prec), prec)
 
 def qm2_cusp_order(qm):
     """Return the cusp order for a level Gamma(2) quasimodular form."""
-    N = 50
-    c = qm2_q_series(qm, N).list()
-    for i in range(N):
-        if c[i] != 0:
-            return i / 2
+    qser = qm2_q_series(qm, 25)
+    if not qser.is_zero():
+        return qser.valuation()
 
 def qm2_first_nonzero_coeff(qm):
     """Return the first nonzero Fourier coefficient."""
-    N = 100
-    c = qm2_q_series(qm, N).list()
-    for i in range(N):
-        if c[i] != 0:
-            return Rational(c[i])
+    qser = qm2_q_series(qm, 50)
+    if not qser.is_zero():
+        return qser.coefficients()[0]
 
 def qm2_normalize(qm):
     """Normalize so that the first nonzero Fourier coefficient is 1."""
     return qm / qm2_first_nonzero_coeff(qm)
 
-def print_qm2(qm, name, prec=30):
+def print_qm2(qm, name, prec=15):
     """Print q-expansion, weight, depth, cusp order, and polynomial data."""
     print(name + "\n")
     print("q_expansion", qm2_q_series(qm, prec), "\n")
@@ -158,8 +153,8 @@ def qm2_find_lin_comb(qm, ls):
     w = qm2_weight(qm)
     s = qm2_depth(qm)
     N = dim_qm2(w, s)
-    m = matrix([qm2_q_series(qm_, N).list()[:N] for qm_ in ls])
-    c_ = vector(qm2_q_series(qm, N).list())
+    m = matrix([qm2_coefficients(qm_, N / 2) for qm_ in ls])
+    c_ = vector(qm2_coefficients(qm, N / 2))
     x_ = m.solve_left(c_)
     r = sum(Rational(x_[j]) * ls[j] for j in range(len(ls)))
     assert r == qm
@@ -168,22 +163,21 @@ def qm2_find_lin_comb(qm, ls):
 def qm2_find_lin_comb_coeff(coeffs, ls):
     """Find a linear combination in `ls` from initial q-series coefficients."""
     N = len(coeffs)
-    m = matrix([qm2_q_series(qm_, N).list() for qm_ in ls])
+    m = matrix([qm2_coefficients(qm_, N / 2) for qm_ in ls])
     c_ = vector(coeffs)
     print(f"m: {m}")
     print(f"c: {c_}")
     x_ = m.solve_left(c_)
     r = sum(Rational(x_[j]) * ls[j] for j in range(len(ls)))
-    assert qm2_q_series(r, N).list() == coeffs
+    assert qm2_coefficients(r, N / 2) == coeffs
     return x_
 
 def qm2_to_func(qm, prec=100):
     """Convert a level Gamma(2) quasimodular form to a function on the positive imaginary axis."""
     qser = qm2_q_series(qm, prec=prec)
-    c = qser.list()
-    func = c[0]
-    for i in range(1, len(c)):
-        func += c[i] * exp(-i * pi * t)  # note q^(1/2) = e^(sqrt(-1) * pi * z)
+    func = 0
+    for n, c in zip(qser.exponents(), qser.coefficients()):
+        func += c * exp(-2 * n * pi * t)  # note q^n = e^(2 * pi * sqrt(-1) * n * z)
     return func
 
 def qm2_modular_components(qm):

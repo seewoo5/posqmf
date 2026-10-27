@@ -29,11 +29,11 @@ jobs:
           auto-update-conda: false
 
       - name: Install Sage and Jupyter tools
-        run: mamba install -y sage=10.6 nbconvert ipykernel tqdm
+        run: mamba install -y sage=10.9 nbconvert ipykernel tqdm
 
       - name: Register Sage Jupyter kernel
         run: |
-          sage -python -c "from sage.repl.ipython_kernel.install import SageKernelSpec; SageKernelSpec.update(prefix='$CONDA_PREFIX')"
+          python -c "from sage.repl.ipython_kernel.install import SageKernelSpec; SageKernelSpec.update(prefix='$CONDA_PREFIX')"
           jupyter kernelspec list
 
       - name: Generate Python modules from Sage sources
