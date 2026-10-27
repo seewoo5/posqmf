@@ -39,11 +39,11 @@ jobs:
       - name: Generate Python modules from Sage sources
         run: bash preparse.sh
 
-      - name: Execute root notebooks
+      - name: Execute notebooks
         run: |
           set -euo pipefail
           mkdir -p executed-notebooks
-          for notebook in *.ipynb; do
+          for notebook in notebooks/*.ipynb; do
             echo "::group::${notebook}"
             jupyter nbconvert \
               --to notebook \

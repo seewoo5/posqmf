@@ -152,6 +152,6 @@ Neither file identifies its family with the paper's $F_w$ and $\widetilde{G}_w$.
 
 ### Miscellaneous
 
-- `X_16_5.lean` verifies that the extremal quasimodular form $X_{16, 5}$ of weight $16$ and depth $5$ has negative coefficients for $n \ge 250$. Negativity for $8 \le n < 250$ is checked separately in `miscellaneous.ipynb`. Written by Claude Opus 4.7.
+- `X_16_5.lean` verifies that the extremal quasimodular form $X_{16, 5}$ of weight $16$ and depth $5$ has negative coefficients for $n \ge 250$. Negativity for $8 \le n < 250$ is checked separately in `notebooks/miscellaneous.ipynb`. Written by Claude Opus 4.7.
 - `D_6_3.lean` verifies the positivity of the coefficients of $\mathcal{D}_{6, 3}$. Written by Claude Opus 4.7.
 - `SigmaBounds.lean` include basic inequalities for the divisor sum function, which are used in the above two files. Written by Claude Opus 4.7.
