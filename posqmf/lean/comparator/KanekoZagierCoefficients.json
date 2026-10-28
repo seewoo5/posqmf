@@ -1,0 +1,10 @@
+{
+  "challenge_module": "PosqmfChallenge.KanekoZagier",
+  "solution_module": "Posqmf",
+  "theorem_names": [
+    "KanekoZagier.coeff_L₂",
+    "KanekoZagier.coeff_L₃"
+  ],
+  "permitted_axioms": ["propext", "Quot.sound", "Classical.choice"],
+  "enable_nanoda": false
+}

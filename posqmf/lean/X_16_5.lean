@@ -9,11 +9,12 @@ import SigmaBounds
 /-!
 # Negativity of the non-leading coefficients of `X_{16,5}`
 
-We prove that the sequence
+The extremal quasimodular form of weight `16` and depth `5`, normalized to start with `q⁷`, is
+`X_{16,5} = ∑_{n ≥ 7} a_n qⁿ` with
 
-  `a_n = x_n + 240 c₆ y_n + c₇ z_n + c₆ τ(n)`
+  `a_n = x_n + 240 c₆ y_n + c₇ z_n + c₆ τ(n)`,
 
-is strictly negative for every `n ≥ 1`, where
+where
 
   `x_n = - n σ₁₃(n) / 201801600 + 4531 n² σ₁₁(n) / 47809681920`
        `  - 149 n³ σ₉(n) / 228096000 + 49 n⁴ σ₇(n) / 25660800`
@@ -25,14 +26,15 @@ The constants `c₆`, `c₇` are the rational numbers arising in the linear
 combination of derivatives of Eisenstein series and Δ-quasi-modular forms
 expressing the extremal quasimodular form `X_{16,5}`.
 
-The strategy follows the sketch in `sketch.tex`:
+Every coefficient of `X_{16,5}` but the leading one `a_7 = 1` is negative, that is, `a_n < 0` for
+every `n ≥ 8`. This file proves it for `n ≥ 250` (`aSeq_neg_of_large`); the remaining range
+`8 ≤ n < 250` is checked in `notebooks/miscellaneous.ipynb`. The proof runs as follows:
 
 * Use the trivial bounds `nᵏ ≤ σₖ(n) ≤ 2 * nᵏ` (for `n ≥ 1` and `k ≥ 2`. `σ₁(n) ≤ n²` for `k = 1`).
-* Take Deligne's bound `|τ(n)| < σ₀(n) n^(11/2)` as an axiom.
+* Take Deligne's bound `|τ(n)| ≤ σ₀(n) n^(11/2)` as an axiom.
 * These yield `|y_n| ≤ (4/15) n^(21/2)` and `|z_n| ≤ (2/15) n^(21/2)`.
 * The leading negative term `- n σ₁₃(n) / 201801600` of magnitude
-  `~ n¹⁴ / 2·10⁸` dominates all the other terms for `n` large enough.
-* Finitely many small `n` are checked individually.
+  `~ n¹⁴ / 2·10⁸` dominates all the other terms for `n ≥ 250`.
 -/
 
 noncomputable section
@@ -269,14 +271,13 @@ proof reduces each correction term to a multiple of `t¹⁴ / 1210809600`
 (one sixth of the dominant negative term), so that the five corrections
 sum to at most `5 t¹⁴ / 1210809600 < t¹⁴ / 201801600`.
 
-The remaining small-`n` cases `1 ≤ n < 250` are open: with `tau`
-treated as `opaque` (per the sketch's "assume Deligne's bound without
-proof" directive), specific values such as `τ(1) = 1, τ(2) = -24, …` are
-inaccessible, so they cannot be dispatched without either a concrete
-definition or auxiliary axioms providing those values. Deligne alone
-permits `|τ(1)| < 1`, which is loose enough that `a_1 > 0` is not
-contradicted by the bound (even though the actual `τ(1) = 1` makes
-`a_1 < 0`).
+The range `8 ≤ n < 250` is not covered here. With `τ` treated as
+`opaque`, so that only Deligne's bound is assumed, specific values such as
+`τ(1) = 1, τ(2) = -24, …` are inaccessible, and these cases cannot be
+dispatched without either a concrete definition or auxiliary axioms
+providing those values. For instance `a_1 = c₆ (τ(1) - 1)`, so Deligne's bound
+`|τ(1)| ≤ 1` alone gives only `a_1 ≤ 0`, whereas the actual `τ(1) = 1`
+makes `a_1 = 0`.
 -/
 
 /-- For `t ≥ 1`: `t^((21:ℝ)/2) ≤ t^11`. -/

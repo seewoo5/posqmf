@@ -1,0 +1,14 @@
+{
+  "challenge_module": "PosqmfChallenge.X_16_5",
+  "solution_module": "Posqmf",
+  "theorem_names": [
+    "aSeq_neg_of_large"
+  ],
+  "permitted_axioms": [
+    "propext",
+    "Quot.sound",
+    "Classical.choice",
+    "abs_tau_lt"
+  ],
+  "enable_nanoda": false
+}

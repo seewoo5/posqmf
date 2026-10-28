@@ -700,7 +700,9 @@ private lemma ftilde_facts (N : ℕ) :
 the base case, the vanishing order and the normalisation are all proved from the definition of the
 `F_w` family in the polynomial model.
 
-`ftildeSeries N` is `F̃_{4N-2}`, and the range `1 ≤ j ≤ N - 2` is the paper's `1 ≤ j ≤ w/4 - 3`. -/
+`ftildeSeries N` is `F̃_{4N-2}`, so for `w = 4N` the range `1 ≤ j ≤ N - 2` is `1 ≤ j ≤ w/4 - 2`:
+the paper's range `1 ≤ j ≤ w/4 - 3` together with the boundary index `w/4 - 2`, where positivity
+also follows from `coeff_ftildeSeries_boundary`. -/
 theorem coeff_ftildeSeries_pos (N j : ℕ) (hN : 2 ≤ N) (hj1 : 1 ≤ j) (hj : j ≤ N - 2) :
     0 < coeff j (ftildeSeries N) := by
   obtain ⟨M, rfl⟩ : ∃ M, N = M + 3 := ⟨N - 3, by lia⟩

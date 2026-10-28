@@ -1,0 +1,13 @@
+{
+  "challenge_module": "PosqmfChallenge.D_6_3",
+  "solution_module": "Posqmf",
+  "theorem_names": [
+    "D63.aSeq_pos"
+  ],
+  "permitted_axioms": [
+    "propext",
+    "Quot.sound",
+    "Classical.choice"
+  ],
+  "enable_nanoda": false
+}

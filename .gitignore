@@ -2,6 +2,8 @@
 .claude
 .ipynb_checkpoints
 .lake
+_out
+_site
 
 *.py
 *.tex

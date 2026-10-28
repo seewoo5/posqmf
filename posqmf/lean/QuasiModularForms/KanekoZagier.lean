@@ -14,7 +14,10 @@ identities proved here, which are identities of formal power series.
 * `KanekoZagier.L₂_eq_serre`: `L_{2,k}^α = ∂_k² - (k(k+2)/144 - α)E₄`.
 * `KanekoZagier.L₃_eq_serre`: the `D`-form and the Serre-derivative form of the third-order
   operator agree, `L_{3,k}^{(α,β)} = ∂_k³ + (α - (3k²+12k+8)/144)E₄∂_k`
-  `+ (β + kα/12 - k²(k+3)/864)E₆`.  This is item 1.1 of the verification plan.
+  `+ (β + kα/12 - k²(k+3)/864)E₆`.
+
+These are the identities between the `D`-forms and the Serre forms in equation (18) and in
+equations (19)–(20) of *Positive quasimodular forms and the sign uncertainty principle*.
 -/
 
 open PowerSeries QExpansion
@@ -51,7 +54,7 @@ theorem L₂_eq_serre (k α : ℝ) (f : ℝ⟦X⟧) :
     L₂ k α f = serreDIter k 2 f - (k * (k + 2) / 144 - α) • (E₄ * f) := by
   rw [L₂, serreD_two_eq]; module
 
-/-- **Serre form of the third-order operator** (item 1.1 of the verification plan):
+/-- **Serre form of the third-order operator** (equations (19) and (20) of the paper):
 `L_{3,k}^{(α,β)} = ∂_k³ + (α - (3k²+12k+8)/144)E₄∂_k + (β + kα/12 - k²(k+3)/864)E₆`. -/
 theorem L₃_eq_serre (k α β : ℝ) (f : ℝ⟦X⟧) :
     L₃ k α β f = serreDIter k 3 f + (α - (3 * k ^ 2 + 12 * k + 8) / 144) • (E₄ * serreD k f)

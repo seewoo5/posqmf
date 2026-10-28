@@ -1,0 +1,32 @@
+{
+  "challenge_module": "PosqmfChallenge.UncertaintyPrinciple",
+  "solution_module": "Posqmf",
+  "theorem_names": [
+    "UncertaintyPrinciple.delta_SFp",
+    "UncertaintyPrinciple.hasWeight_fFam",
+    "UncertaintyPrinciple.fFam_three",
+    "UncertaintyPrinciple.hasWeight_ftildeFam",
+    "UncertaintyPrinciple.ftildeSeries_succ",
+    "UncertaintyPrinciple.ftildeSeries_three",
+    "UncertaintyPrinciple.coeff_fSeries_eq_zero",
+    "UncertaintyPrinciple.mldeF",
+    "UncertaintyPrinciple.coeff_fSeries_eq_one",
+    "UncertaintyPrinciple.coeff_ftildeSeries_pos",
+    "UncertaintyPrinciple.coeff_ftildeSeries_boundary",
+    "UncertaintyPrinciple.hasWeight_gtildeFam",
+    "UncertaintyPrinciple.delta_gtildeFam",
+    "UncertaintyPrinciple.gtildeSeries_succ",
+    "UncertaintyPrinciple.mldeG",
+    "UncertaintyPrinciple.coeff_gtildeSeries_nonneg",
+    "UncertaintyPrinciple.coeff_gtildeSeries_zero_pos"
+  ],
+  "permitted_axioms": [
+    "propext",
+    "Quot.sound",
+    "Classical.choice",
+    "QExpansion.ramanujan_E₂",
+    "QExpansion.ramanujan_E₄",
+    "QExpansion.ramanujan_E₆"
+  ],
+  "enable_nanoda": false
+}

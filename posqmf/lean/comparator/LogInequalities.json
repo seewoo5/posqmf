@@ -1,0 +1,16 @@
+{
+  "challenge_module": "PosqmfChallenge.LogInequalities",
+  "solution_module": "Posqmf",
+  "theorem_names": [
+    "UncertaintyPrinciple.logIneq_basic",
+    "UncertaintyPrinciple.logIneq_Y₄",
+    "UncertaintyPrinciple.logIneq_Y₈",
+    "UncertaintyPrinciple.logIneq_Y₁₀"
+  ],
+  "permitted_axioms": [
+    "propext",
+    "Quot.sound",
+    "Classical.choice"
+  ],
+  "enable_nanoda": false
+}
