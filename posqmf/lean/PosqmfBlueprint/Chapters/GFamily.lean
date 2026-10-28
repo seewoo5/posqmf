@@ -11,7 +11,7 @@ open Informal
 
 set_option verso.blueprint.foldCodeBlocks true
 
-#doc (Manual) "The family $`G̃` and the nonnegativity of its coefficients" =>
+#doc (Manual) "The family $`\\widetilde{G}` and the nonnegativity of its coefficients" =>
 %%%
 tag := "g-family"
 file := "G-family"
@@ -45,7 +45,7 @@ for $`\Gamma(2)` (if $`A \mathcal{L}_S + B = 0` with $`A`, $`B` nonzero modular 
 $`\log(1-\lambda)` would be a rational function of $`\lambda`), which lies outside the
 development. In Lean, `gtildeFam N` is $`\widetilde{G}_{4N}`.
 
-# The family $`G̃`
+# The family $`\widetilde{G}`
 %%%
 file := "The-family-Gtilde"
 %%%

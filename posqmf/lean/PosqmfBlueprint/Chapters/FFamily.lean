@@ -11,7 +11,7 @@ open Informal
 
 set_option verso.blueprint.foldCodeBlocks true
 
-#doc (Manual) "The family $`F` and the coefficients of $`F̃`" =>
+#doc (Manual) "The family $`F` and the coefficients of $`\\widetilde{F}`" =>
 %%%
 tag := "f-family"
 file := "F-family"
@@ -163,7 +163,7 @@ off-diagonal coefficients at the cusp index are $`\frac{8N + 11}{6}` and $`-4(24
 they combine with $`c_w` to exactly $`1`.
 :::
 
-# The forms $`F̃` and their recurrence
+# The forms $`\widetilde{F}` and their recurrence
 %%%
 file := "Ftilde-recurrence"
 %%%
@@ -213,7 +213,7 @@ $`\frac{1}{86400} E_4 E_4'`. Both factors have nonnegative coefficients, with
 $`[q^n]E_4' = 240 n \sigma_3(n) > 0` for $`n \ge 1`.
 :::
 
-# Positivity of the coefficients of $`F̃`
+# Positivity of the coefficients of $`\widetilde{F}`
 %%%
 file := "Ftilde-positivity"
 %%%
