@@ -1,8 +1,9 @@
 name: Blueprint
 
-# Builds the Verso blueprint of `posqmf/lean` (see `posqmf/README.md`) on every pull request, and
-# deploys it to GitHub Pages on pushes to `main`. Deployment needs GitHub Pages to be enabled for
-# the repository with "GitHub Actions" as its source.
+# Builds the GitHub Pages site on every pull request, and deploys it on pushes to `main`: the root
+# README as the landing page, and the Verso blueprint of `posqmf/lean` (see `posqmf/README.md`)
+# under `blueprint/`. Deployment needs GitHub Pages to be enabled for the repository with
+# "GitHub Actions" as its source.
 
 on:
   push:
@@ -22,7 +23,7 @@ concurrency:
 
 jobs:
   build:
-    name: Build blueprint site
+    name: Build the Pages site
     runs-on: ubuntu-latest
     timeout-minutes: 120
     defaults:
@@ -62,10 +63,17 @@ jobs:
       - name: Build the blueprint site
         run: ./scripts/ci-pages.sh
 
+      - name: Install pandoc
+        run: sudo apt-get update && sudo apt-get install -y pandoc
+
+      - name: Assemble the Pages site
+        working-directory: .
+        run: .github/pages/build-site.sh
+
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: posqmf/lean/_out/site/html-multi
+          path: _site
 
   deploy:
     name: Deploy to GitHub Pages

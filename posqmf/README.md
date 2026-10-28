@@ -170,7 +170,7 @@ Neither file identifies its family with the paper's $F_w$ and $`\widetilde{G}_w`
 ### Blueprint
 
 `lean/PosqmfBlueprint` is a [Verso blueprint](https://github.com/leanprover/verso-blueprint) of the Lean code: the informal statements and proofs, taken from the papers, with each statement linked to the Lean declarations that formalize it, a dependency graph, and a progress summary in which the results resting on the Ramanujan axioms (or on Deligne's bound) are marked as such.
-It is published at <https://seewoo5.github.io/posqmf/>.
+It is published at <https://seewoo5.github.io/posqmf/blueprint/>; the root of the site, <https://seewoo5.github.io/posqmf/>, shows the README of the repository.
 To build it locally, run inside `posqmf/lean`
 
 ```sh
@@ -179,6 +179,7 @@ python3 -m http.server 8000 -d _out/site/html-multi
 ```
 
 and open <http://localhost:8000>. The site must be served over HTTP, since the pages fetch their data files.
+To assemble the whole site as GitHub Pages serves it, run `.github/pages/build-site.sh` afterwards (it needs [pandoc](https://pandoc.org)); the result is in `_site` at the root of the repository.
 
 ### Comparator challenges
 
