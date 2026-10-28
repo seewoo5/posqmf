@@ -1,0 +1,15 @@
+{
+  "challenge_module": "PosqmfChallenge.PolymodInequalities",
+  "solution_module": "Posqmf",
+  "theorem_names": [
+    "f_pos",
+    "main_theorem",
+    "main_inequality"
+  ],
+  "permitted_axioms": [
+    "propext",
+    "Quot.sound",
+    "Classical.choice"
+  ],
+  "enable_nanoda": false
+}

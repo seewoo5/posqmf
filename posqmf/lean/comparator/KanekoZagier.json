@@ -1,0 +1,20 @@
+{
+  "challenge_module": "PosqmfChallenge.KanekoZagier",
+  "solution_module": "Posqmf",
+  "theorem_names": [
+    "KanekoZagier.L₂_eq_serre",
+    "KanekoZagier.L₃_eq_serre",
+    "KanekoZagier.coeff_L₂",
+    "KanekoZagier.coeff_L₃",
+    "KanekoZagier.L₃_comp_L₂_eq_L₂_comp_L₃"
+  ],
+  "permitted_axioms": [
+    "propext",
+    "Quot.sound",
+    "Classical.choice",
+    "QExpansion.ramanujan_E₂",
+    "QExpansion.ramanujan_E₄",
+    "QExpansion.ramanujan_E₆"
+  ],
+  "enable_nanoda": false
+}

@@ -10,6 +10,21 @@ relaxedAutoImplicit = false
 weak.linter.mathlibStandardSet = true
 maxSynthPendingDepth = 3
 
+# Independent checker for the main theorems: `lake exe comparator comparator/<Topic>.json` checks
+# the proofs in `Posqmf` against the statements in `PosqmfChallenge/` (see `PosqmfChallenge/README.md`).
+[[require]]
+name = "Comparator"
+git = "https://github.com/leanprover/comparator"
+rev = "v4.35.0"
+
+# The blueprint, rendered with `lake exe vbp build` (see `scripts/ci-pages.sh`).
+[[require]]
+name = "VersoBlueprint"
+git = "https://github.com/leanprover/verso-blueprint"
+rev = "v4.35.0"
+
+# Mathlib last, so that its pins of the shared dependencies (batteries, proofwidgets, …) take
+# precedence over those of Comparator and VersoBlueprint, as `lake exe cache get` needs.
 [[require]]
 name = "mathlib"
 scope = "leanprover-community"
@@ -17,4 +32,20 @@ rev = "v4.35.0"
 
 [[lean_lib]]
 name = "posqmf"
-globs = ["D_6_3", "PolymodInequalities.+", "QuasiModularForms.+", "SigmaBounds", "UncertaintyPrinciple.+", "X_16_5"]
+globs = ["D_6_3", "PolymodInequalities.+", "Posqmf", "QuasiModularForms.+", "SigmaBounds", "UncertaintyPrinciple.+", "X_16_5"]
+
+# Comparator challenges: the statements of the main results, each file importing only Mathlib.
+# Deliberately outside `defaultTargets`, since every theorem there is a `sorry`; Comparator builds
+# these modules itself. There is no root module: the files restate the same definitions, so they
+# cannot be imported together.
+[[lean_lib]]
+name = "PosqmfChallenge"
+globs = ["PosqmfChallenge.+"]
+
+# The blueprint. Verso documents are one long command per chapter, to which Mathlib's style
+# linters do not apply.
+[[lean_lib]]
+name = "PosqmfBlueprint"
+[lean_lib.leanOptions]
+weak.linter.mathlibStandardSet = false
+weak.linter.style.longLine = false

@@ -1,0 +1,80 @@
+name: Blueprint
+
+# Builds the Verso blueprint of `posqmf/lean` (see `posqmf/README.md`) on every pull request, and
+# deploys it to GitHub Pages on pushes to `main`. Deployment needs GitHub Pages to be enabled for
+# the repository with "GitHub Actions" as its source.
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: ${{ github.repository }}-blueprint-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build blueprint site
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    defaults:
+      run:
+        working-directory: posqmf/lean
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install elan
+        working-directory: .
+        run: |
+          curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf \
+            | sh -s -- -y --default-toolchain none
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+
+      # Mathlib comes from `lake exe cache get`; Verso and VersoBlueprint have no such cache.
+      - name: Restore Verso and project build caches
+        uses: actions/cache@v4
+        with:
+          path: |
+            posqmf/lean/.lake/packages/verso
+            posqmf/lean/.lake/packages/VersoBlueprint
+            posqmf/lean/.lake/packages/subverso
+            posqmf/lean/.lake/packages/verso-slides
+            posqmf/lean/.lake/packages/MD4Lean
+            posqmf/lean/.lake/packages/illuminate
+            posqmf/lean/.lake/packages/lean_vir
+            posqmf/lean/.lake/build
+          key: ${{ runner.os }}-blueprint-${{ hashFiles('posqmf/lean/lean-toolchain', 'posqmf/lean/lake-manifest.json', 'posqmf/lean/lakefile.toml') }}-${{ hashFiles('posqmf/lean/**/*.lean') }}
+          restore-keys: |
+            ${{ runner.os }}-blueprint-${{ hashFiles('posqmf/lean/lean-toolchain', 'posqmf/lean/lake-manifest.json', 'posqmf/lean/lakefile.toml') }}-
+
+      - name: Fetch the Mathlib cache
+        run: lake exe cache get
+
+      - name: Build the blueprint site
+        run: ./scripts/ci-pages.sh
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: posqmf/lean/_out/site/html-multi
+
+  deploy:
+    name: Deploy to GitHub Pages
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

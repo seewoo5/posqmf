@@ -149,11 +149,11 @@ The $q$-expansion layer (`Basic`, `Eisenstein`, `Ramanujan`, `Serre`) lives in n
 
 ### `UncertaintyPrinciple`
 
-The directory `lean/UncertaintyPrinciple` formalizes the coefficient-positivity arguments of the paper [*Positive quasimodular forms and the sign uncertainty principle*](https://arxiv.org/abs/2608.15415) that sit on top of the operator layer.
+The directory `lean/UncertaintyPrinciple` formalizes the coefficient-positivity arguments of the paper [*Positive quasimodular forms and the sign uncertainty principle*](https://arxiv.org/abs/2608.15415) that sit on top of the operator layer. Numbering follows the second arXiv version of the paper.
 
-- `LogInequalities.lean` proves the four elementary logarithm inequalities behind the base cases of the positivity of $Y_w$ (Lemma 4.10 and the $Y_4$, $Y_8$, $Y_{10}$ cases of Theorem 4.11), via the mean value theorem.
-- `F.lean` proves positivity of the Fourier coefficients of $`\widetilde{F}_{w-2}`$ (Proposition 4.5), assuming nothing. Its `QExpansion` section runs the induction in $\mathbb{R}[[q]]$ from the recurrence (Lemma 4.4); its `PolynomialModel` section defines the family by that recurrence, indexed so that `fFam N` is the paper's $`F_{4N}`$ (with $F_8$ explicit and $F_0, F_4$ set to zero), sets $`\widetilde{F}_{w-2} := \delta F_w`$ (as `ftildeFam`, of weight $4N-2$, with `ftildeSeries` its $q$-expansion), and supplies the vanishing order and the normalization, the latter through the modular linear differential equation $`L_{3,w-2}^{((w-4)/4,\,0)}F_w = 0`$. The two sections open different namespaces, since `KanekoZagier` and `QuasiModular` both name $D$, $E_2, E_4, E_6$ and $\partial_k$.
-- `G.lean` proves nonnegativity of the Fourier coefficients of $`\widetilde{G}_w`$ (Propositions 4.21 and 4.22), also assuming nothing, plus strict positivity of the constant term. Its third-order equation is proved by the intertwining criterion from a check on the constant $`\widetilde{G}_0`$. The positivity argument needs no polynomial model, since no $\delta$ appears; the family is nevertheless defined there, as $`\widetilde{G}_{4N}`$ of weight $4N$ with $`\delta\widetilde{G}_w = 0`$ — the paper's level 1 modular form — which the $q$-expansion layer cannot state; `gtildeSeries` is its $q$-expansion and the recurrence becomes a theorem.
+- `LogInequalities.lean` proves the four elementary logarithm inequalities behind the base cases of the positivity of $Y_w$ (Lemma 4.17 and the $Y_4$, $Y_8$, $Y_{10}$ cases of Theorem 4.18), via the mean value theorem.
+- `F.lean` proves positivity of the Fourier coefficients of $`\widetilde{F}_{w-2}`$ (Proposition 4.9), assuming nothing. Its `QExpansion` section runs the induction in $\mathbb{R}[[q]]$ from the recurrence (Lemma 4.8); its `PolynomialModel` section defines the family by that recurrence, indexed so that `fFam N` is the paper's $`F_{4N}`$ (with $F_8$ explicit and $F_0, F_4$ set to zero), sets $`\widetilde{F}_{w-2} := \delta F_w`$ (as `ftildeFam`, of weight $4N-2$, with `ftildeSeries` its $q$-expansion), and supplies the vanishing order and the normalization, the latter through the modular linear differential equation $`L_{3,w-2}^{((w-4)/4,\,0)}F_w = 0`$. The two sections open different namespaces, since `KanekoZagier` and `QuasiModular` both name $D$, $E_2, E_4, E_6$ and $\partial_k$.
+- `G.lean` proves nonnegativity of the Fourier coefficients of $`\widetilde{G}_w`$ (Propositions 4.23 and 4.24), also assuming nothing, plus strict positivity of the constant term. Its third-order equation is proved by the intertwining criterion from a check on the constant $`\widetilde{G}_0`$. The positivity argument needs no polynomial model, since no $\delta$ appears; the family is nevertheless defined there, as $`\widetilde{G}_{4N}`$ of weight $4N$ with $`\delta\widetilde{G}_w = 0`$ — the paper's level 1 modular form — which the $q$-expansion layer cannot state; `gtildeSeries` is its $q$-expansion and the recurrence becomes a theorem.
 
 Most results use the Ramanujan axioms of `QuasiModularForms/Ramanujan.lean`. The exceptions are `LogInequalities.lean` and the `QExpansion` sections of both files, which never meet the polynomial model — as do the polynomial facts themselves, since only the $q$-expansion map `qexp` needs those axioms.
 
@@ -164,3 +164,24 @@ Neither file identifies its family with the paper's $F_w$ and $`\widetilde{G}_w`
 - `X_16_5.lean` verifies that the extremal quasimodular form $X_{16, 5}$ of weight $16$ and depth $5$ has negative coefficients for $n \ge 250$. Negativity for $8 \le n < 250$ is checked separately in `notebooks/miscellaneous.ipynb`. Written by Claude Opus 4.7.
 - `D_6_3.lean` verifies the positivity of the coefficients of $\mathcal{D}_{6, 3}$. Written by Claude Opus 4.7.
 - `SigmaBounds.lean` include basic inequalities for the divisor sum function, which are used in the above two files. Written by Claude Opus 4.7.
+
+`Posqmf.lean` imports all of the above.
+
+### Blueprint
+
+`lean/PosqmfBlueprint` is a [Verso blueprint](https://github.com/leanprover/verso-blueprint) of the Lean code: the informal statements and proofs, taken from the papers, with each statement linked to the Lean declarations that formalize it, a dependency graph, and a progress summary in which the results resting on the Ramanujan axioms (or on Deligne's bound) are marked as such.
+It is published at <https://seewoo5.github.io/posqmf/>.
+To build it locally, run inside `posqmf/lean`
+
+```sh
+./scripts/ci-pages.sh
+python3 -m http.server 8000 -d _out/site/html-multi
+```
+
+and open <http://localhost:8000>. The site must be served over HTTP, since the pages fetch their data files.
+
+### Comparator challenges
+
+`lean/PosqmfChallenge` restates the main results, one file per topic, each importing only Mathlib and therefore restating every definition (and axiom) its statements need.
+[Comparator](https://github.com/leanprover/comparator) checks the proofs in `Posqmf` against them; the configurations are in `lean/comparator`, and CI runs all of them.
+See [`lean/PosqmfChallenge/README.md`](lean/PosqmfChallenge/README.md) for what is checked and how to run it locally.
