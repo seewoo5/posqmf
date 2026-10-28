@@ -1,7 +1,17 @@
 import Mathlib.Algebra.Order.Ring.Star
+import Mathlib.Algebra.Order.Star.Int
 import Mathlib.Analysis.SpecialFunctions.ExpDeriv
-import Mathlib.Data.Int.Star
 import Mathlib.MeasureTheory.Integral.IntervalIntegral.FundThmCalculus
+
+/-!
+# Inequality (41) of *Inequalities involving polynomials and quasimodular forms*
+
+We prove `f_pos`: for `t > 0`, the function
+
+  `f t = ∑_{k=0}^{8} (a_k t + b_k) e^{k t}`
+
+is positive, where `a_k = aCoeffs k` and `b_k = bCoeffs k`.
+-/
 
 def aCoeffs : Fin 9 → ℤ
   | 0 => 1

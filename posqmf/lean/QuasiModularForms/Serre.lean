@@ -1,4 +1,4 @@
-import posqmf.lean.QuasiModularForms.Ramanujan
+import QuasiModularForms.Ramanujan
 
 /-!
 # The Serre derivative on formal `q`-expansions

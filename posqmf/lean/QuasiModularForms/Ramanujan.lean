@@ -1,5 +1,5 @@
 import Mathlib.Tactic.Module
-import posqmf.lean.QuasiModularForms.Eisenstein
+import QuasiModularForms.Eisenstein
 
 /-!
 # Ramanujan's identities

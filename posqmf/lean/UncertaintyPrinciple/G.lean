@@ -1,7 +1,7 @@
-import posqmf.lean.QuasiModularForms.Coefficients
-import posqmf.lean.QuasiModularForms.Intertwine
-import posqmf.lean.QuasiModularForms.PolynomialModel
-import posqmf.lean.SigmaBounds
+import QuasiModularForms.Coefficients
+import QuasiModularForms.Intertwine
+import QuasiModularForms.PolynomialModel
+import SigmaBounds
 
 /-!
 # Nonnegativity of the Fourier coefficients of `G̃_w`

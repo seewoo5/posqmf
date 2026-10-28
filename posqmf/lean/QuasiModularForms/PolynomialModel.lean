@@ -1,7 +1,7 @@
 import Mathlib.Algebra.MvPolynomial.Derivation
 import Mathlib.Algebra.MvPolynomial.PDeriv
 import Mathlib.RingTheory.Derivation.Lie
-import posqmf.lean.QuasiModularForms.Serre
+import QuasiModularForms.Serre
 
 /-!
 # The polynomial model `ℝ[E₂,E₄,E₆]` and the operator `δ = ∂/∂E₂`

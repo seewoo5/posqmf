@@ -2,6 +2,14 @@ import Mathlib.Algebra.Order.Ring.Star
 import Mathlib.Algebra.Order.Star.Real
 import Mathlib.Analysis.SpecialFunctions.Pow.Real
 
+/-!
+# Inequality (61) of *Inequalities involving polynomials and quasimodular forms*
+
+We prove `main_inequality`: for `k ≥ 1`,
+
+  `2560/3 · 2^{9k} - 40/3 · 2^{2k} - 17/21 ((k + 2) 2^{11(k+1)/2} + 1048 (k + 1) 2^{11k/2}) > 0`.
+-/
+
 private lemma two_rpow_pos (x : ℝ) : (0 : ℝ) < (2 : ℝ) ^ x :=
   Real.rpow_pos_of_pos (by norm_num) x
 

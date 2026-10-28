@@ -1,4 +1,4 @@
-import posqmf.lean.QuasiModularForms.KanekoZagier
+import QuasiModularForms.KanekoZagier
 
 /-!
 # The intertwining criterion for the Kaneko--Zagier operators

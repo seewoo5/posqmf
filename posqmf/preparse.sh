@@ -1,8 +1,11 @@
 #!/bin/bash
 
+# Work relative to this script's directory, so that it can be run from anywhere
+cd "$(dirname "$0")" || exit 1
+
 # Define the source and destination directories
-SOURCE_DIR="./posqmf/sage"
-DEST_DIR="./posqmf"
+SOURCE_DIR="./sage"
+DEST_DIR="."
 INIT_FILE="$DEST_DIR/__init__.py"
 
 # Check if the source directory exists

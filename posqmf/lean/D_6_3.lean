@@ -1,4 +1,4 @@
-import posqmf.lean.SigmaBounds
+import SigmaBounds
 
 /-!
 # Positivity of `(A_n + B_{n/2}) / 2688` for `n ≥ 5`

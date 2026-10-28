@@ -1,7 +1,7 @@
-import posqmf.lean.QuasiModularForms.Coefficients
-import posqmf.lean.QuasiModularForms.Intertwine
-import posqmf.lean.QuasiModularForms.PolynomialModel
-import posqmf.lean.SigmaBounds
+import QuasiModularForms.Coefficients
+import QuasiModularForms.Intertwine
+import QuasiModularForms.PolynomialModel
+import SigmaBounds
 
 /-!
 # The family `F_w` and the positivity of `F̃_{w-2}`
@@ -249,7 +249,7 @@ theorem ftildeStep_boundary {N : ℕ} {w : ℝ} (hw : w = 4 * N + 12) {F Ft : �
 
 private lemma coeff_E₄_of_pos {m : ℕ} (hm : 1 ≤ m) : coeff m E₄ = 240 * (σ 3 m : ℝ) := by
   rw [E₄, map_add, PowerSeries.coeff_smul, smul_eq_mul, coeff_qSigma, PowerSeries.coeff_one,
-    if_neg (by lia), zero_add]
+    ite_eq_right (by lia), zero_add]
 
 private lemma coeff_E₄_nonneg (m : ℕ) : 0 ≤ coeff m E₄ := by
   rw [E₄, map_add, PowerSeries.coeff_smul, smul_eq_mul, coeff_qSigma, PowerSeries.coeff_one]

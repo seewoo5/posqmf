@@ -3,6 +3,16 @@ import Mathlib.Algebra.Order.Star.Real
 import Mathlib.Analysis.SpecialFunctions.Pow.Real
 import Mathlib.NumberTheory.ArithmeticFunction.Misc
 
+/-!
+# Inequality (60) of *Inequalities involving polynomials and quasimodular forms*
+
+We prove `main_theorem`: for `m ≥ 3`,
+
+  `2520/3 m⁹ - 18224/21 d(m) m^{11/2} + 12/7 m¹⁰ > 0`,
+
+where `d(m) = divisorCount m` is the number of divisors of `m`.
+-/
+
 abbrev divisorCount (n : ℕ) : ℕ := (ArithmeticFunction.sigma 0) n
 
 private lemma sigma0_mul_rpow_le_pow7 (m : ℕ) (hm : 1 ≤ m) :
