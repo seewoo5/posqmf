@@ -2,6 +2,7 @@ import Verso
 import VersoManual
 import VersoBlueprint
 import PosqmfBlueprint.Bibliography
+import PosqmfBlueprint.TitleMath
 import UncertaintyPrinciple.F
 
 open Verso.Genre
@@ -10,7 +11,7 @@ open Informal
 
 set_option verso.blueprint.foldCodeBlocks true
 
-#doc (Manual) "The family F and the coefficients of F̃" =>
+#doc (Manual) "The family $`F` and the coefficients of $`F̃`" =>
 %%%
 tag := "f-family"
 file := "F-family"
@@ -47,7 +48,10 @@ then runs the coefficient induction on $`q`-expansions. In Lean, `fFam N` is $`F
 `ftildeFam N` is $`\widetilde{F}_{4N-2}`; the forms $`F_0` and $`F_4` do not exist and are set to
 $`0`.
 
-# The family F
+# The family $`F`
+%%%
+file := "The-family-F"
+%%%
 
 :::definition "def:F_family" (parent := "grp:F") (lean := "UncertaintyPrinciple.fFam, UncertaintyPrinciple.F₈, UncertaintyPrinciple.SFp, UncertaintyPrinciple.cF")
 %%%
@@ -159,7 +163,7 @@ off-diagonal coefficients at the cusp index are $`\frac{8N + 11}{6}` and $`-4(24
 they combine with $`c_w` to exactly $`1`.
 :::
 
-# The forms F̃ and their recurrence
+# The forms $`F̃` and their recurrence
 %%%
 file := "Ftilde-recurrence"
 %%%
@@ -209,7 +213,7 @@ $`\frac{1}{86400} E_4 E_4'`. Both factors have nonnegative coefficients, with
 $`[q^n]E_4' = 240 n \sigma_3(n) > 0` for $`n \ge 1`.
 :::
 
-# Positivity of the coefficients of F̃
+# Positivity of the coefficients of $`F̃`
 %%%
 file := "Ftilde-positivity"
 %%%
