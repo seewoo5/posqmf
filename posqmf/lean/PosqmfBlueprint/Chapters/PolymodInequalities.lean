@@ -64,9 +64,11 @@ with $`0^0 = 1`, and $`f(0) = \sum_k b_k = 0`.
 $`\frac{d^n}{dt^n}\left(t e^{kt}\right) = (n k^{n-1} + k^n t) e^{kt}` by induction on $`n`, and
 $`\frac{d^n}{dt^n} e^{kt} = k^n e^{kt}`. The Taylor expansion of $`f` at $`0` is therefore
 $`f(t) = \sum_{n \ge 0} \frac{c_n}{n!} t^n`, where for $`n \ge 2`
-$$`\begin{aligned} c_n &= (n - 64) 8^{n-1} + (502n - 13376) 7^{n-1} + (14608 n - 194208) 6^{n-1} \\ &\quad + (88234 n - 453040) 5^{n-1} + 156190 n 4^{n-1} + (88234n + 271824) 3^{n-1} \\ &\quad + (14608 n + 64736) 2^{n-1} + (502 n + 1968). \end{aligned}`
-(The paper writes $`c_0 = f(0) = 8` and sums over $`1 \le k \le 8` only; in fact $`c_0 = Q(1) = 0`,
-and the term $`k = 0` adds $`a_0 = 1` to $`c_1`. Neither affects the argument.)
+$$`\begin{aligned} c_n &= (n - 64) 8^{n-1} + (502n - 13776) 7^{n-1} + (14608 n - 194208) 6^{n-1} \\ &\quad + (88234 n - 453040) 5^{n-1} + 156190 n 4^{n-1} + (88234n + 271824) 3^{n-1} \\ &\quad + (14608 n + 64736) 2^{n-1} + (502 n + 1968). \end{aligned}`
+(Version 1 of the paper takes $`b_k` to be the coefficients of $`Q` rather than $`-Q`, writes
+$`c_0 = f(0) = 8` and $`502n - 13376`, and sums over $`1 \le k \le 8` only. In fact
+$`c_0 = -Q(1) = 0`, $`7 b_7 = -13776`, and the term $`k = 0` adds $`a_0 = 1` to $`c_1`, so that
+$`c_1 = 40320`. None of this affects the argument.)
 :::
 
 :::lemma_ "lem:fpos_cn" (parent := "grp:polymod") (lean := "iteratedDeriv_f_zero_pos, derivSumInt_pos_small, term_nonneg_large_n, term_one_pos_large_n")

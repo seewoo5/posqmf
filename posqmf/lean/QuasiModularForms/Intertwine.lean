@@ -3,9 +3,9 @@ import QuasiModularForms.KanekoZagier
 /-!
 # The intertwining criterion for the Kaneko--Zagier operators
 
-This file proves the computational content of the intertwining criterion (item 1.4 and the
-sufficiency half of 1.5 of the verification plan).  Following the paper we work throughout with
-the Serre-derivative normal forms
+This file proves the intertwining criterion, Lemma 2.4 of *Positive quasimodular forms and the sign
+uncertainty principle*, together with the normal forms (29) and (30) from its proof.  Following
+the paper we work throughout with the Serre-derivative normal forms
 
 `L_{2,k}^γ = ∂_k² + C E₄`,  `L_{3,k}^{(α,β)} = ∂_k³ + A E₄∂_k + B E₆`,
 
@@ -21,9 +21,9 @@ where `A`, `B`, `C` are the shifted parameters defined below; the `D`-forms `L�
 * `KanekoZagier.L₃_comp_L₂_eq_L₂_comp_L₃`: the same statement for the `D`-forms `L₂`, `L₃`, with
   the shifted parameters spelled out.
 
-The converse implication is not proved here: it needs the uniqueness of the Serre-derivative normal
-form, i.e. that `∂_k⁵`, `E₄∂_k³`, `E₆∂_k²`, `E₄²∂_k` and `E₄E₆` are linearly independent as
-operators.  That direction remains a Sage check.
+Lemma 2.4 asserts only this implication, and its converse is not proved here: it would need the
+uniqueness of the Serre-derivative normal form, i.e. that `∂_k⁵`, `E₄∂_k³`, `E₆∂_k²`, `E₄²∂_k` and
+`E₄E₆` are linearly independent as operators.
 -/
 
 namespace KanekoZagier

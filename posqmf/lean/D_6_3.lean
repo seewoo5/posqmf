@@ -14,7 +14,7 @@ and the rational sequence
 
 where `B_{n/2} = 0` if `n` is odd. We prove `a_n > 0` for every `n ≥ 5`.
 
-The strategy follows the sketch in `D_6_3.tex`:
+The proof runs as follows:
 
 * Use the trivial bounds `nᵏ ≤ σₖ(n) ≤ 2 nᵏ` for `k ≥ 2` (and `n ≥ 1`).
 * These yield, for `n ≥ 1`,
